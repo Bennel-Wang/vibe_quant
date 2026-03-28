@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}策略回测 - 量化交易系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>策略回测</h2>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5>回测设置</h5>
+            </div>
+            <div class="card-body">
+                <form id="backtest-form">
+                    <div class="mb-3">
+                        <label class="form-label">选择股票</label>
+                        <select class="form-select" id="backtest-stock" required>
+                            <option value="">请选择</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">买入策略</label>
+                        <select class="form-select" id="buy-strategy" required>
+                            <option value="">请选择</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">卖出策略 <small class="text-muted">（不选则与买入策略相同）</small></label>
+                        <select class="form-select" id="sell-strategy">
+                            <option value="">与买入策略相同</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">开始日期</label>
+                        <input type="date" class="form-control" id="start-date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">结束日期</label>
+                        <input type="date" class="form-control" id="end-date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">初始资金</label>
+                        <input type="number" class="form-control" id="initial-capital" value="1000000" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">开始回测</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header">
+                <h5>回测结果</h5>
+            </div>
+            <div class="card-body">
+                <div id="backtest-results">
+                    <p class="text-muted text-center">请设置回测参数并点击"开始回测"</p>
+                </div>
+                <div id="equity-chart" style="height: 400px; display: none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // 统一初始化：加载股票与策略，设置默认日期
+    function loadStocksAndStrategies(){
+        // 加载股票列表
+        $.get('/api/stocks').done(function(data){
+            var select = $('#backtest-stock');
+            select.empty().append('<option value="">请选择</option>');
+            data.forEach(function(stock){
+                try{
+                    if (stock && stock.type === 'stock'){
+                        select.append('<option value="'+stock.full_code+'">'+(stock.name||stock.full_code)+' ('+stock.full_code+')</option>');
+                    }
+                }catch(e){console.error('填充股票失败', e, stock);}            
+            });
+        }).fail(function(){
+            console.warn('获取股票列表失败');
+        });
+        // 加载策略列表（买入只显示has_buy，卖出只显示has_sell）
+        var _sellStratsBacktest = [];
+        $.get('/api/strategies').done(function(data){
+            var buySelect = $('#buy-strategy');
+            var sellSelect = $('#sell-strategy');
+            buySelect.empty().append('<option value="">请选择</option>');
+            sellSelect.empty().append('<option value="">与买入策略相同</option>');
+            _sellStratsBacktest = [];
+            data.forEach(function(strategy){
+                try{
+                    var key = strategy.key || strategy.id || strategy;
+                    var name = strategy.name || strategy.title || key;
+                    if (strategy.has_buy) {
+                        buySelect.append('<option value="'+key+'">'+name+'</option>');
+                    }
+                    if (strategy.has_sell) {
+                        sellSelect.append('<option value="'+key+'">'+name+'</option>');
+                        _sellStratsBacktest.push({key: key, name: name});
+                    }
+                }catch(e){console.error('填充策略失败', e, strategy);}
+            });
+            // 买入策略改变时自动匹配卖出策略
+            buySelect.off('change.automatch').on('change.automatch', function(){
+                var buyName = buySelect.find('option:selected').text();
+                var matched = _findMatchingSellStrategy(buyName, _sellStratsBacktest);
+                if (matched) sellSelect.val(matched);
+            });
+        }).fail(function(){
+            console.warn('获取策略列表失败');
+        });
+    }
+
+    // 设置默认开始/结束日期
+    var today = new Date();
+    var oneYearAgo = new Date(); oneYearAgo.setFullYear(today.getFullYear()-1);
+    $('#end-date').val(today.toISOString().split('T')[0]);
+    $('#start-date').val(oneYearAgo.toISOString().split('T')[0]);
+
+    loadStocksAndStrategies();
+
+    // 如果需要在页面其它时刻刷新下拉，可暴露一个方法
+    window.refreshBacktestSelectors = loadStocksAndStrategies;
+});
+
+// 根据买入策略名称自动匹配卖出策略（最长公共前缀或去"买入"换"卖出"）
+function _findMatchingSellStrategy(buyName, sellStrats) {
+    if (!buyName || !sellStrats || !sellStrats.length) return null;
+    // 尝试：去掉"买入"后缀 + "卖出"精确匹配
+    var base = buyName.replace(/买入$/, '').replace(/买$/, '');
+    for (var i = 0; i < sellStrats.length; i++) {
+        if (sellStrats[i].name === base + '卖出' || sellStrats[i].key === base + '卖出') {
+            return sellStrats[i].key;
+        }
+    }
+    // 尝试：最长公共前缀（至少2字符）
+    var bestKey = null, bestLen = 1;
+    for (var i = 0; i < sellStrats.length; i++) {
+        var sn = sellStrats[i].name, len = 0;
+        for (var j = 0; j < Math.min(buyName.length, sn.length); j++) {
+            if (buyName[j] === sn[j]) len++; else break;
+        }
+        if (len > bestLen) { bestLen = len; bestKey = sellStrats[i].key; }
+    }
+    return bestKey;
+}
+
+// 格式化与渲染函数
+function fmtNum(v, digits){ if (v===null||v===undefined) return '-'; var n=Number(v); if (isNaN(n)) return '-'; return n.toFixed(digits);}
+
+function displayResults(result){
+    try{
+        var html = '<div class="row">';
+        html += '<div class="col-md-4"><h6>收益指标</h6><table class="table table-sm">';
+        html += '<tr><td>初始资金</td><td>¥'+(result.initial_capital!=null?Number(result.initial_capital).toLocaleString():'-')+'</td></tr>';
+        html += '<tr><td>最终资金</td><td>¥'+(result.final_capital!=null?Number(result.final_capital).toLocaleString():'-')+'</td></tr>';
+        var total_pct = (result.total_return_pct!=null?Number(result.total_return_pct):0);
+        html += '<tr><td>总收益</td><td class="'+(total_pct>=0?'positive':'negative')+'">'+(result.total_return_pct!=null?Number(result.total_return_pct).toFixed(2)+'%':'-')+'</td></tr>';
+        html += '<tr><td>年化收益</td><td>'+(fmtNum(result.annual_return,2)!='-'?fmtNum(result.annual_return,2)+'%':'-')+'</td></tr>';
+        html += '<tr><td>夏普比率</td><td>'+(fmtNum(result.sharpe_ratio,2)!='-'?fmtNum(result.sharpe_ratio,2):'-')+'</td></tr>';
+        html += '</table></div>';
+        html += '<div class="col-md-4"><h6>风险指标</h6><table class="table table-sm">';
+        html += '<tr><td>最大回撤</td><td class="negative">'+(fmtNum(result.max_drawdown_pct,2)!='-'?fmtNum(result.max_drawdown_pct,2)+'%':'-')+'</td></tr>';
+        html += '</table></div>';
+        html += '<div class="col-md-4"><h6>交易统计</h6><table class="table table-sm">';
+        html += '<tr><td>总交易次数</td><td>'+(result.total_trades!=null?result.total_trades:'-')+'</td></tr>';
+        html += '<tr><td>胜率</td><td>'+(fmtNum(result.win_rate,2)!='-'?fmtNum(result.win_rate,2)+'%':'-')+'</td></tr>';
+        html += '<tr><td>盈亏比</td><td>'+(fmtNum(result.profit_factor,2)!='-'?fmtNum(result.profit_factor,2):'-')+'</td></tr>';
+        html += '</table></div></div>';
+
+        if (result.trades && result.trades.length>0){
+            html += '<h6 class="mt-3">交易明细 <small class="text-muted">（共 '+result.trades.length+' 条，可滚动查看）</small></h6>';
+            html += '<div style="max-height:420px;overflow-y:scroll;border:1px solid #dee2e6;border-radius:4px;">';
+            html += '<table class="table table-sm table-striped mb-0"><thead style="position:sticky;top:0;z-index:1;background:#f8f9fa;"><tr><th>日期</th><th>操作</th><th>数量</th><th>价格</th><th>金额</th></tr></thead><tbody>';
+            result.trades.forEach(function(trade, idx){
+                var price = (trade.price==null?'-':(Number(trade.price).toFixed(2)));
+                var amount = (trade.amount==null?'-':Number(trade.amount).toLocaleString());
+                var dateStr = trade.date || '';
+                html += '<tr>';
+                html += '<td>'+ dateStr +'</td>';
+                html += '<td class="'+(trade.action==='buy'?'positive':'negative')+'">'+(trade.action==='buy'?'买入':'卖出')+'</td>';
+                html += '<td>'+(trade.shares!=null?trade.shares:'-')+'</td>';
+                html += '<td>¥'+price+'</td>';
+                html += '<td>¥'+amount+'</td>';
+                html += '</tr>';
+            });
+            html += '</tbody></table></div>';
+        }
+
+        $('#backtest-results').html(html);
+    }catch(e){ console.error('displayResults error', e); $('#backtest-results').html('<p class="text-danger text-center">显示结果失败</p>'); }
+}
+
+function loadEquityChart(data, run_id){
+    try{
+        $('#equity-chart').show();
+        var payload = data || {};
+        if (run_id) payload.run_id = run_id;
+        $.ajax({url:'/api/backtest/chart',method:'POST',contentType:'application/json',data:JSON.stringify(payload),success:function(chartData){ try{ if (!chartData.error){
+                    // Ensure y-axis label for cumulative returns
+                    if (chartData.layout) {
+                        var ly = chartData.layout;
+                        if (ly.yaxis2) { ly.yaxis2.title = '累计收益(%)'; }
+                        else if (ly.yaxis) { ly.yaxis.title = '累计收益(%)'; }
+                    }
+                    Plotly.newPlot('equity-chart', chartData.data, chartData.layout); } else { console.warn('chart error', chartData.error); $('#equity-chart').html('<p class="text-danger">图表数据错误</p>'); } }catch(e){ console.error('绘制图表失败', e); } }, error:function(){ console.warn('获取回测图表失败'); $('#equity-chart').html('<p class="text-danger">获取图表失败</p>'); }});
+    }catch(e){ console.error('loadEquityChart error', e); }
+}
+
+// SSE-enabled submit handler: 支持后台任务（202 + run_id）并回退到同步返回
+$(function(){
+    $('#backtest-form').off('submit').on('submit', function(e){
+        e.preventDefault();
+        var data = {
+            code: $('#backtest-stock').val(),
+            buy_strategy: $('#buy-strategy').val(),
+            sell_strategy: $('#sell-strategy').val() || undefined,
+            start_date: $('#start-date').val().replace(/-/g,''),
+            end_date: $('#end-date').val().replace(/-/g,''),
+            initial_capital: parseFloat($('#initial-capital').val())
+        };
+        if (!data.code || !data.buy_strategy){ $('#backtest-results').html('<p class="text-danger text-center">请选择股票和买入策略</p>'); return; }
+        $('#backtest-results').html('<p class="text-center">回测提交中...</p>');
+        $.ajax({url:'/api/backtest/run', method:'POST', contentType:'application/json', data:JSON.stringify(data), success:function(resp, statusText, jqXHR){
+            var status = jqXHR.status || 200;
+            if (status === 202 || (resp && resp.run_id)){
+                var run_id = resp.run_id || null;
+                if (!run_id){ $('#backtest-results').html('<p class="text-danger text-center">无法获取 run_id</p>'); return; }
+                $('#backtest-results').html('<div id="bt-progress">进度: <span id="bt-progress-text">0%</span> (<span id="bt-eta">-</span>)</div><div class="progress"><div id="bt-progress-bar" class="progress-bar" role="progressbar" style="width:0%"></div></div>');
+                var es = new EventSource('/api/backtest/progress?run_id='+encodeURIComponent(run_id));
+                es.onmessage = function(e){ try{ var info = JSON.parse(e.data); if (info.total && info.total>0){ var pct=Math.round((info.processed/info.total)*100); $('#bt-progress-text').text(pct+'%'); $('#bt-progress-bar').css('width', pct+'%'); } if (info.eta!=null && info.eta!=undefined) $('#bt-eta').text('ETA '+Math.round(info.eta)+'s'); if (info.status==='done' || info.status==='error'){ es.close(); $.get('/api/backtest/result?run_id='+encodeURIComponent(run_id), function(res){ if (res && res.status==='done' && res.result){ displayResults(res.result); loadEquityChart(data, run_id);} else if (res && res.status==='error'){ $('#backtest-results').html('<p class="text-danger text-center">回测出错: '+(res.error||'未知错误')+'</p>'); } else { $('#backtest-results').html('<p class="text-danger text-center">回测结果不可用</p>'); } }); } }catch(err){ console.error('进度解析失败', err, e.data);} };
+                es.onerror=function(err){ console.error('SSE错误', err); };
+            }else{
+                // 兼容旧行为：同步返回结果
+                try{ displayResults(resp); loadEquityChart(data);}catch(e){ $('#backtest-results').html('<p class="text-danger text-center">回测返回数据格式不正确</p>'); }
+            }
+        }, error:function(xhr){ var error = xhr.responseJSON?xhr.responseJSON.error:'回测提交失败'; $('#backtest-results').html('<p class="text-danger text-center">'+error+'</p>'); }});
+    });
+
+
+});
+</script>
+{% endblock %}

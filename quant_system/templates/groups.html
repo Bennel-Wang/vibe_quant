@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block title %}自选股组 - 量化交易系统{% endblock %}
+{% block content %}
+<div class="row align-items-center mb-3">
+    <div class="col"><h2>自选股组 <small class="text-muted fs-6">Watchlist Groups</small></h2></div>
+    <div class="col-auto">
+        <button class="btn btn-primary" onclick="showCreateGroupModal()">+ 新建股组</button>
+    </div>
+</div>
+
+<div class="row" id="groups-container">
+    <div class="col-12 text-center text-muted py-4" id="groups-loading">加载中...</div>
+</div>
+
+<!-- Group chart modal -->
+<div class="modal fade" id="group-chart-modal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="group-chart-title">股组收益图</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="group-chart-div" style="height:400px"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit group modal -->
+<div class="modal fade" id="group-modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="group-modal-title">新建股组</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">股组名称</label>
+                    <input type="text" class="form-control" id="group-name" placeholder="如：白酒龙头">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">添加股票</label>
+                    <div class="input-group mb-2">
+                        <select class="form-select" id="add-stock-select">
+                            <option value="">选择股票</option>
+                        </select>
+                        <input type="number" class="form-control" id="add-stock-weight" value="1" min="0.1" step="0.1" style="max-width:100px" placeholder="权重">
+                        <button class="btn btn-outline-primary" onclick="addStockToGroup()">添加</button>
+                    </div>
+                    <div id="group-stocks-list" class="border rounded p-2" style="min-height:80px">
+                        <p class="text-muted text-center small mt-2" id="no-stocks-hint">暂无股票，请从上方选择添加</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button class="btn btn-primary" onclick="saveGroup()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var groupModal, groupChartModal;
+var currentGroupStocks = [];
+
+$(function() {
+    groupModal = new bootstrap.Modal(document.getElementById('group-modal'));
+    groupChartModal = new bootstrap.Modal(document.getElementById('group-chart-modal'));
+    loadGroups();
+    loadStocksForSelect();
+});
+
+function loadGroups() {
+    $.get('/api/groups', function(data) {
+        var container = $('#groups-container');
+        if (!data.success || !data.groups || data.groups.length === 0) {
+            container.html('<div class="col-12 text-center text-muted py-5"><p>暂无股组</p><p class="small">点击「新建股组」创建第一个自选股组</p></div>');
+            return;
+        }
+        var html = '';
+        data.groups.forEach(function(g) {
+            var stocks = g.stocks || [];
+            var stockBadges = stocks.map(function(s) {
+                return '<span class="badge bg-secondary me-1">' + (s.name || s.code) + 
+                       '<small class="ms-1 opacity-75">×' + (s.weight || 1) + '</small></span>';
+            }).join('');
+            html += '<div class="col-md-4 mb-3">';
+            html += '<div class="card h-100">';
+            html += '<div class="card-header d-flex justify-content-between align-items-center">';
+            html += '<strong>' + g.name + '</strong>';
+            html += '<div>';
+            html += '<button class="btn btn-sm btn-outline-primary me-1" onclick="showGroupChart(\'' + g.name + '\')">📈 收益图</button>';
+            html += '<button class="btn btn-sm btn-outline-danger" onclick="deleteGroup(\'' + g.name + '\')">删除</button>';
+            html += '</div></div>';
+            html += '<div class="card-body">';
+            html += '<p class="small text-muted mb-1">' + stocks.length + ' 只股票</p>';
+            html += '<div>' + (stockBadges || '<span class="text-muted small">暂无股票</span>') + '</div>';
+            html += '</div>';
+            html += '<div class="card-footer">';
+            html += '<div class="row text-center g-0">';
+            stocks.forEach(function(s) {
+                html += '<div class="col-auto me-2"><a href="/stock/' + s.code + '" class="text-decoration-none small">' + (s.name || s.code) + '</a></div>';
+            });
+            html += '</div></div>';
+            html += '</div></div>';
+        });
+        container.html(html);
+    });
+}
+
+function loadStocksForSelect() {
+    $.get('/api/stocks', function(stocks) {
+        var sel = $('#add-stock-select');
+        stocks.filter(s => s.type === 'stock').forEach(function(s) {
+            sel.append('<option value="' + s.code + '" data-name="' + s.name + '">' + s.name + ' (' + s.code + ')</option>');
+        });
+    });
+}
+
+function showCreateGroupModal() {
+    $('#group-modal-title').text('新建股组');
+    $('#group-name').val('');
+    currentGroupStocks = [];
+    renderGroupStocksList();
+    groupModal.show();
+}
+
+function addStockToGroup() {
+    var sel = $('#add-stock-select');
+    var code = sel.val();
+    var name = sel.find(':selected').data('name') || code;
+    var weight = parseFloat($('#add-stock-weight').val()) || 1;
+    if (!code) { alert('请选择股票'); return; }
+    if (currentGroupStocks.find(s => s.code === code)) { alert('该股票已在列表中'); return; }
+    currentGroupStocks.push({code: code, name: name, weight: weight});
+    renderGroupStocksList();
+}
+
+function removeStockFromGroup(code) {
+    currentGroupStocks = currentGroupStocks.filter(s => s.code !== code);
+    renderGroupStocksList();
+}
+
+function renderGroupStocksList() {
+    var el = $('#group-stocks-list');
+    if (currentGroupStocks.length === 0) {
+        el.html('<p class="text-muted text-center small mt-2">暂无股票，请从上方选择添加</p>');
+        return;
+    }
+    var html = currentGroupStocks.map(function(s) {
+        return '<span class="badge bg-primary me-1 mb-1 p-2">' + s.name + ' (' + s.code + ') ×' + s.weight +
+               ' <a href="#" class="text-white ms-1" onclick="removeStockFromGroup(\'' + s.code + '\');return false">✕</a></span>';
+    }).join('');
+    el.html(html);
+}
+
+function saveGroup() {
+    var name = $('#group-name').val().trim();
+    if (!name) { alert('请填写股组名称'); return; }
+    if (currentGroupStocks.length === 0) { alert('请至少添加一只股票'); return; }
+    $.ajax({
+        url: '/api/groups',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({name: name, stocks: currentGroupStocks}),
+        success: function(r) {
+            if (r.success) { groupModal.hide(); loadGroups(); }
+            else alert('保存失败: ' + r.error);
+        },
+        error: function(xhr) { alert('保存失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '网络错误')); }
+    });
+}
+
+function deleteGroup(name) {
+    if (!confirm('确定删除股组「' + name + '」吗？')) return;
+    $.ajax({
+        url: '/api/groups/' + encodeURIComponent(name),
+        method: 'DELETE',
+        success: function(r) { if (r.success) loadGroups(); else alert('删除失败: ' + r.error); }
+    });
+}
+
+function showGroupChart(name) {
+    $('#group-chart-title').text(name + ' - 组合收益');
+    $('#group-chart-div').html('<div class="text-center py-4">加载中...</div>');
+    groupChartModal.show();
+    $.get('/api/groups/' + encodeURIComponent(name) + '/chart', function(data) {
+        if (data.success && data.chart) {
+            var chart = JSON.parse(data.chart);
+            Plotly.newPlot('group-chart-div', chart.data, chart.layout, {responsive: true});
+        } else {
+            $('#group-chart-div').html('<div class="text-center text-muted py-4">暂无收益数据</div>');
+        }
+    }).fail(function() {
+        $('#group-chart-div').html('<div class="text-center text-danger py-4">加载失败</div>');
+    });
+}
+</script>
+{% endblock %}

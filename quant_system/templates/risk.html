@@ -1,0 +1,571 @@
+{% extends "base.html" %}
+
+{% block title %}风险管理 - 量化交易系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>风险管理</h2>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="risk-level">-</div>
+                <div class="metric-label">风险等级</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="position-ratio">-</div>
+                <div class="metric-label">总仓位</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="concentration">-</div>
+                <div class="metric-label">持仓集中度</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="alert-count">-</div>
+                <div class="metric-label">风险提醒</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3" id="risk-summary-cards">
+    <div class="col-md-3">
+        <div class="card text-center border-0 bg-light">
+            <div class="card-body py-2">
+                <div class="fs-4 fw-bold" id="summary-total-capital">-</div>
+                <div class="text-muted small">总资产</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center border-0 bg-light">
+            <div class="card-body py-2">
+                <div class="fs-4 fw-bold" id="summary-available">-</div>
+                <div class="text-muted small">可用资金</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center border-0 bg-light">
+            <div class="card-body py-2">
+                <div class="fs-4 fw-bold" id="summary-position-value">-</div>
+                <div class="text-muted small">持仓市值</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center border-0 bg-light">
+            <div class="card-body py-2">
+                <div class="fs-4 fw-bold" id="summary-pnl">-</div>
+                <div class="text-muted small">浮动盈亏</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">持仓管理</h5>
+                <button class="btn btn-sm btn-primary" onclick="showAddPositionModal()">添加持仓</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped" id="positions-table">
+                        <thead>
+                            <tr>
+                                <th>代码</th>
+                                <th>名称</th>
+                                <th>持仓</th>
+                                <th>成本价</th>
+                                <th>现价</th>
+                                <th>市值</th>
+                                <th>盈亏</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="8" class="text-center">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">资金管理</h5>
+                <button class="btn btn-sm btn-primary" onclick="editCapital()">编辑</button>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <td>总资产</td>
+                        <td id="total-capital-display" class="text-end">-</td>
+                    </tr>
+                    <tr>
+                        <td>可用资金</td>
+                        <td id="available-cash-display" class="text-end">-</td>
+                    </tr>
+                    <tr>
+                        <td>持仓市值</td>
+                        <td id="position-value" class="text-end">-</td>
+                    </tr>
+                    <tr>
+                        <td>浮动盈亏</td>
+                        <td id="unrealized-pnl" class="text-end">-</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">风控设置</h5>
+                <button class="btn btn-sm btn-primary" onclick="editRiskSettings()">编辑</button>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm" id="risk-settings-table">
+                    <tr>
+                        <td>最大仓位比例</td>
+                        <td id="max-position-ratio" class="text-end">-</td>
+                    </tr>
+                    <tr>
+                        <td>单股最大仓位</td>
+                        <td id="max-single-ratio" class="text-end">-</td>
+                    </tr>
+                    <tr>
+                        <td>止损比例</td>
+                        <td id="stop-loss-ratio" class="text-end">-</td>
+                    </tr>
+                    <tr>
+                        <td>止盈比例</td>
+                        <td id="take-profit-ratio" class="text-end">-</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>风险提醒</h5>
+            </div>
+            <div class="card-body" id="risk-alerts">
+                <p class="text-muted">加载中...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加/编辑持仓模态框 -->
+<div class="modal fade" id="position-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="position-modal-title">添加持仓</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="position-form">
+                    <div class="mb-3">
+                        <label class="form-label">股票代码</label>
+                        <select class="form-select" id="position-code" required>
+                            <option value="">选择股票</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">持仓数量</label>
+                        <input type="number" class="form-control" id="position-shares" required min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">成本价</label>
+                        <input type="number" class="form-control" id="position-avg-cost" required min="0" step="0.01">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">当前价格 <small class="text-muted">（自动获取）</small></label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="position-current-price" min="0" step="0.01" placeholder="自动获取中...">
+                            <span class="input-group-text" id="price-fetch-status">—</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="savePosition()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑资金模态框 -->
+<div class="modal fade" id="capital-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑资金</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="capital-form">
+                    <div class="mb-3">
+                        <label class="form-label">总资产</label>
+                        <input type="number" class="form-control" id="edit-total-capital" required min="0" step="0.01">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted">可用资金（自动 = 总资产 − 持仓市值）</label>
+                        <input type="text" class="form-control" id="edit-available-cash-display" disabled placeholder="自动计算">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveCapital()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑风控设置模态框 -->
+<div class="modal fade" id="risk-settings-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑风控设置</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="risk-settings-form">
+                    <div class="mb-3">
+                        <label class="form-label">最大仓位比例 (%)</label>
+                        <input type="number" class="form-control" id="edit-max-position" required min="0" max="100" step="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">单股最大仓位 (%)</label>
+                        <input type="number" class="form-control" id="edit-max-single" required min="0" max="100" step="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">止损比例 (%)</label>
+                        <input type="number" class="form-control" id="edit-stop-loss" required min="0" max="100" step="0.1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">止盈比例 (%)</label>
+                        <input type="number" class="form-control" id="edit-take-profit" required min="0" max="100" step="0.1">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveRiskSettings()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var positionModal, capitalModal, riskSettingsModal;
+
+$(document).ready(function() {
+    positionModal = new bootstrap.Modal(document.getElementById('position-modal'));
+    capitalModal = new bootstrap.Modal(document.getElementById('capital-modal'));
+    riskSettingsModal = new bootstrap.Modal(document.getElementById('risk-settings-modal'));
+    
+    loadRiskData();
+    loadStockList();
+});
+
+function loadRiskData() {
+    // 加载组合风险
+    $.get('/api/risk/portfolio', function(data) {
+        var riskClass = data.risk_level === 'high' ? 'negative' : (data.risk_level === 'medium' ? 'neutral' : 'positive');
+        var riskText = data.risk_level === 'high' ? '高' : (data.risk_level === 'medium' ? '中' : '低');
+        
+        $('#risk-level').html('<span class="' + riskClass + '">' + riskText + '</span>');
+        $('#position-ratio').text((data.position_ratio * 100).toFixed(1) + '%');
+        $('#concentration').text((data.concentration * 100).toFixed(1) + '%');
+        $('#alert-count').text(data.stop_loss_alerts ? data.stop_loss_alerts.length : 0);
+        
+        $('#total-capital-display').text('¥' + data.total_capital.toLocaleString());
+        $('#available-cash-display').text('¥' + data.available_cash.toLocaleString());
+        $('#position-value').text('¥' + data.total_position_value.toLocaleString());
+        
+        var pnlEl = $('#unrealized-pnl');
+        pnlEl.text('¥' + data.total_unrealized_pnl.toLocaleString());
+        pnlEl.removeClass('positive negative');
+        if (data.total_unrealized_pnl > 0) {
+            pnlEl.addClass('positive');
+        } else if (data.total_unrealized_pnl < 0) {
+            pnlEl.addClass('negative');
+        }
+
+        // Update summary cards
+        $('#summary-total-capital').text('¥' + data.total_capital.toLocaleString());
+        $('#summary-available').text('¥' + data.available_cash.toLocaleString());
+        $('#summary-position-value').text('¥' + data.total_position_value.toLocaleString());
+        var pnl = data.total_unrealized_pnl || 0;
+        var pnlSummaryEl = $('#summary-pnl');
+        pnlSummaryEl.text((pnl >= 0 ? '+' : '') + '¥' + Math.abs(pnl).toLocaleString());
+        pnlSummaryEl.removeClass('positive negative').addClass(pnl >= 0 ? 'positive' : 'negative');
+        
+        // 风险提醒
+        var alertsHtml = '';
+        if (data.stop_loss_alerts && data.stop_loss_alerts.length > 0) {
+            alertsHtml = '<div class="alert alert-warning"><ul>';
+            data.stop_loss_alerts.forEach(function(alert) {
+                alertsHtml += '<li><strong>' + alert.name + '(' + alert.code + ')</strong>: ' + alert.reason + '</li>';
+            });
+            alertsHtml += '</ul></div>';
+        } else {
+            alertsHtml = '<div class="alert alert-success">✅ 暂无风险提醒</div>';
+        }
+        $('#risk-alerts').html(alertsHtml);
+    });
+    
+    // 加载持仓明细
+    $.get('/api/risk/positions', function(data) {
+        var tbody = $('#positions-table tbody');
+        tbody.empty();
+        
+        if (data.length === 0) {
+            tbody.append('<tr><td colspan="8" class="text-center">暂无持仓</td></tr>');
+            return;
+        }
+        
+        data.forEach(function(pos) {
+            var pnlClass = pos.unrealized_pnl > 0 ? 'positive' : (pos.unrealized_pnl < 0 ? 'negative' : 'neutral');
+            var row = '<tr>';
+            row += '<td>' + pos.code + '</td>';
+            row += '<td>' + pos.name + '</td>';
+            row += '<td>' + pos.shares + '</td>';
+            row += '<td>¥' + pos.avg_cost.toFixed(2) + '</td>';
+            row += '<td>¥' + pos.current_price.toFixed(2) + '</td>';
+            row += '<td>¥' + pos.market_value.toLocaleString() + '</td>';
+            row += '<td class="' + pnlClass + '">' + pos.unrealized_pnl_pct.toFixed(2) + '%</td>';
+            row += '<td>';
+            row += '<button class="btn btn-sm btn-warning" onclick="editPosition(\'' + pos.code + '\', ' + pos.shares + ', ' + pos.avg_cost + ', ' + pos.current_price + ')">编辑</button> ';
+            row += '<button class="btn btn-sm btn-danger" onclick="deletePosition(\'' + pos.code + '\')">删除</button>';
+            row += '</td>';
+            row += '</tr>';
+            tbody.append(row);
+        });
+    });
+    
+    // 加载风控设置
+    $.get('/api/risk/settings', function(data) {
+        $('#max-position-ratio').text((data.max_position_ratio * 100).toFixed(0) + '%');
+        $('#max-single-ratio').text((data.max_single_stock_ratio * 100).toFixed(0) + '%');
+        $('#stop-loss-ratio').text((data.stop_loss_ratio * 100).toFixed(1) + '%');
+        $('#take-profit-ratio').text((data.take_profit_ratio * 100).toFixed(1) + '%');
+    });
+}
+
+function loadStockList() {
+    $.get('/api/stocks', function(data) {
+        var select = $('#position-code');
+        select.empty();
+        select.append('<option value="">选择股票</option>');
+        data.forEach(function(stock) {
+            if (stock.type === 'stock') {
+                select.append('<option value="' + stock.full_code + '">' + stock.name + ' (' + stock.full_code + ')</option>');
+            }
+        });
+    });
+}
+
+// Auto-fetch current price when stock is selected
+$(document).on('change', '#position-code', function() {
+    var code = $(this).val();
+    if (!code) { $('#position-current-price').val(''); $('#price-fetch-status').text('—'); return; }
+    $('#price-fetch-status').text('获取中...');
+    $.get('/api/data/realtime/latest', function(resp) {
+        var info = resp.data && resp.data[code];
+        if (info && info.price) {
+            $('#position-current-price').val(parseFloat(info.price).toFixed(2));
+            $('#price-fetch-status').html('<span class="text-success">✓实时</span>');
+        } else {
+            // Fallback: try chart API for latest close
+            $.get('/api/stock/' + code + '/chart?freq=day&n=1', function(chartData) {
+                var traces = chartData.data || [];
+                var kTrace = traces.find(t => t.type === 'candlestick');
+                if (kTrace && kTrace.close && kTrace.close.length > 0) {
+                    var lastClose = kTrace.close[kTrace.close.length - 1];
+                    $('#position-current-price').val(parseFloat(lastClose).toFixed(2));
+                    $('#price-fetch-status').html('<span class="text-warning">历史价</span>');
+                } else {
+                    $('#price-fetch-status').html('<span class="text-muted">手动输入</span>');
+                }
+            }).fail(function() {
+                $('#price-fetch-status').html('<span class="text-muted">手动输入</span>');
+            });
+        }
+    }).fail(function() {
+        $('#price-fetch-status').html('<span class="text-muted">手动输入</span>');
+    });
+});
+
+// 持仓管理
+function showAddPositionModal() {
+    $('#position-modal-title').text('添加持仓');
+    $('#position-form')[0].reset();
+    $('#position-code').prop('disabled', false);
+    positionModal.show();
+}
+
+function editPosition(code, shares, avgCost, currentPrice) {
+    $('#position-modal-title').text('编辑持仓');
+    $('#position-code').val(code).prop('disabled', true);
+    $('#position-shares').val(shares);
+    $('#position-avg-cost').val(avgCost);
+    $('#position-current-price').val(currentPrice);
+    positionModal.show();
+}
+
+function savePosition() {
+    var code = $('#position-code').val();
+    var shares = parseInt($('#position-shares').val());
+    var avgCost = parseFloat($('#position-avg-cost').val());
+    var currentPrice = parseFloat($('#position-current-price').val());
+    
+    if (!code || isNaN(shares) || isNaN(avgCost) || isNaN(currentPrice)) {
+        alert('请填写完整信息');
+        return;
+    }
+    
+    $.ajax({
+        url: '/api/risk/position',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            code: code,
+            shares: shares,
+            avg_cost: avgCost,
+            current_price: currentPrice
+        }),
+        success: function(result) {
+            positionModal.hide();
+            loadRiskData();
+            alert('持仓已保存');
+        },
+        error: function(xhr) {
+            alert('保存失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        }
+    });
+}
+
+function deletePosition(code) {
+    if (!confirm('确定要删除持仓 ' + code + ' 吗？')) {
+        return;
+    }
+    
+    $.ajax({
+        url: '/api/risk/position',
+        method: 'DELETE',
+        contentType: 'application/json',
+        data: JSON.stringify({ code: code }),
+        success: function(result) {
+            loadRiskData();
+            alert('持仓已删除');
+        },
+        error: function(xhr) {
+            alert('删除失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        }
+    });
+}
+
+function editCapital() {
+    $.get('/api/risk/portfolio', function(data) {
+        $('#edit-total-capital').val(data.total_capital);
+        var posValue = data.total_position_value || 0;
+        var avail = data.total_capital - posValue;
+        $('#edit-available-cash-display').val('¥' + avail.toLocaleString() + ' (自动)');
+        capitalModal.show();
+    });
+}
+
+function saveCapital() {
+    var totalCapital = parseFloat($('#edit-total-capital').val());
+    
+    if (isNaN(totalCapital) || totalCapital <= 0) {
+        alert('请填写有效的总资产金额');
+        return;
+    }
+    
+    $.ajax({
+        url: '/api/risk/capital',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ total_capital: totalCapital }),
+        success: function(result) {
+            capitalModal.hide();
+            loadRiskData();
+            alert('资金信息已保存');
+        },
+        error: function(xhr) {
+            alert('保存失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        }
+    });
+}
+
+// 风控设置
+function editRiskSettings() {
+    $.get('/api/risk/settings', function(data) {
+        $('#edit-max-position').val(Math.round(data.max_position_ratio * 100));
+        $('#edit-max-single').val(Math.round(data.max_single_stock_ratio * 100));
+        $('#edit-stop-loss').val((data.stop_loss_ratio * 100).toFixed(1));
+        $('#edit-take-profit').val((data.take_profit_ratio * 100).toFixed(1));
+        riskSettingsModal.show();
+    });
+}
+
+function saveRiskSettings() {
+    var maxPosition = parseInt($('#edit-max-position').val()) / 100;
+    var maxSingle = parseInt($('#edit-max-single').val()) / 100;
+    var stopLoss = parseFloat($('#edit-stop-loss').val()) / 100;
+    var takeProfit = parseFloat($('#edit-take-profit').val()) / 100;
+    
+    $.ajax({
+        url: '/api/risk/settings',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            max_position_ratio: maxPosition,
+            max_single_stock_ratio: maxSingle,
+            stop_loss_ratio: stopLoss,
+            take_profit_ratio: takeProfit
+        }),
+        success: function(result) {
+            riskSettingsModal.hide();
+            loadRiskData();
+            alert('风控设置已保存');
+        },
+        error: function(xhr) {
+            alert('保存失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        }
+    });
+}
+</script>
+{% endblock %}

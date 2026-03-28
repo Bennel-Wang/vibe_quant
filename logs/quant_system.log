@@ -1,0 +1,366 @@
+2026-03-28 17:57:48,295 - __main__ - INFO - 启动Web服务...
+2026-03-28 17:57:48,296 - quant_system.stock_manager - WARNING - get_stock_by_code 建议使用后缀格式(如 600519.SH)，收到: 09988
+2026-03-28 17:57:48,296 - quant_system.stock_manager - INFO - get_stock_by_code 自动转换: 09988 → 09988.HK
+2026-03-28 17:57:48,297 - quant_system.web_app - INFO - 系统状态已加载
+2026-03-28 17:57:48,297 - quant_system.web_app - INFO - 策略已从文件加载
+2026-03-28 17:57:48,297 - quant_system.web_app - INFO - 启动Web服务器: http://0.0.0.0:8080
+2026-03-28 17:57:48,299 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-28 17:57:48,299 - quant_system.scheduler - INFO - 已调度自定义任务 [67e09437]: 14:20 -> 交易日盘中数据更新，发送日报，策略提醒1
+2026-03-28 17:57:48,299 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-28 17:57:48,299 - quant_system.scheduler - INFO - 已调度自定义任务 [de00458e]: 14:40 -> 交易日盘中数据更新，策略提醒2
+2026-03-28 17:57:48,299 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-28 17:57:48,299 - quant_system.scheduler - INFO - 已调度自定义任务 [eef58c91]: 09:50 -> 交易日开盘数据更新，发送日报
+2026-03-28 17:57:48,299 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-28 17:57:48,301 - quant_system.scheduler - INFO - 已调度自定义任务 [07c09fe1]: 17:10 -> 每日收盘数据更新，发送日报，策略提醒
+2026-03-28 17:57:48,301 - apscheduler.scheduler - INFO - Added job "TradingScheduler.run_custom_task" to job store "default"
+2026-03-28 17:57:48,301 - apscheduler.scheduler - INFO - Added job "TradingScheduler.run_custom_task" to job store "default"
+2026-03-28 17:57:48,301 - apscheduler.scheduler - INFO - Added job "TradingScheduler.run_custom_task" to job store "default"
+2026-03-28 17:57:48,301 - apscheduler.scheduler - INFO - Added job "TradingScheduler.run_custom_task" to job store "default"
+2026-03-28 17:57:48,301 - apscheduler.scheduler - INFO - Scheduler started
+2026-03-28 17:57:48,302 - quant_system.scheduler - INFO - 调度器已启动
+2026-03-28 17:57:48,302 - quant_system.web_app - INFO - 调度器已在Web进程中自动启动
+2026-03-28 17:57:48,316 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.0.105:8080
+2026-03-28 17:57:48,316 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-28 17:57:50,150 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:57:50] "GET / HTTP/1.1" 200 -
+2026-03-28 17:57:50,335 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:57:50] "GET /api/data/realtime/global HTTP/1.1" 200 -
+2026-03-28 17:57:50,335 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:57:50] "GET /api/config/data_source HTTP/1.1" 200 -
+2026-03-28 17:57:50,337 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:57:50] "GET /api/stocks HTTP/1.1" 200 -
+2026-03-28 17:57:50,591 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:57:50] "POST /api/data/realtime/global HTTP/1.1" 200 -
+2026-03-28 17:57:50,593 - quant_system.data_source - INFO - data_sourcing.DataManager 初始化成功
+2026-03-28 17:57:50,593 - data_manager - INFO - 开始获取数据: 600519.SH (A_STOCK), 20260321-20260328, day
+2026-03-28 17:57:50,599 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:57:50,651 - source.tushare - INFO - Tushare Pro 初始化成功
+2026-03-28 17:57:51,366 - source.tushare - WARNING - Tushare pro_bar 不可用, 改用 daily+adj_factor 手动复权
+2026-03-28 17:57:51,541 - source.tushare - INFO - Tushare daily+adj_factor 手动前复权成功: 600519.SH
+2026-03-28 17:57:51,616 - source.tushare - INFO - Tushare Pro PE_TTM/PB 获取成功: 600519.SH, 5 条
+2026-03-28 17:57:51,617 - source.tushare - INFO - Tushare Pro A股(前复权) 获取成功: 600519.SH, 5 条
+2026-03-28 17:57:51,623 - storage - INFO - 保存数据 600519.SH: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\600519_SH_day.csv
+2026-03-28 17:57:51,631 - storage - INFO - 保存完整数据(含指标) 600519.SH: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\600519_SH_day.csv
+2026-03-28 17:57:52,134 - data_manager - INFO - 开始获取数据: 601318.SH (A_STOCK), 20260321-20260328, day
+2026-03-28 17:57:52,135 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:57:52,338 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:57:52] "GET /api/data/realtime/latest HTTP/1.1" 200 -
+2026-03-28 17:57:52,338 - data_manager - INFO - 开始获取数据: 600519.SH (A_STOCK), 20030101-20260328, day
+2026-03-28 17:57:52,349 - storage - INFO - 加载本地数据 600519.SH: 5 行, 日期范围 20260323-20260327
+2026-03-28 17:57:52,351 - data_manager - INFO - 增量更新: 从 20260328 开始 (本地数据到 20260327)
+2026-03-28 17:57:52,351 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:57:52,473 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:57:52] "GET /backtest HTTP/1.1" 200 -
+2026-03-28 17:57:52,538 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:57:52] "GET /api/data/realtime/global HTTP/1.1" 200 -
+2026-03-28 17:57:52,539 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:57:52] "GET /api/config/data_source HTTP/1.1" 200 -
+2026-03-28 17:57:52,539 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:57:52] "GET /api/stocks HTTP/1.1" 200 -
+2026-03-28 17:57:52,541 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:57:52] "GET /api/strategies HTTP/1.1" 200 -
+2026-03-28 17:57:52,602 - source.tushare - WARNING - Tushare daily 也无数据: 600519.SH
+2026-03-28 17:57:52,603 - data_manager - WARNING - tushare 数据无效或为空, 尝试下一个
+2026-03-28 17:57:52,603 - data_manager - INFO - 尝试历史数据源: baostock
+2026-03-28 17:57:52,637 - source.tushare - WARNING - Tushare pro_bar 不可用, 改用 daily+adj_factor 手动复权
+2026-03-28 17:57:52,678 - source.baostock - INFO - Baostock 初始化成功
+2026-03-28 17:57:52,687 - source.baostock - WARNING - Baostock 无数据: 600519.SH (20260328-20260328)
+2026-03-28 17:57:52,687 - data_manager - WARNING - baostock 数据无效或为空, 尝试下一个
+2026-03-28 17:57:52,688 - data_manager - INFO - 尝试实时数据源补充今日数据
+2026-03-28 17:57:52,688 - data_manager - INFO - 尝试实时数据源: easyquotation
+2026-03-28 17:57:52,689 - source.easyquotation - INFO - Easyquotation 初始化成功
+2026-03-28 17:57:52,823 - source.tushare - INFO - Tushare daily+adj_factor 手动前复权成功: 601318.SH
+2026-03-28 17:57:52,911 - source.tushare - INFO - Tushare Pro PE_TTM/PB 获取成功: 601318.SH, 5 条
+2026-03-28 17:57:52,911 - source.tushare - INFO - Tushare Pro A股(前复权) 获取成功: 601318.SH, 5 条
+2026-03-28 17:57:52,916 - storage - INFO - 保存数据 601318.SH: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\601318_SH_day.csv
+2026-03-28 17:57:52,924 - storage - INFO - 保存完整数据(含指标) 601318.SH: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\601318_SH_day.csv
+2026-03-28 17:57:53,266 - source.easyquotation - INFO - Easyquotation A股实时: 600519.SH, close=1416.02
+2026-03-28 17:57:53,269 - data_manager - INFO - easyquotation 实时数据获取成功
+2026-03-28 17:57:53,274 - storage - INFO - 加载本地数据 600519.SH: 5 行, 日期范围 20260323-20260327
+2026-03-28 17:57:53,280 - storage - INFO - 保存数据 600519.SH: 6 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\600519_SH_day.csv
+2026-03-28 17:57:53,285 - storage - INFO - 保存完整数据(含指标) 600519.SH: 6 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\600519_SH_day.csv
+2026-03-28 17:57:53,285 - quant_system.data_source - INFO - 过滤 600519.SH 非交易日数据 1 行
+2026-03-28 17:57:53,286 - quant_system.data_source - INFO - 600519.SH: 数据完整 (5 行)
+2026-03-28 17:57:53,299 - data_manager - INFO - 开始获取数据: 601318.SH (A_STOCK), 20030101-20260328, day
+2026-03-28 17:57:53,308 - storage - INFO - 加载本地数据 601318.SH: 5 行, 日期范围 20260323-20260327
+2026-03-28 17:57:53,312 - data_manager - INFO - 增量更新: 从 20260328 开始 (本地数据到 20260327)
+2026-03-28 17:57:53,312 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:57:53,426 - data_manager - INFO - 开始获取数据: 002594.SZ (A_STOCK), 20260321-20260328, day
+2026-03-28 17:57:53,426 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:57:53,562 - source.tushare - WARNING - Tushare daily 也无数据: 601318.SH
+2026-03-28 17:57:53,590 - data_manager - WARNING - tushare 数据无效或为空, 尝试下一个
+2026-03-28 17:57:53,600 - data_manager - INFO - 尝试历史数据源: baostock
+2026-03-28 17:57:53,607 - source.baostock - WARNING - Baostock 无数据: 601318.SH (20260328-20260328)
+2026-03-28 17:57:53,607 - data_manager - WARNING - baostock 数据无效或为空, 尝试下一个
+2026-03-28 17:57:53,607 - data_manager - INFO - 尝试实时数据源补充今日数据
+2026-03-28 17:57:53,609 - data_manager - INFO - 尝试实时数据源: easyquotation
+2026-03-28 17:57:53,677 - source.easyquotation - INFO - Easyquotation A股实时: 601318.SH, close=56.95
+2026-03-28 17:57:53,679 - data_manager - INFO - easyquotation 实时数据获取成功
+2026-03-28 17:57:53,683 - storage - INFO - 加载本地数据 601318.SH: 5 行, 日期范围 20260323-20260327
+2026-03-28 17:57:53,689 - storage - INFO - 保存数据 601318.SH: 6 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\601318_SH_day.csv
+2026-03-28 17:57:53,693 - storage - INFO - 保存完整数据(含指标) 601318.SH: 6 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\601318_SH_day.csv
+2026-03-28 17:57:53,693 - quant_system.data_source - INFO - 过滤 601318.SH 非交易日数据 1 行
+2026-03-28 17:57:53,695 - quant_system.data_source - INFO - 601318.SH: 数据完整 (5 行)
+2026-03-28 17:57:53,704 - data_manager - INFO - 开始获取数据: 002594.SZ (A_STOCK), 20030101-20260328, day
+2026-03-28 17:57:53,706 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:57:53,908 - source.tushare - WARNING - Tushare pro_bar 不可用, 改用 daily+adj_factor 手动复权
+2026-03-28 17:57:54,047 - source.tushare - INFO - Tushare daily+adj_factor 手动前复权成功: 002594.SZ
+2026-03-28 17:57:54,150 - source.tushare - INFO - Tushare Pro PE_TTM/PB 获取成功: 002594.SZ, 5 条
+2026-03-28 17:57:54,151 - source.tushare - INFO - Tushare Pro A股(前复权) 获取成功: 002594.SZ, 5 条
+2026-03-28 17:57:54,156 - storage - INFO - 保存数据 002594.SZ: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\002594_SZ_day.csv
+2026-03-28 17:57:54,166 - storage - INFO - 保存完整数据(含指标) 002594.SZ: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\002594_SZ_day.csv
+2026-03-28 17:57:54,540 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:57:54] "GET /api/data/realtime/latest HTTP/1.1" 200 -
+2026-03-28 17:57:54,699 - data_manager - INFO - 开始获取数据: 300750.SZ (A_STOCK), 20260321-20260328, day
+2026-03-28 17:57:54,700 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:57:54,716 - source.tushare - WARNING - Tushare pro_bar 不可用, 改用 daily+adj_factor 手动复权
+2026-03-28 17:57:55,106 - source.tushare - INFO - Tushare daily+adj_factor 手动前复权成功: 002594.SZ
+2026-03-28 17:57:55,225 - source.tushare - WARNING - Tushare pro_bar 不可用, 改用 daily+adj_factor 手动复权
+2026-03-28 17:57:55,278 - source.tushare - INFO - Tushare Pro PE_TTM/PB 获取成功: 002594.SZ, 3568 条
+2026-03-28 17:57:55,278 - source.tushare - INFO - Tushare Pro A股(前复权) 获取成功: 002594.SZ, 3568 条
+2026-03-28 17:57:55,285 - storage - INFO - 加载本地数据 002594.SZ: 5 行, 日期范围 20260323-20260327
+2026-03-28 17:57:55,327 - storage - INFO - 保存数据 002594.SZ: 3568 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\002594_SZ_day.csv
+2026-03-28 17:57:55,450 - source.tushare - INFO - Tushare daily+adj_factor 手动前复权成功: 300750.SZ
+2026-03-28 17:57:55,547 - source.tushare - INFO - Tushare Pro PE_TTM/PB 获取成功: 300750.SZ, 5 条
+2026-03-28 17:57:55,549 - source.tushare - INFO - Tushare Pro A股(前复权) 获取成功: 300750.SZ, 5 条
+2026-03-28 17:57:55,556 - storage - INFO - 保存数据 300750.SZ: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\300750_SZ_day.csv
+2026-03-28 17:57:55,564 - storage - INFO - 保存完整数据(含指标) 002594.SZ: 3568 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\002594_SZ_day.csv
+2026-03-28 17:57:55,575 - quant_system.data_source - INFO - 002594.SZ: 数据略有缺失 — 预期 3614, 实际 3568, 缺失 46 (1.27%)
+2026-03-28 17:57:55,579 - storage - INFO - 保存完整数据(含指标) 300750.SZ: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\300750_SZ_day.csv
+2026-03-28 17:57:55,616 - data_manager - INFO - 开始获取数据: 300750.SZ (A_STOCK), 20030101-20260328, day
+2026-03-28 17:57:55,630 - storage - INFO - 加载本地数据 300750.SZ: 5 行, 日期范围 20260323-20260327
+2026-03-28 17:57:55,631 - data_manager - INFO - 增量更新: 从 20260328 开始 (本地数据到 20260327)
+2026-03-28 17:57:55,632 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:57:55,881 - source.tushare - WARNING - Tushare daily 也无数据: 300750.SZ
+2026-03-28 17:57:55,881 - data_manager - WARNING - tushare 数据无效或为空, 尝试下一个
+2026-03-28 17:57:55,881 - data_manager - INFO - 尝试历史数据源: baostock
+2026-03-28 17:57:55,888 - source.baostock - WARNING - Baostock 无数据: 300750.SZ (20260328-20260328)
+2026-03-28 17:57:55,888 - data_manager - WARNING - baostock 数据无效或为空, 尝试下一个
+2026-03-28 17:57:55,890 - data_manager - INFO - 尝试实时数据源补充今日数据
+2026-03-28 17:57:55,890 - data_manager - INFO - 尝试实时数据源: easyquotation
+2026-03-28 17:57:55,961 - source.easyquotation - INFO - Easyquotation A股实时: 300750.SZ, close=416.18
+2026-03-28 17:57:55,963 - data_manager - INFO - easyquotation 实时数据获取成功
+2026-03-28 17:57:55,966 - storage - INFO - 加载本地数据 300750.SZ: 5 行, 日期范围 20260323-20260327
+2026-03-28 17:57:55,972 - storage - INFO - 保存数据 300750.SZ: 6 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\300750_SZ_day.csv
+2026-03-28 17:57:55,976 - storage - INFO - 保存完整数据(含指标) 300750.SZ: 6 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\300750_SZ_day.csv
+2026-03-28 17:57:55,976 - quant_system.data_source - INFO - 过滤 300750.SZ 非交易日数据 1 行
+2026-03-28 17:57:55,978 - quant_system.data_source - INFO - 300750.SZ: 数据完整 (5 行)
+2026-03-28 17:57:55,988 - data_manager - INFO - 开始获取数据: 09988.HK (HK_STOCK), 20030101-20260328, day
+2026-03-28 17:57:55,989 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:57:56,082 - data_manager - INFO - 开始获取数据: 09988.HK (HK_STOCK), 20260321-20260328, day
+2026-03-28 17:57:56,084 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:57:56,086 - source.tushare - WARNING - Tushare Pro hk_daily 不可用(需更高积分): 09988.HK, 抱歉，您每天最多访问该接口10次，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。
+2026-03-28 17:57:56,086 - data_manager - WARNING - tushare 数据无效或为空, 尝试下一个
+2026-03-28 17:57:56,086 - data_manager - INFO - 尝试实时数据源补充今日数据
+2026-03-28 17:57:56,087 - data_manager - INFO - 尝试实时数据源: easyquotation
+2026-03-28 17:57:56,165 - source.tushare - WARNING - Tushare Pro hk_daily 不可用(需更高积分): 09988.HK, 抱歉，您每天最多访问该接口10次，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。
+2026-03-28 17:57:56,166 - data_manager - WARNING - tushare 数据无效或为空, 尝试下一个
+2026-03-28 17:57:56,166 - data_manager - INFO - 尝试实时数据源补充今日数据
+2026-03-28 17:57:56,166 - data_manager - INFO - 尝试实时数据源: easyquotation
+2026-03-28 17:57:56,791 - source.easyquotation - INFO - Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-28 17:57:56,795 - data_manager - INFO - easyquotation 实时数据获取成功
+2026-03-28 17:57:56,801 - source.easyquotation - INFO - Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 17:57:56,801 - storage - INFO - 保存数据 09988.HK: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\09988_HK_day.csv
+2026-03-28 17:57:56,808 - data_manager - INFO - easyquotation 实时数据获取成功
+2026-03-28 17:57:56,823 - storage - INFO - 保存完整数据(含指标) 09988.HK: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\09988_HK_day.csv
+2026-03-28 17:57:56,824 - storage - WARNING - 加载本地数据失败 09988.HK: No columns to parse from file
+2026-03-28 17:57:56,833 - storage - INFO - 保存数据 09988.HK: 1500 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\09988_HK_day.csv
+2026-03-28 17:57:56,933 - storage - INFO - 保存完整数据(含指标) 09988.HK: 1500 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\09988_HK_day.csv
+2026-03-28 17:57:56,940 - quant_system.data_source - INFO - 09988.HK: 数据略有缺失 — 预期 1504, 实际 1500, 缺失 4 (0.27%)
+2026-03-28 17:57:56,971 - data_manager - INFO - 开始获取数据: 002304.SZ (A_STOCK), 20030101-20260328, day
+2026-03-28 17:57:56,971 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:57:57,326 - data_manager - INFO - 开始获取数据: 002304.SZ (A_STOCK), 20260321-20260328, day
+2026-03-28 17:57:57,328 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:57:57,826 - source.tushare - WARNING - Tushare pro_bar 不可用, 改用 daily+adj_factor 手动复权
+2026-03-28 17:57:58,005 - source.tushare - INFO - Tushare daily+adj_factor 手动前复权成功: 002304.SZ
+2026-03-28 17:57:58,067 - source.tushare - WARNING - Tushare pro_bar 不可用, 改用 daily+adj_factor 手动复权
+2026-03-28 17:57:58,089 - source.tushare - INFO - Tushare Pro PE_TTM/PB 获取成功: 002304.SZ, 5 条
+2026-03-28 17:57:58,094 - source.tushare - INFO - Tushare Pro A股(前复权) 获取成功: 002304.SZ, 5 条
+2026-03-28 17:57:58,103 - storage - INFO - 保存数据 002304.SZ: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\002304_SZ_day.csv
+2026-03-28 17:57:58,123 - storage - INFO - 保存完整数据(含指标) 002304.SZ: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\002304_SZ_day.csv
+2026-03-28 17:59:44,094 - __main__ - INFO - 启动Web服务...
+2026-03-28 17:59:44,120 - quant_system.stock_manager - WARNING - get_stock_by_code 建议使用后缀格式(如 600519.SH)，收到: 09988
+2026-03-28 17:59:44,120 - quant_system.stock_manager - INFO - get_stock_by_code 自动转换: 09988 → 09988.HK
+2026-03-28 17:59:44,121 - quant_system.web_app - INFO - 系统状态已加载
+2026-03-28 17:59:44,121 - quant_system.web_app - INFO - 策略已从文件加载
+2026-03-28 17:59:44,121 - quant_system.web_app - INFO - 启动Web服务器: http://0.0.0.0:8080
+2026-03-28 17:59:44,122 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-28 17:59:44,122 - quant_system.scheduler - INFO - 已调度自定义任务 [67e09437]: 14:20 -> 交易日盘中数据更新，发送日报，策略提醒1
+2026-03-28 17:59:44,122 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-28 17:59:44,122 - quant_system.scheduler - INFO - 已调度自定义任务 [de00458e]: 14:40 -> 交易日盘中数据更新，策略提醒2
+2026-03-28 17:59:44,123 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-28 17:59:44,123 - quant_system.scheduler - INFO - 已调度自定义任务 [eef58c91]: 09:50 -> 交易日开盘数据更新，发送日报
+2026-03-28 17:59:44,124 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-28 17:59:44,124 - quant_system.scheduler - INFO - 已调度自定义任务 [07c09fe1]: 17:10 -> 每日收盘数据更新，发送日报，策略提醒
+2026-03-28 17:59:44,124 - apscheduler.scheduler - INFO - Added job "TradingScheduler.run_custom_task" to job store "default"
+2026-03-28 17:59:44,125 - apscheduler.scheduler - INFO - Added job "TradingScheduler.run_custom_task" to job store "default"
+2026-03-28 17:59:44,125 - apscheduler.scheduler - INFO - Added job "TradingScheduler.run_custom_task" to job store "default"
+2026-03-28 17:59:44,126 - apscheduler.scheduler - INFO - Added job "TradingScheduler.run_custom_task" to job store "default"
+2026-03-28 17:59:44,126 - apscheduler.scheduler - INFO - Scheduler started
+2026-03-28 17:59:44,127 - quant_system.scheduler - INFO - 调度器已启动
+2026-03-28 17:59:44,127 - quant_system.web_app - INFO - 调度器已在Web进程中自动启动
+2026-03-28 17:59:44,142 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.0.105:8080
+2026-03-28 17:59:44,143 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-03-28 17:59:46,011 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:46] "GET / HTTP/1.1" 200 -
+2026-03-28 17:59:46,266 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:46] "GET /api/data/realtime/global HTTP/1.1" 200 -
+2026-03-28 17:59:46,266 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:46] "GET /api/config/data_source HTTP/1.1" 200 -
+2026-03-28 17:59:46,267 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:46] "GET /api/stocks HTTP/1.1" 200 -
+2026-03-28 17:59:46,522 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:46] "POST /api/data/realtime/global HTTP/1.1" 200 -
+2026-03-28 17:59:46,524 - quant_system.data_source - INFO - data_sourcing.DataManager 初始化成功
+2026-03-28 17:59:46,525 - data_manager - INFO - 开始获取数据: 600519.SH (A_STOCK), 20260321-20260328, day
+2026-03-28 17:59:46,540 - storage - INFO - 加载本地数据 600519.SH: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:46,544 - data_manager - INFO - 增量更新: 从 20260329 开始 (本地数据到 20260328)
+2026-03-28 17:59:46,548 - storage - INFO - 加载本地数据 600519.SH: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:46,548 - data_manager - INFO - 本地数据已是最新: 600519.SH
+2026-03-28 17:59:46,550 - storage - INFO - 加载本地数据 600519.SH: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:46,554 - quant_system.data_source - INFO - 过滤 600519.SH 非交易日数据 1 行
+2026-03-28 17:59:46,876 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:46] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-03-28 17:59:47,056 - data_manager - INFO - 开始获取数据: 601318.SH (A_STOCK), 20260321-20260328, day
+2026-03-28 17:59:47,068 - storage - INFO - 加载本地数据 601318.SH: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:47,070 - data_manager - INFO - 增量更新: 从 20260329 开始 (本地数据到 20260328)
+2026-03-28 17:59:47,073 - storage - INFO - 加载本地数据 601318.SH: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:47,074 - data_manager - INFO - 本地数据已是最新: 601318.SH
+2026-03-28 17:59:47,076 - storage - INFO - 加载本地数据 601318.SH: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:47,078 - quant_system.data_source - INFO - 过滤 601318.SH 非交易日数据 1 行
+2026-03-28 17:59:47,581 - data_manager - INFO - 开始获取数据: 002594.SZ (A_STOCK), 20260321-20260328, day
+2026-03-28 17:59:47,611 - storage - INFO - 加载本地数据 002594.SZ: 3568 行, 日期范围 20110630-20260327
+2026-03-28 17:59:47,614 - data_manager - INFO - 增量更新: 从 20260328 开始 (本地数据到 20260327)
+2026-03-28 17:59:47,614 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:59:47,657 - source.tushare - INFO - Tushare Pro 初始化成功
+2026-03-28 17:59:47,876 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:47] "GET /strategy HTTP/1.1" 200 -
+2026-03-28 17:59:47,969 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:47] "GET /api/data/realtime/global HTTP/1.1" 200 -
+2026-03-28 17:59:47,970 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:47] "GET /api/config/data_source HTTP/1.1" 200 -
+2026-03-28 17:59:47,971 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:47] "GET /api/strategies HTTP/1.1" 200 -
+2026-03-28 17:59:47,975 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:47] "GET /api/stocks HTTP/1.1" 200 -
+2026-03-28 17:59:47,977 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:47] "GET /api/scheduler/status HTTP/1.1" 200 -
+2026-03-28 17:59:47,977 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:47] "GET /api/strategies HTTP/1.1" 200 -
+2026-03-28 17:59:47,978 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:47] "GET /api/stocks HTTP/1.1" 200 -
+2026-03-28 17:59:47,981 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:47] "GET /api/stocks HTTP/1.1" 200 -
+2026-03-28 17:59:48,556 - source.tushare - WARNING - Tushare daily 也无数据: 002594.SZ
+2026-03-28 17:59:48,556 - data_manager - WARNING - tushare 数据无效或为空, 尝试下一个
+2026-03-28 17:59:48,556 - data_manager - INFO - 尝试历史数据源: baostock
+2026-03-28 17:59:48,924 - source.baostock - INFO - Baostock 初始化成功
+2026-03-28 17:59:49,043 - source.baostock - WARNING - Baostock 无数据: 002594.SZ (20260328-20260328)
+2026-03-28 17:59:49,043 - data_manager - WARNING - baostock 数据无效或为空, 尝试下一个
+2026-03-28 17:59:49,043 - data_manager - INFO - 尝试实时数据源补充今日数据
+2026-03-28 17:59:49,044 - data_manager - INFO - 尝试实时数据源: easyquotation
+2026-03-28 17:59:49,044 - source.easyquotation - INFO - Easyquotation 初始化成功
+2026-03-28 17:59:49,089 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:49] "GET /api/strategy/rsi HTTP/1.1" 200 -
+2026-03-28 17:59:49,515 - source.easyquotation - INFO - Easyquotation A股实时: 002594.SZ, close=105.3
+2026-03-28 17:59:49,519 - data_manager - INFO - easyquotation 实时数据获取成功
+2026-03-28 17:59:49,542 - storage - INFO - 加载本地数据 002594.SZ: 3568 行, 日期范围 20110630-20260327
+2026-03-28 17:59:49,644 - storage - INFO - 保存数据 002594.SZ: 3569 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\002594_SZ_day.csv
+2026-03-28 17:59:49,853 - storage - INFO - 保存完整数据(含指标) 002594.SZ: 3569 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\002594_SZ_day.csv
+2026-03-28 17:59:49,861 - quant_system.data_source - INFO - 过滤 002594.SZ 非交易日数据 1 行
+2026-03-28 17:59:49,974 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:49] "GET /api/data/realtime/latest HTTP/1.1" 200 -
+2026-03-28 17:59:49,974 - data_manager - INFO - 开始获取数据: 600519.SH (A_STOCK), 20030101-20260328, day
+2026-03-28 17:59:49,977 - storage - INFO - 加载本地数据 600519.SH: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:49,980 - data_manager - INFO - 增量更新: 从 20260329 开始 (本地数据到 20260328)
+2026-03-28 17:59:49,984 - storage - INFO - 加载本地数据 600519.SH: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:49,985 - data_manager - WARNING - 本地数据不完整 (600519.SH): 最早 20260323, 请求起始 20030101, 差距 8482 天，需重新获取
+2026-03-28 17:59:49,985 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:59:50,365 - data_manager - INFO - 开始获取数据: 300750.SZ (A_STOCK), 20260321-20260328, day
+2026-03-28 17:59:50,377 - storage - INFO - 加载本地数据 300750.SZ: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:50,380 - data_manager - INFO - 增量更新: 从 20260329 开始 (本地数据到 20260328)
+2026-03-28 17:59:50,383 - storage - INFO - 加载本地数据 300750.SZ: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:50,383 - data_manager - INFO - 本地数据已是最新: 300750.SZ
+2026-03-28 17:59:50,386 - storage - INFO - 加载本地数据 300750.SZ: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:50,387 - quant_system.data_source - INFO - 过滤 300750.SZ 非交易日数据 1 行
+2026-03-28 17:59:50,889 - data_manager - INFO - 开始获取数据: 09988.HK (HK_STOCK), 20260321-20260328, day
+2026-03-28 17:59:50,987 - storage - INFO - 加载本地数据 09988.HK: 1500 行, 日期范围 20200226-20260327
+2026-03-28 17:59:50,992 - data_manager - INFO - 增量更新: 从 20260328 开始 (本地数据到 20260327)
+2026-03-28 17:59:50,997 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:59:51,081 - source.tushare - WARNING - Tushare Pro hk_daily 不可用(需更高积分): 09988.HK, 抱歉，您每天最多访问该接口10次，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。
+2026-03-28 17:59:51,084 - source.tushare - WARNING - Tushare pro_bar 不可用, 改用 daily+adj_factor 手动复权
+2026-03-28 17:59:51,084 - data_manager - WARNING - tushare 数据无效或为空, 尝试下一个
+2026-03-28 17:59:51,088 - data_manager - INFO - 尝试实时数据源补充今日数据
+2026-03-28 17:59:51,088 - data_manager - INFO - 尝试实时数据源: easyquotation
+2026-03-28 17:59:51,270 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:51] "GET /strategy/alerts HTTP/1.1" 200 -
+2026-03-28 17:59:51,337 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:51] "GET /api/data/realtime/global HTTP/1.1" 200 -
+2026-03-28 17:59:51,338 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:51] "GET /api/config/data_source HTTP/1.1" 200 -
+2026-03-28 17:59:51,338 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:51] "GET /api/strategies HTTP/1.1" 200 -
+2026-03-28 17:59:51,374 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:51] "GET /api/stocks HTTP/1.1" 200 -
+2026-03-28 17:59:51,446 - source.tushare - INFO - Tushare daily+adj_factor 手动前复权成功: 600519.SH
+2026-03-28 17:59:51,570 - source.easyquotation - INFO - Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=122.6
+2026-03-28 17:59:51,573 - data_manager - INFO - easyquotation 实时数据获取成功
+2026-03-28 17:59:51,588 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:51] "POST /api/strategy/alerts/assign HTTP/1.1" 200 -
+2026-03-28 17:59:51,591 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:51] "POST /api/strategy/alerts/assign HTTP/1.1" 200 -
+2026-03-28 17:59:51,594 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:51] "POST /api/strategy/alerts/assign HTTP/1.1" 200 -
+2026-03-28 17:59:51,600 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:51] "POST /api/strategy/alerts/assign HTTP/1.1" 200 -
+2026-03-28 17:59:51,603 - storage - INFO - 加载本地数据 09988.HK: 1500 行, 日期范围 20200226-20260327
+2026-03-28 17:59:51,630 - source.tushare - INFO - Tushare Pro PE_TTM/PB 获取成功: 600519.SH, 5568 条
+2026-03-28 17:59:51,643 - source.tushare - INFO - Tushare Pro A股(前复权) 获取成功: 600519.SH, 5568 条
+2026-03-28 17:59:51,687 - storage - INFO - 加载本地数据 600519.SH: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:51,696 - storage - INFO - 保存数据 09988.HK: 1498 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\09988_HK_day.csv
+2026-03-28 17:59:51,829 - storage - INFO - 保存完整数据(含指标) 09988.HK: 1498 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\09988_HK_day.csv
+2026-03-28 17:59:51,832 - quant_system.data_source - INFO - 过滤 09988.HK 非交易日数据 1 行
+2026-03-28 17:59:51,842 - storage - INFO - 保存数据 600519.SH: 5569 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\600519_SH_day.csv
+2026-03-28 17:59:52,171 - storage - INFO - 保存完整数据(含指标) 600519.SH: 5569 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\600519_SH_day.csv
+2026-03-28 17:59:52,181 - quant_system.data_source - INFO - 过滤 600519.SH 非交易日数据 1 行
+2026-03-28 17:59:52,187 - quant_system.data_source - INFO - 600519.SH: 数据略有缺失 — 预期 5702, 实际 5568, 缺失 134 (2.35%)
+2026-03-28 17:59:52,240 - data_manager - INFO - 开始获取数据: 601318.SH (A_STOCK), 20030101-20260328, day
+2026-03-28 17:59:52,243 - storage - INFO - 加载本地数据 601318.SH: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:52,244 - data_manager - INFO - 增量更新: 从 20260329 开始 (本地数据到 20260328)
+2026-03-28 17:59:52,247 - storage - INFO - 加载本地数据 601318.SH: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:52,247 - data_manager - WARNING - 本地数据不完整 (601318.SH): 最早 20260323, 请求起始 20030101, 差距 8482 天，需重新获取
+2026-03-28 17:59:52,247 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:59:52,342 - data_manager - INFO - 开始获取数据: 002304.SZ (A_STOCK), 20260321-20260328, day
+2026-03-28 17:59:52,345 - storage - INFO - 加载本地数据 002304.SZ: 5 行, 日期范围 20260323-20260327
+2026-03-28 17:59:52,347 - data_manager - INFO - 增量更新: 从 20260328 开始 (本地数据到 20260327)
+2026-03-28 17:59:52,348 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:59:52,613 - source.tushare - WARNING - Tushare daily 也无数据: 002304.SZ
+2026-03-28 17:59:52,613 - data_manager - WARNING - tushare 数据无效或为空, 尝试下一个
+2026-03-28 17:59:52,614 - data_manager - INFO - 尝试历史数据源: baostock
+2026-03-28 17:59:52,621 - source.baostock - WARNING - Baostock 无数据: 002304.SZ (20260328-20260328)
+2026-03-28 17:59:52,621 - data_manager - WARNING - baostock 数据无效或为空, 尝试下一个
+2026-03-28 17:59:52,621 - data_manager - INFO - 尝试实时数据源补充今日数据
+2026-03-28 17:59:52,623 - data_manager - INFO - 尝试实时数据源: easyquotation
+2026-03-28 17:59:52,692 - source.easyquotation - INFO - Easyquotation A股实时: 002304.SZ, close=50.8
+2026-03-28 17:59:52,695 - data_manager - INFO - easyquotation 实时数据获取成功
+2026-03-28 17:59:52,699 - storage - INFO - 加载本地数据 002304.SZ: 5 行, 日期范围 20260323-20260327
+2026-03-28 17:59:52,704 - storage - INFO - 保存数据 002304.SZ: 6 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\002304_SZ_day.csv
+2026-03-28 17:59:52,707 - storage - INFO - 保存完整数据(含指标) 002304.SZ: 6 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\002304_SZ_day.csv
+2026-03-28 17:59:52,708 - quant_system.data_source - INFO - 过滤 002304.SZ 非交易日数据 1 行
+2026-03-28 17:59:53,209 - data_manager - INFO - 开始获取数据: 000568.SZ (A_STOCK), 20260321-20260328, day
+2026-03-28 17:59:53,217 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:59:53,290 - source.tushare - WARNING - Tushare pro_bar 不可用, 改用 daily+adj_factor 手动复权
+2026-03-28 17:59:53,340 - werkzeug - INFO - 127.0.0.1 - - [28/Mar/2026 17:59:53] "GET /api/data/realtime/latest HTTP/1.1" 200 -
+2026-03-28 17:59:53,626 - source.tushare - INFO - Tushare daily+adj_factor 手动前复权成功: 601318.SH
+2026-03-28 17:59:53,733 - source.tushare - WARNING - Tushare pro_bar 不可用, 改用 daily+adj_factor 手动复权
+2026-03-28 17:59:53,781 - source.tushare - INFO - Tushare Pro PE_TTM/PB 获取成功: 601318.SH, 4570 条
+2026-03-28 17:59:53,782 - source.tushare - INFO - Tushare Pro A股(前复权) 获取成功: 601318.SH, 4570 条
+2026-03-28 17:59:53,790 - storage - INFO - 加载本地数据 601318.SH: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:53,837 - storage - INFO - 保存数据 601318.SH: 4571 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\601318_SH_day.csv
+2026-03-28 17:59:53,978 - source.tushare - INFO - Tushare daily+adj_factor 手动前复权成功: 000568.SZ
+2026-03-28 17:59:54,058 - source.tushare - INFO - Tushare Pro PE_TTM/PB 获取成功: 000568.SZ, 5 条
+2026-03-28 17:59:54,063 - source.tushare - INFO - Tushare Pro A股(前复权) 获取成功: 000568.SZ, 5 条
+2026-03-28 17:59:54,070 - storage - INFO - 保存数据 000568.SZ: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\000568_SZ_day.csv
+2026-03-28 17:59:54,081 - storage - INFO - 保存完整数据(含指标) 000568.SZ: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\000568_SZ_day.csv
+2026-03-28 17:59:54,120 - storage - INFO - 保存完整数据(含指标) 601318.SH: 4571 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\601318_SH_day.csv
+2026-03-28 17:59:54,128 - quant_system.data_source - INFO - 过滤 601318.SH 非交易日数据 1 行
+2026-03-28 17:59:54,133 - quant_system.data_source - INFO - 601318.SH: 数据略有缺失 — 预期 4679, 实际 4570, 缺失 109 (2.33%)
+2026-03-28 17:59:54,178 - data_manager - INFO - 开始获取数据: 002594.SZ (A_STOCK), 20030101-20260328, day
+2026-03-28 17:59:54,203 - storage - INFO - 加载本地数据 002594.SZ: 3569 行, 日期范围 20110630-20260328
+2026-03-28 17:59:54,206 - data_manager - INFO - 增量更新: 从 20260329 开始 (本地数据到 20260328)
+2026-03-28 17:59:54,224 - storage - INFO - 加载本地数据 002594.SZ: 3569 行, 日期范围 20110630-20260328
+2026-03-28 17:59:54,225 - data_manager - WARNING - 本地数据不完整 (002594.SZ): 最早 20110630, 请求起始 20030101, 差距 3102 天，需重新获取
+2026-03-28 17:59:54,226 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:59:54,584 - data_manager - INFO - 开始获取数据: 600009.SH (A_STOCK), 20260321-20260328, day
+2026-03-28 17:59:54,585 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:59:55,083 - source.tushare - WARNING - Tushare pro_bar 不可用, 改用 daily+adj_factor 手动复权
+2026-03-28 17:59:55,150 - source.tushare - WARNING - Tushare pro_bar 不可用, 改用 daily+adj_factor 手动复权
+2026-03-28 17:59:55,216 - source.tushare - INFO - Tushare daily+adj_factor 手动前复权成功: 600009.SH
+2026-03-28 17:59:55,289 - source.tushare - INFO - Tushare Pro PE_TTM/PB 获取成功: 600009.SH, 5 条
+2026-03-28 17:59:55,290 - source.tushare - INFO - Tushare Pro A股(前复权) 获取成功: 600009.SH, 5 条
+2026-03-28 17:59:55,293 - storage - INFO - 保存数据 600009.SH: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\600009_SH_day.csv
+2026-03-28 17:59:55,304 - storage - INFO - 保存完整数据(含指标) 600009.SH: 5 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\600009_SH_day.csv
+2026-03-28 17:59:55,501 - source.tushare - INFO - Tushare daily+adj_factor 手动前复权成功: 002594.SZ
+2026-03-28 17:59:55,648 - source.tushare - INFO - Tushare Pro PE_TTM/PB 获取成功: 002594.SZ, 3568 条
+2026-03-28 17:59:55,649 - source.tushare - INFO - Tushare Pro A股(前复权) 获取成功: 002594.SZ, 3568 条
+2026-03-28 17:59:55,672 - storage - INFO - 加载本地数据 002594.SZ: 3569 行, 日期范围 20110630-20260328
+2026-03-28 17:59:55,764 - storage - INFO - 保存数据 002594.SZ: 3569 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\002594_SZ_day.csv
+2026-03-28 17:59:55,815 - data_manager - INFO - 开始获取数据: 002572.SZ (A_STOCK), 20260321-20260328, day
+2026-03-28 17:59:55,863 - data_manager - INFO - 尝试历史数据源: tushare
+2026-03-28 17:59:55,977 - storage - INFO - 保存完整数据(含指标) 002594.SZ: 3569 行 -> D:\Git_project\vibecoding_quant\data_sourcing\data\002594_SZ_day.csv
+2026-03-28 17:59:56,010 - quant_system.data_source - INFO - 过滤 002594.SZ 非交易日数据 1 行
+2026-03-28 17:59:56,014 - quant_system.data_source - INFO - 002594.SZ: 数据略有缺失 — 预期 3614, 实际 3568, 缺失 46 (1.27%)
+2026-03-28 17:59:56,051 - data_manager - INFO - 开始获取数据: 300750.SZ (A_STOCK), 20030101-20260328, day
+2026-03-28 17:59:56,057 - storage - INFO - 加载本地数据 300750.SZ: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:56,060 - data_manager - INFO - 增量更新: 从 20260329 开始 (本地数据到 20260328)
+2026-03-28 17:59:56,062 - storage - INFO - 加载本地数据 300750.SZ: 6 行, 日期范围 20260323-20260328
+2026-03-28 17:59:56,062 - data_manager - WARNING - 本地数据不完整 (300750.SZ): 最早 20260323, 请求起始 20030101, 差距 8482 天，需重新获取
+2026-03-28 17:59:56,062 - data_manager - INFO - 尝试历史数据源: tushare

@@ -1,0 +1,646 @@
+{% extends "base.html" %}
+
+{% block title %}仪表盘 - 量化交易系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2>仪表盘</h2>
+        <small class="text-muted" id="dashboard-last-update"></small>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="total-capital">-</div>
+                <div class="metric-label">总资产</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="available-cash">-</div>
+                <div class="metric-label">可用资金</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="position-ratio">-</div>
+                <div class="metric-label">仓位比例</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="unrealized-pnl">-</div>
+                <div class="metric-label">浮动盈亏</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="today-pnl">-</div>
+                <div class="metric-label">今日盈亏</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value text-info" style="font-size:1rem">{{ data_start_date }}</div>
+                <div class="metric-label">数据开始日期</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 指数行情 -->
+<div class="row mb-3 mt-4" id="index-section">
+    <div class="col-12">
+        <h5>指数行情</h5>
+        <div class="row" id="index-cards">
+            <!-- filled dynamically -->
+        </div>
+    </div>
+</div>
+
+<!-- 实时行情汇总表 -->
+<div class="row mt-2">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">实时行情</h5>
+                <span id="rt-status-badge" class="badge bg-secondary">未启动</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0" id="realtime-summary-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="rt-sortable" data-col="0" style="cursor:pointer;user-select:none;white-space:nowrap">代码</th>
+                                <th class="rt-sortable" data-col="1" style="cursor:pointer;user-select:none;white-space:nowrap">名称</th>
+                                <th class="rt-sortable" data-col="2" style="cursor:pointer;user-select:none;white-space:nowrap">最新价</th>
+                                <th class="rt-sortable" data-col="3" style="cursor:pointer;user-select:none;white-space:nowrap">涨跌</th>
+                                <th class="rt-sortable" data-col="4" style="cursor:pointer;user-select:none;white-space:nowrap">涨跌幅</th>
+                                <th class="rt-sortable" data-col="5" style="cursor:pointer;user-select:none;white-space:nowrap">评分</th>
+                                <th class="rt-sortable" data-col="6" style="cursor:pointer;user-select:none;white-space:nowrap">今开</th>
+                                <th class="rt-sortable" data-col="7" style="cursor:pointer;user-select:none;white-space:nowrap">最高</th>
+                                <th class="rt-sortable" data-col="8" style="cursor:pointer;user-select:none;white-space:nowrap">最低</th>
+                                <th>备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="realtime-summary-body">
+                            <tr><td colspan="11" class="text-center text-muted py-3">等待实时数据...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>持仓列表</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm" id="positions-table">
+                        <thead>
+                            <tr>
+                                <th>代码</th>
+                                <th>名称</th>
+                                <th>持仓</th>
+                                <th>成本价</th>
+                                <th>现价</th>
+                                <th>市值</th>
+                                <th>浮动盈亏</th>
+                                <th>今日盈亏</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="8" class="text-center">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>风险提醒</h5>
+            </div>
+            <div class="card-body" id="risk-alerts">
+                <p class="text-muted">加载中...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加股票 -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>添加股票</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-md-6 position-relative">
+                        <input type="text" class="form-control" id="add-stock-input" placeholder="输入代码或名称（如600519 或 贵州茅台）" autocomplete="off">
+                        <div id="stock-search-results" class="list-group position-absolute w-100" style="z-index:1050; max-height:200px; overflow-y:auto; display:none;"></div>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="add-stock-market">
+                            <option value="" disabled selected>选择市场</option>
+                            <option value="sh">上海</option>
+                            <option value="sz">深圳</option>
+                            <option value="hk">港股</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="add-stock-type">
+                            <option value="stock">个股</option>
+                            <option value="index">指数</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-success w-100" onclick="addStock()">添加</button>
+                    </div>
+                </div>
+                <div id="add-stock-msg" class="mt-2"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>快速查看</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <select class="form-select" id="stock-select">
+                            <option value="">选择股票</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-primary" onclick="viewStock()">查看详情</button>
+                        <button class="btn btn-secondary" onclick="runStrategy()">运行策略</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var _prevPrices = {};
+var _rtPollInterval = null;
+var _portfolioPollInterval = null;
+var _indexCodes = new Set();
+var _deletedCodes = new Set();  // codes removed by user this session
+var _sortCol = -1;   // active sort column index (-1 = none)
+var _sortDir = 'asc';
+
+function sortRealtimeTable(colIdx) {
+    if (_sortCol === colIdx) {
+        _sortDir = _sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+        _sortCol = colIdx;
+        _sortDir = 'asc';
+    }
+    applySortIndicators();
+    applyRealtimeSort();
+}
+
+function applySortIndicators() {
+    $('#realtime-summary-table thead th.rt-sortable').each(function() {
+        $(this).find('.sort-icon').remove();
+        if (parseInt($(this).data('col')) === _sortCol) {
+            $(this).append('<span class="sort-icon ms-1 text-primary">' + (_sortDir === 'asc' ? '▲' : '▼') + '</span>');
+        } else {
+            $(this).append('<span class="sort-icon ms-1 text-muted" style="opacity:0.3">⇅</span>');
+        }
+    });
+}
+
+function applyRealtimeSort() {
+    if (_sortCol < 0) return;
+    var tbody = $('#realtime-summary-body');
+    var rows = tbody.find('tr').filter(function() {
+        return $(this).find('td[colspan]').length === 0;
+    }).get();
+    rows.sort(function(a, b) {
+        var aText = $(a).find('td').eq(_sortCol).text().trim();
+        var bText = $(b).find('td').eq(_sortCol).text().trim();
+        var aNum = parseFloat(aText.replace(/[+%¥, ]/g, ''));
+        var bNum = parseFloat(bText.replace(/[+%¥, ]/g, ''));
+        var cmp = (!isNaN(aNum) && !isNaN(bNum))
+            ? aNum - bNum
+            : aText.localeCompare(bText, 'zh');
+        return _sortDir === 'asc' ? cmp : -cmp;
+    });
+    rows.forEach(function(row) { tbody.append(row); });
+}
+
+function loadStocks() {
+    $.get('/api/stocks', function(data) {
+        var indices = data.filter(s => s.type === 'index');
+        var stocks = data.filter(s => s.type === 'stock');
+
+        _indexCodes = new Set(indices.map(s => s.full_code || s.code));
+
+        var select = $('#stock-select');
+        select.empty().append('<option value="">选择股票</option>');
+        stocks.forEach(function(stock) {
+            select.append(`<option value="${stock.full_code}">${stock.name} (${stock.full_code})</option>`);
+        });
+
+        updateIndexCards(indices);
+    });
+}
+
+function updateIndexCards(indices) {
+    var html = '';
+    indices.forEach(function(s) {
+        var price = s.price != null ? parseFloat(s.price).toFixed(2) : '-';
+        var pct = s.change_pct != null ? parseFloat(s.change_pct) : null;
+        var chg = s.change != null ? parseFloat(s.change) : null;
+        var pctText = pct != null ? (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%' : '-';
+        var chgText = chg != null ? (chg >= 0 ? '+' : '') + chg.toFixed(2) : '';
+        var cls = pct != null ? (pct >= 0 ? 'positive' : 'negative') : 'neutral';
+        var safeFullCode = (s.full_code || s.code).replace(/[^a-zA-Z0-9]/g, '_');
+        html += `<div class="col-md-2 col-6" id="index-card-${safeFullCode}">
+            <a href="/stock/${s.full_code || s.code}" class="text-decoration-none">
+            <div class="card text-center p-2" style="cursor:pointer">
+                <div class="fw-bold text-muted small">${s.name}</div>
+                <div class="fs-5 fw-bold ${cls}" id="index-price-${safeFullCode}">${price}</div>
+                <div class="small ${cls}" id="index-pct-${safeFullCode}">${pctText} ${chgText}</div>
+            </div>
+            </a>
+        </div>`;
+    });
+    $('#index-cards').html(html);
+}
+
+function refreshPortfolio() {
+    $.get('/api/risk/portfolio', function(data) {
+        $('#total-capital').text('¥' + data.total_capital.toLocaleString());
+        $('#available-cash').text('¥' + data.available_cash.toLocaleString());
+        $('#position-ratio').text((data.position_ratio * 100).toFixed(1) + '%');
+
+        var pnlEl = $('#unrealized-pnl');
+        pnlEl.text('¥' + data.total_unrealized_pnl.toLocaleString());
+        pnlEl.removeClass('positive negative neutral');
+        if (data.total_unrealized_pnl > 0) pnlEl.addClass('positive');
+        else if (data.total_unrealized_pnl < 0) pnlEl.addClass('negative');
+        else pnlEl.addClass('neutral');
+
+        // 今日盈亏
+        var todayEl = $('#today-pnl');
+        var todayPnl = data.total_today_pnl || 0;
+        todayEl.text((todayPnl >= 0 ? '+' : '') + '¥' + todayPnl.toLocaleString());
+        todayEl.removeClass('positive negative neutral');
+        if (todayPnl > 0) todayEl.addClass('positive');
+        else if (todayPnl < 0) todayEl.addClass('negative');
+        else todayEl.addClass('neutral');
+
+        var alertsHtml = '';
+        if (data.stop_loss_alerts && data.stop_loss_alerts.length > 0) {
+            alertsHtml = '<ul class="list-group">';
+            data.stop_loss_alerts.forEach(function(alert) {
+                alertsHtml += `<li class="list-group-item list-group-item-warning">
+                    ${alert.name}(${alert.code}): ${alert.reason}
+                </li>`;
+            });
+            alertsHtml += '</ul>';
+        } else {
+            alertsHtml = '<p class="text-success">✅ 暂无风险提醒</p>';
+        }
+        $('#risk-alerts').html(alertsHtml);
+    });
+}
+
+function refreshPositions() {
+    $.get('/api/risk/positions', function(data) {
+        var tbody = $('#positions-table tbody');
+        tbody.empty();
+        if (data.length === 0) {
+            tbody.append('<tr><td colspan="8" class="text-center">暂无持仓</td></tr>');
+            return;
+        }
+        data.forEach(function(pos) {
+            var pnlClass = pos.unrealized_pnl > 0 ? 'positive' : (pos.unrealized_pnl < 0 ? 'negative' : 'neutral');
+            var todayClass = (pos.today_pnl || 0) > 0 ? 'positive' : ((pos.today_pnl || 0) < 0 ? 'negative' : 'neutral');
+            var todayPnl = pos.today_pnl || 0;
+            var todayPnlPct = pos.today_pnl_pct || 0;
+            tbody.append(`<tr>
+                <td>${pos.code}</td>
+                <td>${pos.name}</td>
+                <td>${pos.shares}</td>
+                <td>¥${pos.avg_cost.toFixed(2)}</td>
+                <td>¥${pos.current_price.toFixed(2)}</td>
+                <td>¥${pos.market_value.toLocaleString()}</td>
+                <td class="${pnlClass}">${pos.unrealized_pnl_pct.toFixed(2)}%</td>
+                <td class="${todayClass}">${todayPnl >= 0 ? '+' : ''}${todayPnlPct.toFixed(2)}%</td>
+            </tr>`);
+        });
+    });
+}
+
+$(document).ready(function() {
+    refreshPortfolio();
+    refreshPositions();
+    loadStocks();
+
+    // 绑定列头排序点击
+    $(document).on('click', '#realtime-summary-table thead th.rt-sortable', function() {
+        sortRealtimeTable(parseInt($(this).data('col')));
+    });
+    // 初始化排序指示器（显示淡色 ⇅）
+    applySortIndicators();
+
+    // 自动开启全局实时更新（如果尚未开启）
+    $.get('/api/data/realtime/global', function(resp) {
+        if (!resp.enabled) {
+            $.ajax({
+                url: '/api/data/realtime/global',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({enabled: true, interval: 5}),
+                success: function() { $(document).trigger('globalRtChanged', [true]); }
+            });
+        }
+    });
+
+    // 启动实时轮询（行情 + 持仓 + 组合）
+    startRtPolling();
+
+    $(document).on('globalRtChanged', function(e, enabled) {
+        if (enabled) startRtPolling(); else stopRtPolling();
+    });
+});
+
+function startRtPolling() {
+    if (_rtPollInterval) return;
+    fetchRealtimeSummary();
+    _rtPollInterval = setInterval(fetchRealtimeSummary, 5000);
+    // 持仓和组合每10秒刷新
+    _portfolioPollInterval = setInterval(function() {
+        refreshPortfolio();
+        refreshPositions();
+    }, 10000);
+}
+
+function stopRtPolling() {
+    if (_rtPollInterval) { clearInterval(_rtPollInterval); _rtPollInterval = null; }
+    if (_portfolioPollInterval) { clearInterval(_portfolioPollInterval); _portfolioPollInterval = null; }
+}
+
+function fetchRealtimeSummary() {
+    $.get('/api/data/realtime/latest', function(resp) {
+        var badge = $('#rt-status-badge');
+        if (resp.is_running) {
+            badge.removeClass('bg-secondary bg-danger').addClass('bg-success').text('更新中');
+        } else if (resp.global_enabled) {
+            badge.removeClass('bg-secondary bg-success').addClass('bg-warning text-dark').text('等待启动');
+        } else {
+            badge.removeClass('bg-success bg-warning').addClass('bg-secondary').text('未启动');
+        }
+
+        if (resp.last_update) {
+            $('#dashboard-last-update').text('最后更新: ' + resp.last_update);
+        }
+
+        var data = resp.data || {};
+        var keys = Object.keys(data);
+        if (keys.length === 0) return;
+
+        var tbody = $('#realtime-summary-body');
+        // 清除占位符（等待实时数据... / 暂无实时数据）
+        tbody.find('tr').each(function() {
+            if ($(this).find('td[colspan]').length > 0) $(this).remove();
+        });
+        keys.forEach(function(codeKey) {
+            var d = data[codeKey];
+
+            // Update index cards if this is an index code (match by full_code)
+            var fullCode = d.full_code || codeKey;
+            if (_indexCodes.has(fullCode)) {
+                var safeCode = fullCode.replace(/[^a-zA-Z0-9]/g, '_');
+                var pEl = document.getElementById('index-price-' + safeCode);
+                var rEl = document.getElementById('index-pct-' + safeCode);
+                if (pEl && d.price != null) pEl.textContent = parseFloat(d.price).toFixed(2);
+                if (rEl && d.pct_chg != null) {
+                    var p = parseFloat(d.pct_chg);
+                    var c = d.change != null ? parseFloat(d.change) : null;
+                    rEl.textContent = (p >= 0 ? '+' : '') + p.toFixed(2) + '%' + (c != null ? ' ' + (c >= 0 ? '+' : '') + c.toFixed(2) : '');
+                    rEl.className = 'small ' + (p >= 0 ? 'positive' : 'negative');
+                }
+                return;
+            }
+
+            var price = d.price;
+            var pct   = d.pct_chg;
+            var chg   = d.change;
+
+            var pctText = pct != null ? (parseFloat(pct) >= 0 ? '+' : '') + parseFloat(pct).toFixed(2) + '%' : '-';
+            var chgText = chg != null ? (parseFloat(chg) >= 0 ? '+' : '') + parseFloat(chg).toFixed(2) : '-';
+            var pctCls  = pct != null ? (parseFloat(pct) >= 0 ? 'positive' : 'negative') : 'neutral';
+
+            // 评分数据
+            var scoreVal = d.score;
+            var scoreText = scoreVal != null ? parseFloat(scoreVal).toFixed(1) : '-';
+            var ratingText = d.rating || '-';
+            var ratingColor = d.rating_color || '#999';
+            var dominantText = d.dominant || '';
+            var scoreTip = scoreVal != null ? (ratingText + (dominantText ? '(' + dominantText + ')' : '')) : '';
+
+            var rowId = 'rt-row-' + codeKey.replace(/[^a-zA-Z0-9]/g, '_');
+            var priceId = 'rt-price-' + codeKey.replace(/[^a-zA-Z0-9]/g, '_');
+            var scoreId = 'rt-score-' + codeKey.replace(/[^a-zA-Z0-9]/g, '_');
+
+            var existingRow = document.getElementById(rowId);
+            if (_deletedCodes.has(fullCode) || _deletedCodes.has(codeKey)) return;
+            if (!existingRow) {
+                var noteText = d.notes || '';
+                var noteId = 'rt-note-' + codeKey.replace(/[^a-zA-Z0-9]/g, '_');
+                var displayCode = fullCode;
+                var linkCode = fullCode;
+                tbody.append(`<tr id="${rowId}" data-fullcode="${fullCode}">
+                    <td>${displayCode}</td>
+                    <td>${d.name || codeKey}</td>
+                    <td id="${priceId}" class="fw-bold">${price != null ? price : '-'}</td>
+                    <td class="${pctCls}">${chgText}</td>
+                    <td class="${pctCls}">${pctText}</td>
+                    <td id="${scoreId}" style="color:${ratingColor};font-weight:bold;cursor:help" title="${scoreTip}">${scoreText}<small style="font-size:0.7em;margin-left:2px">${ratingText !== '-' ? ratingText : ''}</small></td>
+                    <td>${d.open != null ? d.open : '-'}</td>
+                    <td>${d.high != null ? d.high : '-'}</td>
+                    <td>${d.low  != null ? d.low  : '-'}</td>
+                    <td><span id="${noteId}" class="small text-muted text-truncate d-inline-block" style="max-width:80px;cursor:default" title="${noteText}">${noteText.length > 6 ? noteText.substring(0, 6) + '…' : noteText}</span></td>
+                    <td><a href="/stock/${linkCode}" class="btn btn-sm btn-outline-primary">详情</a>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteStock('${displayCode}')">删除</button></td>
+                </tr>`);
+            } else {
+                var prevPrice = _prevPrices[codeKey];
+                var priceEl = document.getElementById(priceId);
+                if (priceEl && price != null) {
+                    priceEl.textContent = price;
+                    if (prevPrice != null && price !== prevPrice) {
+                        var flashCls = parseFloat(price) >= parseFloat(prevPrice) ? 'value-flash-up' : 'value-flash-down';
+                        priceEl.classList.remove('value-flash-up', 'value-flash-down');
+                        void priceEl.offsetWidth;
+                        priceEl.classList.add(flashCls);
+                    }
+                }
+                // 更新评分单元格
+                var scoreEl = document.getElementById(scoreId);
+                if (scoreEl) {
+                    scoreEl.style.color = ratingColor;
+                    scoreEl.title = scoreTip;
+                    scoreEl.innerHTML = scoreText + (ratingText !== '-' ? '<small style="font-size:0.7em;margin-left:2px">' + ratingText + '</small>' : '');
+                }
+                var cells = existingRow.querySelectorAll('td');
+                if (cells[3]) { cells[3].textContent = chgText; cells[3].className = pctCls; }
+                if (cells[4]) { cells[4].textContent = pctText; cells[4].className = pctCls; }
+                if (cells[6]) cells[6].textContent = d.open != null ? d.open : '-';
+                if (cells[7]) cells[7].textContent = d.high != null ? d.high : '-';
+                if (cells[8]) cells[8].textContent = d.low  != null ? d.low  : '-';
+            }
+            _prevPrices[codeKey] = price;
+        });
+
+        // 每次数据刷新后维持当前排序
+        applyRealtimeSort();
+    });
+}
+
+function addStock() {
+    var input = $('#add-stock-input').val().trim();
+    var market = $('#add-stock-market').val();
+    var stockType = $('#add-stock-type').val();
+
+    if (!input) {
+        $('#add-stock-msg').html('<span class="text-danger">请输入股票代码或名称</span>');
+        return;
+    }
+
+    if (!market) {
+        $('#add-stock-msg').html('<span class="text-danger">请选择市场（上海/深圳/港股）</span>');
+        return;
+    }
+
+    // 自动检测是代码还是名称：纯数字视为代码，否则视为名称
+    var isCode = /^\d+$/.test(input) || /^[A-Z]+$/i.test(input);
+    var payload = {market: market, type: stockType};
+    if (isCode) {
+        payload.code = input;
+    } else {
+        payload.name = input;
+    }
+
+    $.ajax({
+        url: '/api/stocks/add',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(payload),
+        success: function(resp) {
+            $('#add-stock-msg').html('<span class="text-success">' + resp.message + '</span>');
+            $('#add-stock-input').val('');
+            loadStocks();
+        },
+        error: function(xhr) {
+            var err = xhr.responseJSON ? xhr.responseJSON.error : '添加失败';
+            $('#add-stock-msg').html('<span class="text-danger">' + err + '</span>');
+        }
+    });
+}
+
+function deleteStock(code) {
+    if (!confirm('确定要从监控列表删除 ' + code + ' 吗？')) return;
+    $.ajax({
+        url: '/api/stocks/' + encodeURIComponent(code),
+        method: 'DELETE',
+        success: function(resp) {
+            alert(resp.message || '已删除');
+            _deletedCodes.add(code);
+            // 移除对应的实时行（按 data-fullcode 属性精确匹配）
+            $('#realtime-summary-body tr[data-fullcode="' + code + '"]').remove();
+            loadStocks();
+        },
+        error: function(xhr) {
+            alert(xhr.responseJSON ? xhr.responseJSON.error : '删除失败');
+        }
+    });
+}
+
+// 搜索自动补全 - 统一输入框
+var _searchTimer = null;
+$('#add-stock-input').on('input', function() {
+    var q = $(this).val().trim();
+    clearTimeout(_searchTimer);
+    if (q.length < 2) {
+        $('#stock-search-results').hide();
+        return;
+    }
+    _searchTimer = setTimeout(function() {
+        $.get('/api/stocks/search?q=' + encodeURIComponent(q), function(results) {
+            var container = $('#stock-search-results');
+            container.empty();
+            if (!results || results.length === 0) {
+                container.hide();
+                return;
+            }
+            results.forEach(function(r) {
+                var badge = r.exists ? '<span class="badge bg-secondary ms-1">已添加</span>' : '';
+                container.append(
+                    '<a href="#" class="list-group-item list-group-item-action py-1 px-2 small" ' +
+                    'data-code="' + r.code + '" data-name="' + r.name + '" data-market="' + r.market + '">' +
+                    r.name + ' (' + r.code + ') ' + badge + '</a>'
+                );
+            });
+            container.show();
+            container.find('a').on('click', function(e) {
+                e.preventDefault();
+                $('#add-stock-input').val($(this).data('code'));
+                if ($(this).data('market')) {
+                    $('#add-stock-market').val($(this).data('market'));
+                }
+                container.hide();
+            });
+        });
+    }, 400);
+});
+
+$(document).on('click', function(e) {
+    if (!$(e.target).closest('#add-stock-input, #stock-search-results').length) {
+        $('#stock-search-results').hide();
+    }
+});
+
+function viewStock() {
+    var code = $('#stock-select').val();
+    if (code) window.location.href = '/stock/' + code;
+}
+
+function runStrategy() {
+    var code = $('#stock-select').val();
+    if (code) window.location.href = '/strategy?code=' + code;
+}
+
+</script>
+{% endblock %}

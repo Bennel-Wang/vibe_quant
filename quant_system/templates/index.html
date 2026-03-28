@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - 量化交易系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">欢迎使用量化交易系统</h1>
+        <p class="lead">这是一个功能完整的量化交易平台，支持数据采集、技术指标分析、策略回测等功能。</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">📊 数据管理</h5>
+                <p class="card-text">管理股票列表，查看历史数据和实时行情。</p>
+                <a href="/dashboard" class="btn btn-primary">进入仪表盘</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">📈 策略回测</h5>
+                <p class="card-text">使用历史数据验证您的交易策略。</p>
+                <a href="/backtest" class="btn btn-primary">开始回测</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">🛡️ 风险管理</h5>
+                <p class="card-text">查看持仓情况和风险指标。</p>
+                <a href="/risk" class="btn btn-primary">查看风控</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <h3>股票列表</h3>
+        <div id="stock-list" class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>代码</th>
+                        <th>名称</th>
+                        <th>市场</th>
+                        <th>类型</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="stock-table-body">
+                    <tr>
+                        <td colspan="5" class="text-center">加载中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // 加载股票列表
+    $.get('/api/stocks', function(data) {
+        var tbody = $('#stock-table-body');
+        tbody.empty();
+        
+        data.forEach(function(stock) {
+            var row = `<tr>
+                <td>${stock.full_code}</td>
+                <td>${stock.name}</td>
+                <td>${stock.market.toUpperCase()}</td>
+                <td>${stock.type === 'stock' ? '个股' : (stock.type === 'index' ? '指数' : '板块')}</td>
+                <td>
+                    <a href="/stock/${stock.full_code}" class="btn btn-sm btn-info">详情</a>
+                </td>
+            </tr>`;
+            tbody.append(row);
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,88 @@
+项目结构
+plaintext
+vibequation/
+├── config.yaml              # 主配置文件
+├── requirements.txt         # Python依赖
+├── main.py                  # 主程序入口
+├── config/
+│   └── stocks.yaml          # 股票代码配置
+├── data/                    # 数据存储目录
+│   ├── history/             # 历史数据
+│   ├── realtime/            # 实时数据
+│   ├── news/                # 新闻数据
+│   ├── indicators/          # 技术指标
+│   ├── features/            # 特征数据
+│   └── backtest/            # 回测结果
+├── logs/                    # 日志目录
+└── quant_system/            # 核心模块
+    ├── __init__.py
+    ├── config_manager.py    # 配置管理
+    ├── stock_manager.py     # 股票代码管理
+    ├── data_source.py       # 数据源(Tushare+Easyquotation)
+    ├── news_collector.py    # 新闻采集与情感分析
+    ├── indicators.py        # 技术指标计算
+    ├── data_cleaner.py      # 数据清洗
+    ├── feature_extractor.py # 特征提取(AI分析)
+    ├── strategy.py          # 策略层
+    ├── backtest.py          # 回测引擎
+    ├── risk_manager.py      # 风控模块
+    ├── notification.py      # 消息通知(PushPlus)
+    ├── web_app.py           # Web服务
+    ├── templates/           # HTML模板
+    │   ├── base.html
+    │   ├── index.html
+    │   ├── dashboard.html
+    │   ├── stock_detail.html
+    │   ├── backtest.html
+    │   ├── strategy.html
+    │   └── risk.html
+    └── static/              # 静态文件
+        ├── css/
+        └── js/
+功能模块说明
+模块	功能
+配置管理	YAML配置文件，统一管理所有Token和参数
+股票管理	统一管理股票/板块/指数代码，支持多格式转换
+数据源	Tushare采集历史数据，Easyquotation采集实时数据
+新闻采集	新浪财经新闻采集，支持情感分析
+技术指标	RSI、MACD、KDJ、布林带、移动平均线等
+数据清洗	缺失值填充、去重、异常值检测、数据对齐
+特征提取	AI分析股票特征，推荐最适合的策略类型
+策略层	自然语言策略描述、量化规则、AI决策
+回测引擎	支持多策略回测，计算收益率、夏普比率、最大回撤等
+风控模块	仓位管理、止损止盈、风险预警
+消息通知	PushPlus微信推送
+Web界面	Flask可视化界面，支持K线图、回测图表等
+使用方法
+安装依赖
+bash
+pip install -r requirements.txt
+配置Token
+编辑 config.yaml，填入您的Token：
+tushare_token: Tushare Pro API Token
+pushplus_token: PushPlus消息推送Token
+modelscope_token: ModelScope AI模型Token
+启动Web服务
+bash
+python main.py web
+访问 http://127.0.0.1:8080
+命令行使用
+bash
+# 更新数据
+python main.py update-data
+
+# 运行策略
+python main.py run-strategy -c 600519 -s rsi
+
+# 回测
+python main.py backtest -c 600519 -s macd --start-date 20230101
+
+# 风险报告
+python main.py risk-report
+
+# 查看帮助
+python main.py --help
+Repo Wiki
+使用 Wiki 增强 AI 智能体
+
+为此仓库生成 Repo Wiki，通过结构化上下文增强 AI 智能体的能力。

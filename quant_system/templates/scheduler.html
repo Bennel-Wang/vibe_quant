@@ -1,0 +1,832 @@
+{% extends "base.html" %}
+{% block title %}定时任务调度器{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h4 class="mb-0">📅 定时任务调度器</h4>
+</div>
+
+<style>
+/* ── Scheduler page styles ── */
+.sched-section-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6c757d;
+    margin-bottom: 0.6rem;
+}
+/* Task table */
+#tasks-table thead th {
+    background: #343a40;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border: none;
+    padding: 0.6rem 0.75rem;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+#tasks-table tbody tr { transition: background 0.15s; }
+#tasks-table tbody tr:hover { background: rgba(13,110,253,0.04); }
+#tasks-table td {
+    vertical-align: middle;
+    padding: 0.55rem 0.75rem;
+    border-color: #f0f0f0;
+    font-size: 0.875rem;
+}
+.task-name-cell .task-label { font-weight: 600; font-size: 0.9rem; }
+.task-name-cell .task-key  { font-size: 0.72rem; color: #9e9e9e; }
+.task-type-badge {
+    font-size: 0.68rem;
+    padding: 0.18em 0.55em;
+    border-radius: 3px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+.sched-badge {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.3em 0.65em;
+    border-radius: 5px;
+    background: #e9ecef;
+    color: #495057;
+    font-family: monospace;
+    letter-spacing: 0.03em;
+}
+.status-badge { font-size: 0.75rem; padding: 0.3em 0.7em; border-radius: 4px; }
+.last-run-text { font-size: 0.75rem; color: #6c757d; }
+.result-text {
+    font-size: 0.75rem;
+    color: #6c757d;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+}
+.task-actions .btn { padding: 0.2rem 0.5rem; font-size: 0.78rem; line-height: 1.3; }
+.task-actions .btn + .btn { margin-left: 2px; }
+/* custom task separator row */
+.custom-tasks-divider td {
+    background: #f8f9fa;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #6c757d;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.75rem;
+    border-top: 2px solid #dee2e6;
+}
+/* ── Add-task card ── */
+.add-task-card {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem 0.9rem;
+}
+.add-task-card .form-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+.type-toggle-group .btn {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 5px;
+}
+.skip-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    cursor: pointer;
+    user-select: none;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    background: #fff;
+    transition: border-color 0.15s, background 0.15s;
+}
+.skip-toggle:has(input:checked) {
+    border-color: #0d6efd;
+    background: #e8f0fe;
+    color: #0d6efd;
+}
+.skip-toggle input { cursor: pointer; accent-color: #0d6efd; }
+/* Dark theme overrides */
+[data-theme="dark"] #tasks-table tbody tr:hover { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] #tasks-table td { border-color: #2a2a2a; }
+[data-theme="dark"] .sched-badge { background: #2d2d2d; color: #bbb; }
+[data-theme="dark"] .add-task-card { background: #1e1e1e; border-color: #333; }
+[data-theme="dark"] .skip-toggle { background: #2d2d2d; border-color: #444; color: #ccc; }
+[data-theme="dark"] .skip-toggle:has(input:checked) { background: #1a2a4a; border-color: #4d8fda; color: #7ab3f5; }
+[data-theme="dark"] .custom-tasks-divider td { background: #252525; border-top-color: #333; }
+</style>
+
+<!-- ── 调度器状态栏 ── -->
+<div class="d-flex flex-wrap align-items-center gap-3 mb-4 px-3 py-2 rounded border" style="background:var(--bs-body-bg,#fff)">
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge fs-6 px-3 py-2" id="scheduler-badge" style="min-width:80px">加载中</span>
+        <span id="status-text" class="small text-muted"></span>
+    </div>
+    <div class="vr d-none d-sm-block" style="height:28px"></div>
+    <div class="d-flex align-items-center gap-1 small">
+        <span class="text-muted">📅 今日交易日：</span>
+        <strong id="trading-day-text">—</strong>
+    </div>
+    <div class="vr d-none d-sm-block" style="height:28px"></div>
+    <div class="d-flex align-items-center gap-1 small">
+        <span class="text-muted">⏰ 下次执行：</span>
+        <code id="next-run-text" style="font-size:0.85rem">—</code>
+    </div>
+    <div class="ms-auto d-flex gap-2 flex-wrap">
+        <button class="btn btn-sm btn-primary" onclick="runAllTasks()">⚡ 立即全部执行</button>
+        <button class="btn btn-sm btn-success" id="btn-start" onclick="toggleScheduler(true)">▶ 启动</button>
+        <button class="btn btn-sm btn-outline-warning" id="btn-stop" onclick="toggleScheduler(false)">⏹ 停止</button>
+    </div>
+</div>
+
+<!-- ── 任务列表 ── -->
+<div class="sched-section-title">任务列表</div>
+<div class="table-responsive mb-4">
+    <table class="table table-hover align-middle mb-0" id="tasks-table" style="border-radius:8px;overflow:hidden;border:1px solid #dee2e6">
+        <thead>
+            <tr>
+                <th style="width:26%">任务</th>
+                <th style="width:9%" class="text-center">定时</th>
+                <th style="width:9%" class="text-center">跳过非交易日</th>
+                <th style="width:7%" class="text-center">启用</th>
+                <th style="width:9%" class="text-center">状态</th>
+                <th style="width:14%">上次执行</th>
+                <th style="width:14%">结果</th>
+                <th style="width:12%" class="text-center">操作</th>
+            </tr>
+        </thead>
+        <tbody id="tasks-body">
+            <tr><td colspan="8" class="text-center text-muted py-4">加载中…</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ── 新增任务 ── -->
+<div class="sched-section-title">新增定时任务</div>
+<div class="add-task-card mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label" for="new-task-name">任务名称</label>
+            <input type="text" class="form-control form-control-sm" id="new-task-name" placeholder="例如：盘中小结">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label" for="new-task-time">执行时间</label>
+            <input type="time" class="form-control form-control-sm" id="new-task-time">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">任务类型（可多选）</label>
+            <div id="new-task-types" class="type-toggle-group d-flex flex-wrap gap-1">
+                <input type="checkbox" class="btn-check" id="type-data_update" autocomplete="off" checked>
+                <label class="btn btn-outline-primary btn-sm" for="type-data_update">📊 数据更新</label>
+                <input type="checkbox" class="btn-check" id="type-ai_report" autocomplete="off">
+                <label class="btn btn-outline-success btn-sm" for="type-ai_report">🤖 AI日报</label>
+                <input type="checkbox" class="btn-check" id="type-strategy_alert" autocomplete="off">
+                <label class="btn btn-outline-warning btn-sm" for="type-strategy_alert">📡 策略提醒</label>
+            </div>
+        </div>
+        <div class="col-md-2 d-flex flex-column gap-2">
+            <label class="form-label mb-0">选项</label>
+            <label class="skip-toggle">
+                <input type="checkbox" id="new-skip-nontrading" checked>
+                <span>🚫 跳过非交易日</span>
+            </label>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-3 pt-2" style="border-top:1px solid #dee2e6">
+        <small class="text-muted">添加后可在列表中点击 ✏️ 编辑或 🗑️ 删除</small>
+        <button class="btn btn-primary btn-sm px-3" id="btn-add-task" onclick="addUnifiedTask()">
+            ➕ 添加任务
+        </button>
+    </div>
+</div>
+
+<!-- 自定义任务已整合到主任务列表（右侧操作可编辑/执行/删除） -->
+
+<script>
+var _pollTimer = null;
+var schedulerConfigModal = null;
+
+function loadStatus() {
+    $.get('/api/scheduler/status', function(data) {
+        var running = data.is_running;
+        $('#scheduler-badge').text(running ? '运行中' : '已停止')
+            .removeClass('bg-secondary bg-success bg-danger')
+            .addClass(running ? 'bg-success' : 'bg-danger');
+        $('#status-text').text(running ? '✅ 运行中' : '⏹ 已停止');
+        $('#btn-start').toggle(!running);
+        $('#btn-stop').toggle(running);
+        $('#trading-day-text').text(data.is_trading_day ? '✅ 是' : '❌ 否');
+        var nextRuns = data.next_run_times || [];
+        $('#next-run-text').text(nextRuns.length ? nextRuns[0] : '无计划任务');
+    });
+}
+
+function loadTasks() {
+    $.get('/api/scheduler/tasks', function(tasks) {
+        var tbody = $('#tasks-body');
+        tbody.empty();
+        window._schedulerTasks = tasks || {};
+
+        var typeMap = { 'data_update': ['📊 数据更新', 'bg-primary'], 'ai_report': ['🤖 AI日报', 'bg-success'], 'strategy_alert': ['📡 策略提醒', 'bg-warning text-dark'] };
+
+        function renderRow(key, t, isCustom) {
+            // Status badge
+            var statusBadge = t.running
+                ? '<span class="badge bg-warning text-dark status-badge"><span class="spinner-border spinner-border-sm me-1" style="width:.6rem;height:.6rem"></span>运行中</span>'
+                : (t.last_success === true
+                    ? '<span class="badge bg-success status-badge">✔ 完成</span>'
+                    : (t.last_success === false
+                        ? '<span class="badge bg-danger status-badge">✖ 失败</span>'
+                        : '<span class="badge bg-secondary status-badge">— 未执行</span>'));
+            // Enable badge
+            var enableBadge = t.enabled
+                ? '<span class="badge bg-success bg-opacity-75 status-badge">启用</span>'
+                : '<span class="badge bg-secondary status-badge">禁用</span>';
+            // Skip badge
+            var skipBadge = t.skip_non_trading_day
+                ? '<span title="跳过非交易日" style="font-size:1.1rem">✅</span>'
+                : '<span title="不跳过非交易日" style="font-size:1.1rem;opacity:.35">🚫</span>';
+            // Schedule
+            var schedule = t.schedule || '--';
+            var scheduleBadge = '<span class="sched-badge">' + schedule + '</span>';
+            // Last run
+            var lastRun = t.last_run || '--';
+            var lastRunHtml = '<span class="last-run-text">' + lastRun + '</span>';
+            // Result
+            var rawResult = t.last_result || '--';
+            var shortResult = (rawResult.length > 38) ? rawResult.substring(0, 38) + '…' : rawResult;
+            var resultHtml = '<span class="result-text" title="' + rawResult.replace(/"/g, '&quot;') + '">' + shortResult + '</span>';
+            // Label & key
+            var label = t.label || key;
+            // Types badges
+            var typesHtml = '';
+            if (t.types && t.types.length) {
+                t.types.forEach(function(tp) {
+                    var info = typeMap[tp] || [tp, 'bg-secondary'];
+                    typesHtml += '<span class="badge task-type-badge ' + info[1] + ' me-1">' + info[0] + '</span>';
+                });
+            }
+            var nameCell =
+                '<div class="task-name-cell">' +
+                  '<div class="task-label">' + label + '</div>' +
+                  '<div class="task-key">' + key + '</div>' +
+                  (typesHtml ? '<div class="mt-1">' + typesHtml + '</div>' : '') +
+                '</div>';
+            // Action buttons
+            var btnDisabled = t.running ? 'disabled' : '';
+            var runIcon = t.running ? '<span class="spinner-border spinner-border-sm" style="width:.65rem;height:.65rem"></span>' : '▶';
+            var ops = '<div class="task-actions d-flex justify-content-center gap-1">';
+            if (isCustom) {
+                var cid = key.replace('custom_', '');
+                ops += '<button class="btn btn-sm btn-outline-secondary" title="编辑" onclick="editCustomTask(\'' + cid + '\')">✏️</button>';
+                ops += '<button class="btn btn-sm btn-outline-primary" title="立即执行" onclick="runCustomTask(\'' + cid + '\')" ' + btnDisabled + '>' + runIcon + '</button>';
+                ops += t.enabled
+                    ? '<button class="btn btn-sm btn-outline-warning" title="禁用" onclick="toggleCustomEnable(\''+cid+'\', false)">⏸</button>'
+                    : '<button class="btn btn-sm btn-outline-success" title="启用" onclick="toggleCustomEnable(\''+cid+'\', true)">▶️</button>';
+                ops += '<button class="btn btn-sm btn-outline-danger" title="删除" onclick="deleteCustomTask(\''+cid+'\')">🗑️</button>';
+            } else {
+                ops += '<button class="btn btn-sm btn-outline-primary" title="立即执行" onclick="runTask(\'' + key + '\')" ' + btnDisabled + '>' + runIcon + '</button>';
+                ops += t.enabled
+                    ? '<button class="btn btn-sm btn-outline-warning" title="禁用" onclick="toggleTaskEnable(\''+key+'\', false)">⏸</button>'
+                    : '<button class="btn btn-sm btn-outline-success" title="启用" onclick="toggleTaskEnable(\''+key+'\', true)">▶️</button>';
+                ops += '<button class="btn btn-sm btn-outline-danger" title="删除" onclick="deleteTask(\''+key+'\')">🗑️</button>';
+            }
+            ops += '</div>';
+            tbody.append(
+                '<tr>' +
+                '<td>' + nameCell + '</td>' +
+                '<td class="text-center">' + scheduleBadge + '</td>' +
+                '<td class="text-center">' + skipBadge + '</td>' +
+                '<td class="text-center">' + enableBadge + '</td>' +
+                '<td class="text-center">' + statusBadge + '</td>' +
+                '<td>' + lastRunHtml + '</td>' +
+                '<td>' + resultHtml + '</td>' +
+                '<td>' + ops + '</td>' +
+                '</tr>'
+            );
+        }
+
+        // 只渲染自定义任务
+        var customKeys = Object.keys(tasks).filter(function(k) {
+            return k.startsWith('custom_') && tasks[k];
+        });
+        if (customKeys.length === 0) {
+            tbody.append('<tr><td colspan="8" class="text-center text-muted py-4">暂无自定义任务，请在下方添加</td></tr>');
+        } else {
+            customKeys.forEach(function(k) { renderRow(k, tasks[k], true); });
+        }
+    });
+}
+
+function runTask(name) {
+    $.post('/api/scheduler/run/' + name, function(resp) {
+        if (resp.success) {
+            showToast(resp.message, 'success');
+            startPolling();
+        } else {
+            showToast(resp.error || '触发失败', 'danger');
+        }
+    }).fail(function(xhr) {
+        var msg = xhr.responseJSON ? xhr.responseJSON.error : '请求失败';
+        showToast(msg, 'danger');
+    });
+}
+
+function runAllTasks() {
+    $.post('/api/scheduler/run', function(resp) {
+        if (resp.success) {
+            showToast('全部任务已在后台启动', 'success');
+            startPolling();
+        }
+    });
+}
+
+function toggleScheduler(start) {
+    var url = start ? '/api/scheduler/start' : '/api/scheduler/stop';
+    $.post(url, function(resp) {
+        showToast(resp.message || '操作完成', 'success');
+        loadStatus();
+    });
+}
+
+function startPolling() {
+    if (_pollTimer) clearInterval(_pollTimer);
+    loadTasks();
+    _pollTimer = setInterval(function() {
+        loadTasks();
+        // 如果没有任务在运行，停止轮询
+        $.get('/api/scheduler/tasks', function(tasks) {
+            var anyRunning = false;
+            Object.keys(tasks).forEach(function(k) { if (tasks[k].running) anyRunning = true; });
+            if (!anyRunning && _pollTimer) {
+                clearInterval(_pollTimer);
+                _pollTimer = null;
+            }
+        });
+    }, 3000);
+}
+
+function showToast(msg, type) {
+    var id = 'toast-' + Date.now();
+    $('body').append(
+        '<div id="' + id + '" class="position-fixed top-0 end-0 m-3 alert alert-' + (type || 'info') + ' shadow" style="z-index:9999">' + msg + '</div>'
+    );
+    setTimeout(function() { $('#' + id).fadeOut(function() { $(this).remove(); }); }, 3000);
+}
+
+$(function() {
+    loadStatus();
+    loadTasks();
+    loadNotificationStatus();
+    if (document.getElementById('scheduler-config-modal')) {
+        schedulerConfigModal = new bootstrap.Modal(document.getElementById('scheduler-config-modal'));
+        loadSchedulerStocks();
+    }
+    if (document.getElementById('custom-task-modal')) {
+        customTaskModal = new bootstrap.Modal(document.getElementById('custom-task-modal'));
+        $('#custom-task-save').on('click', function() {
+            var id = $('#custom-task-id').val();
+            var name = $('#custom-task-name').val().trim();
+            var time = $('#custom-task-time').val();
+            var types = [];
+            if ($('#custom-type-data_update').is(':checked')) types.push('data_update');
+            if ($('#custom-type-ai_report').is(':checked')) types.push('ai_report');
+            if ($('#custom-type-strategy_alert').is(':checked')) types.push('strategy_alert');
+            var enabled = $('#custom-task-enabled').is(':checked');
+            var skip = $('#custom-task-skip').is(':checked');
+            if (!name || !time || types.length === 0) { showToast('请输入名称/时间并选择至少一个类型', 'warning'); return; }
+            $.ajax({
+                url: '/api/scheduler/custom_tasks/' + id,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({time: time, name: name, types: types, enabled: enabled, skip_non_trading_day: skip}),
+                success: function(resp) {
+                    if (resp && resp.success) {
+                        showToast('已保存', 'success');
+                        if (customTaskModal) customTaskModal.hide();
+                        loadTasks();
+                    } else {
+                        showToast(resp.error || '保存失败', 'danger');
+                    }
+                },
+                error: function() { showToast('保存失败', 'danger'); }
+            });
+        });
+    }
+    setInterval(loadStatus, 15000);
+});
+</script>
+
+<script>
+function runCustomTask(id) {
+    $.post('/api/scheduler/custom_tasks/' + id + '/run', function(resp) {
+        if (resp && resp.success) {
+            showToast('自定义任务已触发', 'success');
+            startPolling();
+        } else {
+            showToast((resp && resp.error) || '触发失败', 'danger');
+        }
+    }).fail(function() { showToast('触发失败', 'danger'); });
+}
+
+// Wrapper to delete custom task (used by buttons). Use direct AJAX to avoid double prompts.
+function deleteCustomTask(id) {
+    if (!confirm('确认删除任务 ?')) return;
+    $.ajax({
+        url: '/api/scheduler/custom_tasks/' + id,
+        method: 'DELETE',
+        success: function(resp) { showToast('已删除', 'success'); loadTasks(); },
+        error: function() { showToast('删除失败', 'danger'); }
+    });
+}
+
+function addUnifiedTask() {
+    var name = $('#new-task-name').val().trim();
+    var time = $('#new-task-time').val();
+    var types = [];
+    if ($('#type-data_update').is(':checked')) types.push('data_update');
+    if ($('#type-ai_report').is(':checked')) types.push('ai_report');
+    if ($('#type-strategy_alert').is(':checked')) types.push('strategy_alert');
+    var skip = $('#new-skip-nontrading').is(':checked');
+    if (!time || !name || types.length === 0) { showToast('请输入名称/时间并选择至少一个类型', 'warning'); return; }
+    $.ajax({
+        url: '/api/scheduler/custom_tasks',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({time: time, name: name, types: types, enabled: true, skip_non_trading_day: skip}),
+        success: function(resp) {
+            if (resp.success) {
+                $('#new-task-name').val('');
+                $('#new-task-time').val('');
+                $('#type-data_update').prop('checked', true);
+                $('#type-ai_report').prop('checked', false);
+                $('#type-strategy_alert').prop('checked', false);
+                $('#new-skip-nontrading').prop('checked', true);
+                showToast('已添加任务', 'success');
+                loadTasks();
+            } else {
+                showToast(resp.error || '添加失败', 'danger');
+            }
+        },
+        error: function(xhr) {
+            var msg = xhr.responseJSON ? xhr.responseJSON.error : '请求失败';
+            showToast(msg, 'danger');
+        }
+    });
+}
+
+function toggleCustomEnable(id, enabled) {
+    $.ajax({
+        url: '/api/scheduler/custom_tasks/' + id,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify({enabled: enabled}),
+        success: function(resp) { if (resp && resp.success) { showToast('已保存', 'success'); loadTasks(); } else { showToast(resp.error || '保存失败', 'danger'); } },
+        error: function() { showToast('保存失败', 'danger'); }
+    });
+}
+
+function editCustomTask(id) {
+    var key = 'custom_' + id;
+    var t = window._schedulerTasks && window._schedulerTasks[key];
+    var currentTime = (t && (t.schedule || t.time)) ? (t.schedule || t.time) : '';
+    var currentName = (t && t.name) ? t.name : '';
+    var currentTypes = (t && t.types) ? t.types : [];
+    $('#custom-task-id').val(id);
+    $('#custom-task-name').val(currentName);
+    var timeVal = currentTime;
+    if (timeVal && timeVal.indexOf(' ') >= 0) timeVal = timeVal.split(' ')[1];
+    $('#custom-task-time').val(timeVal);
+    $('#custom-type-data_update').prop('checked', currentTypes.indexOf('data_update') !== -1);
+    $('#custom-type-ai_report').prop('checked', currentTypes.indexOf('ai_report') !== -1);
+    $('#custom-type-strategy_alert').prop('checked', currentTypes.indexOf('strategy_alert') !== -1);
+    $('#custom-task-enabled').prop('checked', !!(t && t.enabled));
+    $('#custom-task-skip').prop('checked', !!(t && (t.skip_non_trading_day !== undefined ? t.skip_non_trading_day : true)));
+    if (typeof customTaskModal !== 'undefined' && customTaskModal) {
+        customTaskModal.show();
+    } else {
+        alert('编辑对话框不可用');
+    }
+}
+
+
+function toggleTaskEnable(name, enabled) {
+    // 支持内建任务和自定义任务的启用/禁用
+    if (typeof name === 'string' && name.startsWith('custom_')) {
+        var cid = name.replace('custom_', '');
+        toggleCustomEnable(cid, enabled);
+        return;
+    }
+    $.ajax({
+        url: '/api/scheduler/task/' + name,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify({enabled: enabled}),
+        success: function(resp) { showToast('已保存', 'success'); loadTasks(); loadStatus(); },
+        error: function() { showToast('操作失败', 'danger'); }
+    });
+}
+
+function deleteTask(name) {
+    if (!confirm('确认删除任务 ' + name + ' ?')) return;
+    // 支持删除自定义任务
+    if (typeof name === 'string' && name.startsWith('custom_')) {
+        var cid = name.replace('custom_', '');
+        $.ajax({ url: '/api/scheduler/custom_tasks/' + cid, method: 'DELETE', success: function(resp) { showToast('已删除', 'success'); loadTasks(); }, error: function() { showToast('删除失败', 'danger'); } });
+        return;
+    }
+    $.ajax({ url: '/api/scheduler/task/' + name, method: 'DELETE', success: function(resp) { showToast('已删除', 'success'); loadTasks(); loadStatus(); }, error: function() { showToast('删除失败', 'danger'); } });
+}
+
+function loadSchedulerStocks() {
+    $.get('/api/stocks', function(data) {
+        var select = $('#scheduler-stocks');
+        if (!select || select.length === 0) return;
+        select.empty();
+        data.forEach(function(stock) {
+            if (stock.type === 'stock') {
+                select.append('<option value="' + stock.full_code + '">' + stock.name + '</option>');
+            }
+        });
+    });
+}
+
+function runSchedulerNow() {
+    if (!confirm('确定要立即运行定时任务吗？')) return;
+    $.ajax({ url: '/api/scheduler/run', method: 'POST', success: function() { alert('任务已在后台启动'); }, error: function() { alert('启动失败'); } });
+}
+
+function editSchedulerConfig() {
+    $.get('/api/scheduler/config', function(data) {
+        $('#scheduler-enabled').prop('checked', data.enabled);
+        $('#scheduler-times').val((data.afternoon_times || []).join(','));
+        var selectedStocks = data.selected_stocks || [];
+        $('#scheduler-stocks option').each(function() { $(this).prop('selected', selectedStocks.includes($(this).val())); });
+        var tasks = data.tasks || {};
+        $('#task-data').prop('checked', tasks.update_data);
+        $('#task-news').prop('checked', tasks.update_news);
+        $('#task-indicators').prop('checked', tasks.update_indicators);
+        $('#task-ai').prop('checked', tasks.ai_analysis);
+        $('#task-notify').prop('checked', tasks.send_notification);
+
+        var schedule = data.task_schedule || {};
+        function getSkip(key, defaultVal){ var v = schedule[key]; if (!v) return defaultVal; return (typeof v.skip_non_trading_day !== 'undefined') ? v.skip_non_trading_day : defaultVal; }
+        $('#task-data-skip').prop('checked', getSkip('data_update', true));
+        $('#task-indicators-skip').prop('checked', getSkip('indicators', true));
+        $('#task-news-skip').prop('checked', getSkip('news', true));
+        $('#task-ai-skip').prop('checked', getSkip('ai_analysis', true));
+        $('#task-notify-skip').prop('checked', getSkip('notification', true));
+
+        if (schedulerConfigModal) schedulerConfigModal.show();
+    });
+}
+
+function saveSchedulerConfig() {
+    var times = $('#scheduler-times').val().split(',').map(function(t){return t.trim();}).filter(function(t){return t;});
+    var selectedStocks = $('#scheduler-stocks').val() || [];
+    var config = { enabled: $('#scheduler-enabled').is(':checked'), afternoon_times: times, selected_stocks: selectedStocks, tasks: { update_data: $('#task-data').is(':checked'), update_news: $('#task-news').is(':checked'), update_indicators: $('#task-indicators').is(':checked'), ai_analysis: $('#task-ai').is(':checked'), send_notification: $('#task-notify').is(':checked') } };
+
+    // 添加每个内建任务的 skip 配置到 task_schedule 中
+    var task_schedule = {};
+    task_schedule['data_update'] = { enabled: $('#task-data').is(':checked'), skip_non_trading_day: $('#task-data-skip').is(':checked') };
+    task_schedule['indicators'] = { enabled: $('#task-indicators').is(':checked'), skip_non_trading_day: $('#task-indicators-skip').is(':checked') };
+    task_schedule['news'] = { enabled: $('#task-news').is(':checked'), skip_non_trading_day: $('#task-news-skip').is(':checked') };
+    task_schedule['ai_analysis'] = { enabled: $('#task-ai').is(':checked'), skip_non_trading_day: $('#task-ai-skip').is(':checked') };
+    task_schedule['notification'] = { enabled: $('#task-notify').is(':checked'), skip_non_trading_day: $('#task-notify-skip').is(':checked') };
+    config['task_schedule'] = task_schedule;
+
+    $.ajax({ url: '/api/scheduler/config', method: 'POST', contentType: 'application/json', data: JSON.stringify(config), success: function(){ if (schedulerConfigModal) schedulerConfigModal.hide(); loadTasks(); loadStatus(); alert('配置已保存'); }, error: function(){ alert('保存失败'); } });
+}
+
+function loadNotificationStatus() {
+    $.get('/api/notification/status', function(data) {
+        if (data.wechat) {
+            var badge = data.wechat.enabled ? '<span class="badge bg-success">已配置</span>' : '<span class="badge bg-secondary">未配置</span>';
+            $('#wechat-status').html('状态: ' + badge);
+            if (data.wechat.token_configured) $('#pushplus-token').attr('placeholder', '已配置（输入新值可更新）');
+        }
+        if (data.email) {
+            var badge = data.email.enabled ? '<span class="badge bg-success">已配置</span>' : '<span class="badge bg-secondary">未配置</span>';
+            $('#email-status').html('状态: ' + badge);
+            if (data.email.smtp_host) $('#smtp-host').val(data.email.smtp_host);
+            if (data.email.receiver) $('#smtp-receiver').val(data.email.receiver);
+        }
+    });
+}
+
+function saveNotificationConfig() {
+    var cfg = { smtp_host: $('#smtp-host').val(), smtp_port: parseInt($('#smtp-port').val()) || 465, sender: $('#smtp-sender').val(), password: $('#smtp-password').val(), receiver: $('#smtp-receiver').val(), pushplus_token: $('#pushplus-token').val() };
+    $.ajax({ url: '/api/notification/config', method: 'POST', contentType: 'application/json', data: JSON.stringify(cfg), success: function(data) { alert(data.success ? '通知配置已保存' : ('保存失败: ' + (data.error || ''))); loadNotificationStatus(); }, error: function() { alert('保存失败'); } });
+}
+
+function testNotification(channel) {
+    $.ajax({ url: '/api/notification/test', method: 'POST', contentType: 'application/json', data: JSON.stringify({channel: channel}), success: function(data) { if (data.success) { var results = data.results || {}; var msgs = []; Object.keys(results).forEach(function(k){ msgs.push(k + ': ' + (results[k] ? '成功' : '失败')); }); alert('测试完成: ' + msgs.join(', ')); } else { alert('测试失败: ' + (data.error || '')); } }, error: function() { alert('请求失败'); } });
+}
+</script>
+
+<!-- 通知设置 -->
+
+<!-- 自定义任务编辑模态框 -->
+<div class="modal fade" id="custom-task-modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">编辑自定义任务</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="custom-task-form">
+          <input type="hidden" id="custom-task-id" value="">
+          <div class="mb-3">
+            <label class="form-label small">任务名称</label>
+            <input type="text" id="custom-task-name" class="form-control form-control-sm" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small">时间</label>
+            <input type="time" id="custom-task-time" class="form-control form-control-sm" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small">任务类型</label>
+            <div class="btn-group" role="group" aria-label="types">
+              <input type="checkbox" class="btn-check" id="custom-type-data_update" autocomplete="off">
+              <label class="btn btn-outline-primary btn-sm me-1" for="custom-type-data_update">数据更新</label>
+              <input type="checkbox" class="btn-check" id="custom-type-ai_report" autocomplete="off">
+              <label class="btn btn-outline-primary btn-sm me-1" for="custom-type-ai_report">AI日报</label>
+              <input type="checkbox" class="btn-check" id="custom-type-strategy_alert" autocomplete="off">
+              <label class="btn btn-outline-primary btn-sm" for="custom-type-strategy_alert">策略提醒</label>
+            </div>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="custom-task-skip">
+            <label class="form-check-label">跳过非交易日</label>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="custom-task-enabled">
+            <label class="form-check-label">启用任务</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="custom-task-save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card mt-3">
+  <div class="card-header"><h5>📬 通知设置</h5></div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header bg-success bg-opacity-10"><strong>微信推送 (PushPlus)</strong></div>
+          <div class="card-body">
+            <div id="wechat-status" class="mb-2"></div>
+            <div class="mb-2">
+              <label class="form-label small">Token</label>
+              <input type="text" class="form-control form-control-sm" id="pushplus-token" placeholder="PushPlus Token">
+            </div>
+            <button class="btn btn-sm btn-outline-primary" onclick="testNotification('wechat')">发送测试</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header bg-info bg-opacity-10"><strong>邮件通知 (SMTP)</strong></div>
+          <div class="card-body">
+            <div id="email-status" class="mb-2"></div>
+            <div class="row g-2 mb-2">
+              <div class="col-8">
+                <label class="form-label small">SMTP服务器</label>
+                <input type="text" class="form-control form-control-sm" id="smtp-host" placeholder="smtp.qq.com">
+              </div>
+              <div class="col-4">
+                <label class="form-label small">端口</label>
+                <input type="number" class="form-control form-control-sm" id="smtp-port" placeholder="465" value="465">
+              </div>
+            </div>
+            <div class="mb-2">
+              <label class="form-label small">发件邮箱</label>
+              <input type="email" class="form-control form-control-sm" id="smtp-sender" placeholder="your@qq.com">
+            </div>
+            <div class="mb-2">
+              <label class="form-label small">邮箱密码/授权码</label>
+              <input type="password" class="form-control form-control-sm" id="smtp-password" placeholder="授权码">
+            </div>
+            <div class="mb-2">
+              <label class="form-label small">收件邮箱</label>
+              <input type="email" class="form-control form-control-sm" id="smtp-receiver" placeholder="receiver@example.com">
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="saveNotificationConfig()">保存配置</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="testNotification('email')">发送测试</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 调度器配置模态框 -->
+<div class="modal fade" id="scheduler-config-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">调度器配置</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduler-config-form">
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="scheduler-enabled">
+                            <label class="form-check-label" for="scheduler-enabled">启用调度器</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">定时时间 (逗号分隔)</label>
+                        <input type="text" class="form-control" id="scheduler-times" placeholder="14:25,14:45">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">选中股票 (留空表示全部)</label>
+                        <select class="form-select" id="scheduler-stocks" multiple size="5">
+                        </select>
+                        <small class="text-muted">按住Ctrl键可多选</small>
+                    </div>
+                    <h6>任务配置为每日任务</h6>
+                    <div class="mb-3">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="form-check me-3">
+                                    <input class="form-check-input" type="checkbox" id="task-data">
+                                    <label class="form-check-label">数据更新</label>
+                                </div>
+                                <div class="form-check form-check-inline ms-2">
+                                    <input class="form-check-input" type="checkbox" id="task-data-skip" checked>
+                                    <label class="form-check-label small">跳过非交易日</label>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="form-check me-3">
+                                    <input class="form-check-input" type="checkbox" id="task-indicators">
+                                    <label class="form-check-label">指标计算</label>
+                                </div>
+                                <div class="form-check form-check-inline ms-2">
+                                    <input class="form-check-input" type="checkbox" id="task-indicators-skip" checked>
+                                    <label class="form-check-label small">跳过非交易日</label>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="form-check me-3">
+                                    <input class="form-check-input" type="checkbox" id="task-news">
+                                    <label class="form-check-label">新闻更新</label>
+                                </div>
+                                <div class="form-check form-check-inline ms-2">
+                                    <input class="form-check-input" type="checkbox" id="task-news-skip" checked>
+                                    <label class="form-check-label small">跳过非交易日</label>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="form-check me-3">
+                                    <input class="form-check-input" type="checkbox" id="task-ai">
+                                    <label class="form-check-label">AI分析</label>
+                                </div>
+                                <div class="form-check form-check-inline ms-2">
+                                    <input class="form-check-input" type="checkbox" id="task-ai-skip" checked>
+                                    <label class="form-check-label small">跳过非交易日</label>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="form-check me-3">
+                                    <input class="form-check-input" type="checkbox" id="task-notify">
+                                    <label class="form-check-label">发送通知</label>
+                                </div>
+                                <div class="form-check form-check-inline ms-2">
+                                    <input class="form-check-input" type="checkbox" id="task-notify-skip" checked>
+                                    <label class="form-check-label small">跳过非交易日</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveSchedulerConfig()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

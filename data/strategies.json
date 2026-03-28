@@ -1,0 +1,350 @@
+{
+  "中线超跌买入": {
+    "name": "中线超跌买入",
+    "description": "适合家具股这种利空已经被提前兑现的股票，要求大盘不能太差",
+    "rules": [
+      {
+        "condition": "m_rsi6_pct100 < 85",
+        "action": "buy",
+        "position_ratio": 0.05,
+        "reason": "月RSI百分位(100月) < 85",
+        "connector": "OR"
+      },
+      {
+        "condition": "w_rsi6_pct100 < 98",
+        "action": "buy",
+        "position_ratio": 0.05,
+        "reason": "周RSI百分位(100周) < 98，中期超跌",
+        "connector": "AND"
+      },
+      {
+        "condition": "rsi6_pct100 < 90",
+        "action": "buy",
+        "position_ratio": 0.05,
+        "reason": "日RSI百分位(100日) < 90，短期超跌",
+        "connector": "AND"
+      },
+      {
+        "condition": "m_rsi6_pct100 < 80",
+        "action": "buy",
+        "position_ratio": 0.05,
+        "reason": "月RSI百分位(100月) < 80，长期低估",
+        "connector": "AND"
+      },
+      {
+        "condition": "rel_strength_5 > 0.0",
+        "action": "buy",
+        "position_ratio": 0.05,
+        "reason": "五日相对大盘超额收益>0",
+        "connector": "AND"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "中线超跌卖出": {
+    "name": "中线超跌卖出",
+    "description": "",
+    "rules": [
+      {
+        "condition": "w_rsi6_pct100 > 30",
+        "action": "sell",
+        "position_ratio": 0.05,
+        "reason": "股价回到正常位置，卖出",
+        "connector": "AND"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "RSI超卖反弹买入": {
+    "name": "RSI超卖反弹买入",
+    "description": "日线RSI深度超卖后出现反弹信号时买入，适合短线波段操作",
+    "rules": [
+      {
+        "condition": "rsi_6 < 20",
+        "action": "buy",
+        "position_ratio": 0.3,
+        "reason": "RSI6极度超卖(<20)，大概率反弹",
+        "connector": "OR"
+      },
+      {
+        "condition": "rsi_6 < 30 and close > ma_5",
+        "action": "buy",
+        "position_ratio": 0.2,
+        "reason": "RSI6超卖且价格站上5日均线，反弹确认",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": [
+      {
+        "condition": "macd_histogram < 0 and rsi_6 > 50",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "MACD空头排列且RSI中性，不追高",
+        "connector": "OR"
+      }
+    ]
+  },
+  "RSI超买卖出": {
+    "name": "RSI超买卖出",
+    "description": "日线RSI进入超买区域时分批卖出，锁定短线利润",
+    "rules": [
+      {
+        "condition": "rsi_6 > 80",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "RSI6极度超买(>80)，卖出一半仓位",
+        "connector": "OR"
+      },
+      {
+        "condition": "rsi_6 > 70 and close < ma_5",
+        "action": "sell",
+        "position_ratio": 0.3,
+        "reason": "RSI超买且跌破5日均线，趋势走弱",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "MACD金叉买入": {
+    "name": "MACD金叉买入",
+    "description": "MACD发生金叉且价格站上20日均线时买入，趋势跟踪策略",
+    "rules": [
+      {
+        "condition": "macd_histogram > 0 and macd > macd_signal and close > ma_20",
+        "action": "buy",
+        "position_ratio": 0.3,
+        "reason": "MACD金叉且价格在均线上方，趋势向上",
+        "connector": "OR"
+      },
+      {
+        "condition": "macd_histogram > 0 and ma_5 > ma_20",
+        "action": "buy",
+        "position_ratio": 0.2,
+        "reason": "MACD正值且均线多头排列，加仓",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": [
+      {
+        "condition": "rsi_6 > 75",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "RSI已超买，不追高",
+        "connector": "OR"
+      }
+    ]
+  },
+  "MACD死叉卖出": {
+    "name": "MACD死叉卖出",
+    "description": "MACD发生死叉时卖出，避免趋势反转损失",
+    "rules": [
+      {
+        "condition": "macd_histogram < 0 and macd < macd_signal",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "MACD死叉，趋势转弱，减仓",
+        "connector": "OR"
+      },
+      {
+        "condition": "macd_histogram < 0 and close < ma_20",
+        "action": "sell",
+        "position_ratio": 0.3,
+        "reason": "MACD负值且跌破20日均线，继续减仓",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "均线多头买入": {
+    "name": "均线多头买入",
+    "description": "5日、20日、60日均线多头排列，价格回调到5日均线附近时买入",
+    "rules": [
+      {
+        "condition": "ma_5 > ma_20 and ma_20 > ma_60 and close > ma_5 * 0.98",
+        "action": "buy",
+        "position_ratio": 0.25,
+        "reason": "三线多头排列且价格贴近5日均线，趋势买入",
+        "connector": "OR"
+      },
+      {
+        "condition": "ma_5 > ma_20 and close < ma_5 and close > ma_20",
+        "action": "buy",
+        "position_ratio": 0.2,
+        "reason": "多头排列中价格回调至5日均线下方但在20日均线上，回调买入",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": [
+      {
+        "condition": "rsi_6 > 80",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "RSI超买不追",
+        "connector": "OR"
+      }
+    ]
+  },
+  "均线空头卖出": {
+    "name": "均线空头卖出",
+    "description": "均线由多头转空头排列时减仓或清仓",
+    "rules": [
+      {
+        "condition": "ma_5 < ma_20 and close < ma_20",
+        "action": "sell",
+        "position_ratio": 0.4,
+        "reason": "5日均线下穿20日均线且价格在均线下方，减仓",
+        "connector": "OR"
+      },
+      {
+        "condition": "ma_5 < ma_20 and ma_20 < ma_60",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "三线空头排列，清仓止损",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "布林带下轨买入": {
+    "name": "布林带下轨买入",
+    "description": "价格触及或跌破布林带下轨时买入，均值回归策略",
+    "rules": [
+      {
+        "condition": "close <= boll_lower * 1.01",
+        "action": "buy",
+        "position_ratio": 0.2,
+        "reason": "价格触及布林带下轨，超跌反弹概率高",
+        "connector": "OR"
+      },
+      {
+        "condition": "boll_position < 0.1 and rsi_6 < 35",
+        "action": "buy",
+        "position_ratio": 0.25,
+        "reason": "布林带位置极低且RSI超卖，双重确认买入",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": [
+      {
+        "condition": "ma_20 < ma_60",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "中期趋势向下，不逆势抄底",
+        "connector": "OR"
+      }
+    ]
+  },
+  "布林带上轨卖出": {
+    "name": "布林带上轨卖出",
+    "description": "价格触及或突破布林带上轨时卖出，锁定均值回归利润",
+    "rules": [
+      {
+        "condition": "close >= boll_upper * 0.99",
+        "action": "sell",
+        "position_ratio": 0.4,
+        "reason": "价格触及布林带上轨，超买回落概率高",
+        "connector": "OR"
+      },
+      {
+        "condition": "boll_position > 0.9 and rsi_6 > 70",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "布林带位置极高且RSI超买，双重确认卖出",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "KDJ超卖买入": {
+    "name": "KDJ超卖买入",
+    "description": "KDJ指标J值进入超卖区域并出现底背离时买入",
+    "rules": [
+      {
+        "condition": "kdj_j < 10",
+        "action": "buy",
+        "position_ratio": 0.25,
+        "reason": "KDJ的J值极度超卖(<10)，短线反弹空间大",
+        "connector": "OR"
+      },
+      {
+        "condition": "kdj_k < 20 and kdj_d < 20 and kdj_j < kdj_k",
+        "action": "buy",
+        "position_ratio": 0.2,
+        "reason": "KDJ三线均在超卖区，底部确认",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "KDJ超买卖出": {
+    "name": "KDJ超买卖出",
+    "description": "KDJ指标进入超买区域时减仓",
+    "rules": [
+      {
+        "condition": "kdj_j > 90",
+        "action": "sell",
+        "position_ratio": 0.4,
+        "reason": "KDJ的J值极度超买(>90)，短线见顶风险高",
+        "connector": "OR"
+      },
+      {
+        "condition": "kdj_k > 80 and kdj_d > 80 and kdj_j > kdj_k",
+        "action": "sell",
+        "position_ratio": 0.3,
+        "reason": "KDJ三线均在超买区且J值开始下行，减仓",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "低PE价值买入": {
+    "name": "低PE价值买入",
+    "description": "市盈率处于历史低位且技术面企稳时买入，价值+技术双重验证",
+    "rules": [
+      {
+        "condition": "pettm_pct10y < 20 and rsi6_pct100 < 40",
+        "action": "buy",
+        "position_ratio": 0.3,
+        "reason": "PE处于10年历史20%分位以下且日线RSI低位，估值+超跌双重买点",
+        "connector": "OR"
+      },
+      {
+        "condition": "pettm_pct10y < 10 and close > ma_20",
+        "action": "buy",
+        "position_ratio": 0.35,
+        "reason": "PE极低(历史10%以下)且价格站上20日均线，价值底部确认",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": [
+      {
+        "condition": "macd_histogram < 0 and ma_5 < ma_20",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "技术面仍在下跌趋势中，等待企稳",
+        "connector": "OR"
+      }
+    ]
+  },
+  "高PE高位卖出": {
+    "name": "高PE高位卖出",
+    "description": "市盈率处于历史高位且技术面出现顶部信号时减仓",
+    "rules": [
+      {
+        "condition": "pettm_pct10y > 80 and rsi6_pct100 > 70",
+        "action": "sell",
+        "position_ratio": 0.4,
+        "reason": "PE处于10年历史80%分位以上且RSI高位，估值+超买双重卖点",
+        "connector": "OR"
+      },
+      {
+        "condition": "pettm_pct10y > 90 and macd_histogram < 0",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "PE极高且MACD转负，高估值顶部确认",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  }
+}

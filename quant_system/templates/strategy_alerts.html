@@ -1,0 +1,351 @@
+{% extends "base.html" %}
+
+{% block title %}策略提醒 - 量化交易系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>策略 <small class="text-muted fs-6">Strategy</small></h2>
+        <ul class="nav nav-tabs mt-3" id="strategy-tabs">
+            <li class="nav-item">
+                <a class="nav-link" href="/strategy">策略管理</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/strategy/alerts">策略提醒</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <p class="text-muted mb-0">为每只股票分配一种策略，点击计算后展示近一年回测收益与当前操作建议。</p>
+        <div>
+            <button class="btn btn-success me-2" id="btn-compute-all" onclick="computeAll()">
+                <span id="compute-spinner" class="spinner-border spinner-border-sm me-1 d-none" role="status"></span>
+                全部计算
+            </button>
+            <button class="btn btn-primary" id="btn-send-wechat" onclick="sendToWechat()" disabled>
+                📤 发送到微信
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm mb-0" id="alerts-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:70px">代码</th>
+                                <th style="width:90px">名称</th>
+                                <th style="width:300px">
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-success bg-opacity-75 px-2 py-1">🟢 买入策略</span>
+                                        <span class="badge bg-danger bg-opacity-75 px-2 py-1">🔴 卖出策略</span>
+                                    </div>
+                                </th>
+                                <th style="width:60px">计算</th>
+                                <th style="width:180px">近一年回测收益</th>
+                                <th style="width:120px">当前建议</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alerts-tbody">
+                            <tr><td colspan="6" class="text-center text-muted py-3">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="send-result" class="mt-3"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var BUY_STRATEGIES = [];   // 仅含 action=buy 的策略名
+var SELL_STRATEGIES = [];  // 仅含 action=sell 的策略名
+var _SELL_STRAT_OBJS = []; // {name, key} 用于自动匹配
+var _stockAlerts = {};  // code -> {name, buy_strategy, sell_strategy, return_today, return_yesterday, signal, computed}
+
+// 根据买入策略名称自动匹配卖出策略
+function _findMatchingSellStrategy(buyName, sellStrats) {
+    if (!buyName || !sellStrats || !sellStrats.length) return null;
+    var base = buyName.replace(/买入$/, '').replace(/买$/, '');
+    for (var i = 0; i < sellStrats.length; i++) {
+        var sn = sellStrats[i].name || sellStrats[i];
+        if (sn === base + '卖出') return sn;
+    }
+    var bestMatch = null, bestLen = 1;
+    for (var i = 0; i < sellStrats.length; i++) {
+        var sn = sellStrats[i].name || sellStrats[i], len = 0;
+        for (var j = 0; j < Math.min(buyName.length, sn.length); j++) {
+            if (buyName[j] === sn[j]) len++; else break;
+        }
+        if (len > bestLen) { bestLen = len; bestMatch = sn; }
+    }
+    return bestMatch;
+}
+
+$(document).ready(function() {
+    // 先从策略管理加载可用策略，再加载股票
+    $.get('/api/strategies', function(data) {
+        data.forEach(function(s) {
+            if (s.has_buy)  BUY_STRATEGIES.push(s.name);
+            if (s.has_sell) { SELL_STRATEGIES.push(s.name); _SELL_STRAT_OBJS.push({name: s.name, key: s.key}); }
+        });
+        if (BUY_STRATEGIES.length === 0)  BUY_STRATEGIES  = ['RSI超卖反弹买入', 'MACD金叉买入', '均线多头买入'];
+        if (SELL_STRATEGIES.length === 0) SELL_STRATEGIES = ['RSI超买卖出', 'MACD死叉卖出', '均线空头卖出'];
+        loadStocksForAlerts();
+    }).fail(function() {
+        BUY_STRATEGIES  = ['RSI超卖反弹买入', 'MACD金叉买入', '均线多头买入'];
+        SELL_STRATEGIES = ['RSI超买卖出', 'MACD死叉卖出', '均线空头卖出'];
+        loadStocksForAlerts();
+    });
+});
+
+function loadStocksForAlerts() {
+    $.get('/api/stocks', function(data) {
+        var stocks = data.filter(function(s) { return s.type === 'stock'; });
+        var tbody = document.getElementById('alerts-tbody');
+        tbody.innerHTML = '';
+        if (stocks.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">暂无监控股票</td></tr>';
+            return;
+        }
+        stocks.forEach(function(s) {
+            var code = s.full_code || s.code;
+            var savedBuy = s.buy_strategy || s.strategy || '';
+            var savedSell = s.sell_strategy || '';
+
+            // 初始加载时：如果有买入策略但没有卖出策略，自动匹配
+            var autoSell = savedSell;
+            if (savedBuy && !savedSell) {
+                var objs = _SELL_STRAT_OBJS.length ? _SELL_STRAT_OBJS : SELL_STRATEGIES.map(function(n){ return {name: n}; });
+                autoSell = _findMatchingSellStrategy(savedBuy, objs) || '';
+            }
+
+            _stockAlerts[code] = { name: s.name, buy_strategy: savedBuy, sell_strategy: autoSell, computed: false };
+
+            // 如果自动匹配到了卖出策略，立即持久化保存
+            if (autoSell && autoSell !== savedSell) {
+                _persistAssign(code);
+            }
+
+            function makeOptions(selected) {
+                var opts = '<option value="">与买入策略相同</option>';
+                return opts + SELL_STRATEGIES.map(function(st) {
+                    return '<option value="' + st + '"' + (st === selected ? ' selected' : '') + '>' + st + '</option>';
+                }).join('');
+            }
+            function makeBuyOptions(selected) {
+                var opts = '<option value="">-- 请选择 --</option>';
+                return opts + BUY_STRATEGIES.map(function(st) {
+                    return '<option value="' + st + '"' + (st === selected ? ' selected' : '') + '>' + st + '</option>';
+                }).join('');
+            }
+
+            tbody.insertAdjacentHTML('beforeend',
+                '<tr id="alert-row-' + code.replace(/\./g, '_') + '" data-code="' + code + '">' +
+                '<td>' + s.code + '</td>' +
+                '<td>' + s.name + '</td>' +
+                '<td>' +
+                  '<div class="d-flex gap-2">' +
+                    '<div class="border border-success rounded p-1 flex-fill" style="background:rgba(40,167,69,.07)">' +
+                      '<div class="text-success" style="font-size:10px;font-weight:600;margin-bottom:2px">🟢 买入</div>' +
+                      '<select class="form-select form-select-sm buy-strat-select border-0 p-0" style="background:transparent" onchange="onBuyStrategyChange(\'' + code + '\', this.value)">' + makeBuyOptions(savedBuy) + '</select>' +
+                    '</div>' +
+                    '<div class="border border-danger rounded p-1 flex-fill" style="background:rgba(220,53,69,.07)">' +
+                      '<div class="text-danger" style="font-size:10px;font-weight:600;margin-bottom:2px">🔴 卖出</div>' +
+                      '<select class="form-select form-select-sm sell-strat-select border-0 p-0" style="background:transparent" onchange="onSellStrategyChange(\'' + code + '\', this.value)">' + makeOptions(autoSell) + '</select>' +
+                    '</div>' +
+                  '</div>' +
+                '</td>' +
+                '<td><button class="btn btn-sm btn-outline-primary" onclick="computeOne(\'' + code + '\')">▶</button></td>' +
+                '<td class="return-cell text-muted">-</td>' +
+                '<td class="signal-cell text-muted">-</td>' +
+                '</tr>'
+            );
+        });
+    });
+}
+
+function _persistAssign(code) {
+    var info = _stockAlerts[code];
+    $.ajax({
+        url: '/api/strategy/alerts/assign',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ code: code, buy_strategy: info.buy_strategy, sell_strategy: info.sell_strategy })
+    });
+}
+
+function onBuyStrategyChange(code, strategy) {
+    _stockAlerts[code].buy_strategy = strategy;
+    _stockAlerts[code].computed = false;
+    var row = document.getElementById('alert-row-' + code.replace(/\./g, '_'));
+    if (row) {
+        row.querySelector('.return-cell').innerHTML = '<span class="text-muted">-</span>';
+        row.querySelector('.signal-cell').innerHTML = '<span class="text-muted">-</span>';
+        // 自动匹配卖出策略
+        var matched = _findMatchingSellStrategy(strategy, _SELL_STRAT_OBJS.length ? _SELL_STRAT_OBJS : SELL_STRATEGIES.map(function(n){return {name:n};}));
+        if (matched) {
+            var sellSel = row.querySelector('.sell-strat-select');
+            if (sellSel) { sellSel.value = matched; _stockAlerts[code].sell_strategy = matched; }
+        }
+    }
+    _persistAssign(code);
+}
+
+function onSellStrategyChange(code, strategy) {
+    _stockAlerts[code].sell_strategy = strategy;
+    _stockAlerts[code].computed = false;
+    var row = document.getElementById('alert-row-' + code.replace(/\./g, '_'));
+    if (row) {
+        row.querySelector('.return-cell').innerHTML = '<span class="text-muted">-</span>';
+        row.querySelector('.signal-cell').innerHTML = '<span class="text-muted">-</span>';
+    }
+    _persistAssign(code);
+}
+
+function computeOne(code) {
+    var info = _stockAlerts[code];
+    if (!info) return;
+    var row = document.getElementById('alert-row-' + code.replace(/\./g, '_'));
+    if (row) {
+        row.querySelector('.return-cell').innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        row.querySelector('.signal-cell').innerHTML = '';
+    }
+    var payload = { code: code, buy_strategy: info.buy_strategy };
+    if (info.sell_strategy) payload.sell_strategy = info.sell_strategy;
+    $.ajax({
+        url: '/api/strategy/alerts/compute',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(payload),
+        success: function(resp) {
+            if (resp.success) {
+                applyResult(code, resp);
+            } else {
+                if (row) row.querySelector('.return-cell').innerHTML = '<span class="text-danger">失败</span>';
+            }
+        },
+        error: function() {
+            if (row) row.querySelector('.return-cell').innerHTML = '<span class="text-danger">错误</span>';
+        }
+    });
+}
+
+function applyResult(code, resp) {
+    var info = _stockAlerts[code];
+    info.return_today = resp.return_today;
+    info.return_yesterday = resp.return_yesterday;
+    info.signal = resp.signal;
+    info.computed = true;
+
+    var row = document.getElementById('alert-row-' + code.replace(/\./g, '_'));
+    if (!row) return;
+
+    var retToday = resp.return_today;
+    var diff = resp.return_today - resp.return_yesterday;
+    var retCls = retToday >= 0 ? 'text-success' : 'text-danger';
+    var diffSign = diff >= 0 ? '+' : '';
+    var retText = (retToday >= 0 ? '+' : '') + retToday.toFixed(2) + '%';
+    retText += ' <small class="text-muted">(较昨日' + diffSign + diff.toFixed(2) + '%)</small>';
+    row.querySelector('.return-cell').innerHTML = '<span class="fw-bold ' + retCls + '">' + retText + '</span>';
+
+    var sigCls = resp.signal.includes('买入') ? 'badge bg-success' :
+                 resp.signal.includes('卖出') ? 'badge bg-danger' :
+                 resp.signal.includes('加仓') ? 'badge bg-success' : 'badge bg-secondary';
+    row.querySelector('.signal-cell').innerHTML = '<span class="' + sigCls + '">' + resp.signal + '</span>';
+
+    checkSendButton();
+}
+
+function checkSendButton() {
+    var anyComputed = Object.keys(_stockAlerts).some(function(c) { return _stockAlerts[c].computed; });
+    document.getElementById('btn-send-wechat').disabled = !anyComputed;
+}
+
+function computeAll() {
+    var btn = document.getElementById('btn-compute-all');
+    var spinner = document.getElementById('compute-spinner');
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+
+    var codes = Object.keys(_stockAlerts);
+    var payload = codes.map(function(c) {
+        var info = _stockAlerts[c];
+        var item = { code: c, buy_strategy: info.buy_strategy };
+        if (info.sell_strategy) item.sell_strategy = info.sell_strategy;
+        return item;
+    });
+
+    $.ajax({
+        url: '/api/strategy/alerts/compute-all',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ items: payload }),
+        success: function(resp) {
+            btn.disabled = false;
+            spinner.classList.add('d-none');
+            if (resp.success && resp.results) {
+                resp.results.forEach(function(r) {
+                    if (r.success) applyResult(r.code, r);
+                });
+            }
+        },
+        error: function() {
+            btn.disabled = false;
+            spinner.classList.add('d-none');
+            alert('批量计算失败');
+        }
+    });
+}
+
+function sendToWechat() {
+    var btn = document.getElementById('btn-send-wechat');
+    btn.disabled = true;
+
+    var items = [];
+    Object.keys(_stockAlerts).forEach(function(code) {
+        var info = _stockAlerts[code];
+        if (info.computed) {
+            items.push({
+                code: code,
+                name: info.name,
+                strategy: info.buy_strategy + (info.sell_strategy ? '(买)+' + info.sell_strategy + '(卖)' : ''),
+                return_today: info.return_today,
+                return_yesterday: info.return_yesterday,
+                signal: info.signal
+            });
+        }
+    });
+
+    $.ajax({
+        url: '/api/strategy/alerts/send',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ items: items }),
+        success: function(resp) {
+            btn.disabled = false;
+            if (resp.success) {
+                $('#send-result').html('<div class="alert alert-success">✅ 策略提醒已发送到微信</div>');
+                setTimeout(function() { $('#send-result').html(''); }, 5000);
+            } else {
+                $('#send-result').html('<div class="alert alert-danger">发送失败: ' + (resp.error || '') + '</div>');
+            }
+        },
+        error: function() {
+            btn.disabled = false;
+            $('#send-result').html('<div class="alert alert-danger">请求失败</div>');
+        }
+    });
+}
+</script>
+{% endblock %}

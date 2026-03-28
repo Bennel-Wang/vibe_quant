@@ -1,0 +1,35 @@
+2026-03-21 15:28:35 [source.mootdx] INFO: Mootdx 初始化成功
+2026-03-21 15:28:39 [source.mootdx] WARNING: Mootdx 无数据: 000001.SH
+2026-03-21 15:28:51 [source.mootdx] ERROR: Mootdx 港股获取异常 HSI.HK: 市场参数错误, 市场参数不能为空.
+2026-03-21 15:28:51 [source.mootdx] WARNING: Mootdx 无数据: 399006.SZ
+2026-03-21 15:28:51 [source.mootdx] WARNING: Mootdx 无数据: 000001.SZ
+2026-03-21 15:29:06 [source.mootdx] ERROR: Mootdx 港股获取异常 00700.HK: 市场参数错误, 市场参数不能为空.
+2026-03-21 15:33:56 [source.mootdx] INFO: Mootdx 初始化成功
+2026-03-21 15:33:56 [source.mootdx] INFO: Mootdx A股获取成功: 000001.SH, 38 条
+2026-03-21 15:33:56 [source.mootdx] WARNING: Mootdx 扩展市场(港股)接口目前已失效: HSI.HK
+2026-03-21 15:33:56 [source.mootdx] INFO: Mootdx A股获取成功: 399006.SZ, 38 条
+2026-03-21 15:33:56 [source.mootdx] INFO: Mootdx A股获取成功: 000001.SZ, 38 条
+2026-03-21 15:33:56 [source.mootdx] WARNING: Mootdx 扩展市场(港股)接口目前已失效: 00700.HK
+2026-03-21 15:48:28 [source.mootdx] INFO: Mootdx 初始化成功
+2026-03-21 15:48:28 [source.mootdx] INFO: Mootdx A股获取成功: 000001.SH, 38 条
+2026-03-21 15:48:28 [source.mootdx] WARNING: Mootdx 扩展市场(港股)接口目前已失效: HSI.HK
+2026-03-21 15:48:28 [source.mootdx] INFO: Mootdx A股获取成功: 399006.SZ, 38 条
+2026-03-21 15:48:28 [source.mootdx] INFO: Mootdx A股获取成功: 000001.SZ, 38 条
+2026-03-21 15:48:28 [source.mootdx] WARNING: Mootdx 扩展市场(港股)接口目前已失效: 00700.HK
+2026-03-21 16:03:51 [source.mootdx] INFO: Mootdx 初始化成功
+2026-03-21 16:03:52 [source.mootdx] INFO: Mootdx A股获取成功: 000001.SH, 38 条
+2026-03-21 16:03:52 [source.mootdx] INFO: Mootdx A股获取成功: 399006.SZ, 38 条
+2026-03-21 16:03:52 [source.mootdx] INFO: Mootdx A股获取成功: 000001.SZ, 38 条
+2026-03-21 16:34:20 [source.mootdx] INFO: Mootdx 初始化成功
+2026-03-21 16:34:20 [source.mootdx] WARNING: Mootdx 无数据: 801010.SH
+2026-03-21 16:34:50 [source.mootdx] WARNING: Mootdx 无数据: 801020.SH
+2026-03-24 20:58:41 [source.mootdx] INFO: Mootdx 初始化成功
+2026-03-24 20:58:41 [source.mootdx] INFO: Mootdx A股获取成功: 000001.SH, 37 条
+2026-03-24 20:58:41 [source.mootdx] INFO: Mootdx A股获取成功: 399006.SZ, 37 条
+2026-03-24 20:58:41 [source.mootdx] INFO: Mootdx A股获取成功: 000001.SZ, 37 条
+2026-03-24 21:35:59 [source.mootdx] INFO: Mootdx 初始化成功
+2026-03-24 21:35:59 [source.mootdx] INFO: Mootdx A股获取成功: 000001.SH, 57 条
+2026-03-24 21:35:59 [source.mootdx] WARNING: Mootdx 扩展市场(港股)接口目前已失效: HSI.HK
+2026-03-24 21:35:59 [source.mootdx] INFO: Mootdx A股获取成功: 399006.SZ, 57 条
+2026-03-24 21:36:00 [source.mootdx] INFO: Mootdx A股获取成功: 000001.SZ, 57 条
+2026-03-24 21:36:00 [source.mootdx] WARNING: Mootdx 扩展市场(港股)接口目前已失效: 00700.HK

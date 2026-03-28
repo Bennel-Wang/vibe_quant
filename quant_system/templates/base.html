@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSP: 只允许本站和信任的CDN加载脚本，阻止浏览器扩展/网络注入的第三方脚本。允许内联脚本以兼容现有模板（可后续替换为 nonce 策略） -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.plot.ly https://code.jquery.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; connect-src 'self' https:;">
+    <title>{% block title %}量化交易系统{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Theme variables */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-card: #ffffff;
+            --text-primary: #212529;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+            --table-bg: #ffffff;
+            --table-stripe: #f8f9fa;
+            --input-bg: #ffffff;
+            --input-text: #212529;
+        }
+        [data-theme="dark"] {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --bg-card: #1e1e1e;
+            --text-primary: #e0e0e0;
+            --text-muted: #9e9e9e;
+            --border-color: #333333;
+            --table-bg: #1e1e1e;
+            --table-stripe: #252525;
+            --input-bg: #2d2d2d;
+            --input-text: #e0e0e0;
+        }
+        [data-theme="dark"] body { background-color: var(--bg-primary); color: var(--text-primary); }
+        [data-theme="dark"] .card { background-color: var(--bg-card); border-color: var(--border-color); color: var(--text-primary); }
+        [data-theme="dark"] .card-header { background-color: #252525; border-color: var(--border-color); }
+        [data-theme="dark"] .table { --bs-table-bg: var(--table-bg); --bs-table-striped-bg: var(--table-stripe); color: var(--text-primary); }
+        [data-theme="dark"] .bg-light { background-color: var(--bg-secondary) !important; }
+        [data-theme="dark"] .text-muted { color: var(--text-muted) !important; }
+        [data-theme="dark"] .form-control, [data-theme="dark"] .form-select {
+            background-color: var(--input-bg); color: var(--input-text); border-color: var(--border-color);
+        }
+        [data-theme="dark"] .modal-content { background-color: var(--bg-card); color: var(--text-primary); }
+        [data-theme="dark"] .modal-header { border-color: var(--border-color); }
+        [data-theme="dark"] .modal-footer { border-color: var(--border-color); }
+        [data-theme="dark"] footer { background-color: var(--bg-secondary) !important; }
+        [data-theme="dark"] .navbar-dark { background-color: #0a0a0a !important; }
+        [data-theme="dark"] .list-group-item { background-color: var(--bg-card); border-color: var(--border-color); color: var(--text-primary); }
+
+        /* Market ticker bar */
+        .ticker-item { display:inline-flex; gap:6px; align-items:center; }
+        .ticker-price { font-weight:600; }
+        /* A股习惯：涨红跌绿 */
+        .ticker-chg.up { color:#ef5350; }
+        .ticker-chg.down { color:#26a69a; }
+        .ticker-chg.flat { color:#9e9e9e; }
+
+        .navbar-brand { font-weight: bold; }
+        .card { margin-bottom: 20px; }
+        .metric-value { font-size: 24px; font-weight: bold; }
+        .metric-label { font-size: 12px; color: #666; }
+        /* A股习惯：盈利红色，亏损绿色 */
+        .positive { color: #ef5350; }
+        .negative { color: #26a69a; }
+        .neutral { color: #6c757d; }
+
+        /* 全局实时开关 */
+        #global-rt-toggle { cursor: pointer; user-select: none; }
+        #global-rt-dot {
+            display: inline-block; width: 10px; height: 10px;
+            border-radius: 50%; background: #6c757d;
+            margin-right: 4px; vertical-align: middle;
+            transition: background 0.3s;
+        }
+        #global-rt-dot.active { background: #28a745; animation: pulse 1.5s infinite; }
+        @keyframes pulse {
+            0%   { box-shadow: 0 0 0 0 rgba(40,167,69,.6); }
+            70%  { box-shadow: 0 0 0 6px rgba(40,167,69,0); }
+            100% { box-shadow: 0 0 0 0 rgba(40,167,69,0); }
+        }
+
+        /* 实时数值更新闪光（A股习惯：涨红跌绿） */
+        .value-flash-up   { animation: flash-up   0.6s ease-out; }
+        .value-flash-down { animation: flash-down 0.6s ease-out; }
+        @keyframes flash-up   { 0%{background:#fde8e8} 100%{background:transparent} }
+        @keyframes flash-down { 0%{background:#e8f5e9} 100%{background:transparent} }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<!-- Market Ticker Bar -->
+<div id="market-ticker-bar" style="background:#1a1a2e; color:#e0e0e0; font-size:13px; padding:4px 0; border-bottom:1px solid #333;">
+    <div class="container d-flex align-items-center gap-4 overflow-auto" style="white-space:nowrap;">
+        <span class="text-muted small me-2">大盘行情</span>
+        <span id="ticker-000001_SH" class="ticker-item">上证指数 <span class="ticker-price">--</span> <span class="ticker-chg">--</span></span>
+        <span id="ticker-399001_SZ" class="ticker-item">深证成指 <span class="ticker-price">--</span> <span class="ticker-chg">--</span></span>
+        <span id="ticker-399006_SZ" class="ticker-item">创业板 <span class="ticker-price">--</span> <span class="ticker-chg">--</span></span>
+        <span id="ticker-000300_SH" class="ticker-item">沪深300 <span class="ticker-price">--</span> <span class="ticker-chg">--</span></span>
+        <span id="ticker-HSI_HK" class="ticker-item">恒生指数 <span class="ticker-price">--</span> <span class="ticker-chg">--</span></span>
+        <span class="ms-auto text-muted small" id="ticker-update-time"></span>
+    </div>
+</div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">量化交易系统</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">仪表盘</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/backtest">回测</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/strategy">策略</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/factors">因子挖掘</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/risk">风控</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/groups">自选股组</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/report">AI日报</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/scheduler">调度器</a>
+                    </li>
+                </ul>
+                <!-- 全局实时更新开关 -->
+                <span class="navbar-text me-3">
+                    <span id="global-rt-toggle" class="badge bg-secondary" title="全局实时更新开关（跨页面持久）" onclick="toggleGlobalRealtime()">
+                        <span id="global-rt-dot"></span>
+                        <span id="global-rt-label">实时: 关</span>
+                    </span>
+                </span>
+                <!-- Dark mode toggle -->
+                <span class="navbar-text ms-2">
+                    <button id="dark-mode-btn" class="btn btn-sm btn-outline-light" title="切换夜间模式" onclick="toggleDarkMode()">🌙</button>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="bg-light text-center py-3 mt-5">
+        <div class="container">
+            <small class="text-muted">量化交易系统 &copy; 2026666666的豆仔</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    // ============================================================
+    // 全局实时更新开关（状态存 localStorage，跨页面持久）
+    // ============================================================
+    // Default to ON if no stored preference
+    var _stored_rt = localStorage.getItem('globalRtEnabled');
+    var _globalRtEnabled = _stored_rt === null ? true : _stored_rt === 'true';
+
+    function _applyGlobalRtUI(enabled) {
+        var dot = document.getElementById('global-rt-dot');
+        var label = document.getElementById('global-rt-label');
+        var badge = document.getElementById('global-rt-toggle');
+        if (enabled) {
+            dot && dot.classList.add('active');
+            if (label) label.textContent = '实时: 开';
+            if (badge) { badge.classList.remove('bg-secondary'); badge.classList.add('bg-success'); }
+        } else {
+            dot && dot.classList.remove('active');
+            if (label) label.textContent = '实时: 关';
+            if (badge) { badge.classList.remove('bg-success'); badge.classList.add('bg-secondary'); }
+        }
+    }
+
+    function toggleGlobalRealtime() {
+        _globalRtEnabled = !_globalRtEnabled;
+        localStorage.setItem('globalRtEnabled', _globalRtEnabled);
+        _applyGlobalRtUI(_globalRtEnabled);
+        $.ajax({
+            url: '/api/data/realtime/global',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ enabled: _globalRtEnabled, interval: 5 }),
+            error: function(xhr) {
+                console.warn('全局实时切换失败:', xhr.responseText);
+            }
+        });
+        // 通知同页面其他监听者
+        $(document).trigger('globalRtChanged', [_globalRtEnabled]);
+    }
+
+    // 页面加载时同步 UI 并通知服务端（只在开时才通知，避免重复停止）
+    $(function() {
+        _applyGlobalRtUI(_globalRtEnabled);
+        if (_globalRtEnabled) {
+            // 服务端可能已在运行，检查状态后按需启动
+            $.get('/api/data/realtime/global', function(state) {
+                if (!state.is_running) {
+                    $.ajax({
+                        url: '/api/data/realtime/global',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ enabled: true, interval: 5 })
+                    });
+                }
+            });
+        }
+    });
+
+    // Dark mode
+    function toggleDarkMode() {
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        var newTheme = isDark ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        document.getElementById('dark-mode-btn').textContent = isDark ? '🌙' : '☀️';
+    }
+
+    // Apply saved theme on load
+    $(function() {
+        var saved = localStorage.getItem('theme') || 'light';
+        if (saved === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            var btn = document.getElementById('dark-mode-btn');
+            if (btn) btn.textContent = '☀️';
+        }
+    });
+
+    // 数据源切换
+    function switchDataSource(source) {
+        $.ajax({
+            url: '/api/config/data_source',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ source: source }),
+            success: function(res) {
+                if (res.success) {
+                    localStorage.setItem('preferredDataSource', source);
+                }
+            },
+            error: function(xhr) {
+                console.warn('切换数据源失败:', xhr.responseText);
+            }
+        });
+    }
+
+    // 加载当前数据源配置
+    $(function() {
+        $.get('/api/config/data_source', function(res) {
+            if (res.success) {
+                $('#data-source-select').val(res.preferred_source);
+            }
+        });
+    });
+
+    // Market ticker auto-refresh
+    var _tickerInterval = null;
+    var _tickerCodes = ['000001.SH','399001.SZ','399006.SZ','000300.SH','HSI.HK'];
+
+    function updateMarketTicker() {
+        $.get('/api/data/realtime/latest', function(resp) {
+            var data = resp.data || {};
+            var now = new Date();
+            $('#ticker-update-time').text(now.getHours().toString().padStart(2,'0') + ':' +
+                now.getMinutes().toString().padStart(2,'0') + ':' +
+                now.getSeconds().toString().padStart(2,'0'));
+
+            _tickerCodes.forEach(function(tickerCode) {
+                var found = null;
+                Object.keys(data).forEach(function(k) {
+                    var d = data[k];
+                    // 匹配 full_code（000001.SH格式）
+                    if (d.full_code === tickerCode) {
+                        found = d;
+                    }
+                });
+                if (!found) return;
+
+                var price = found.price != null ? parseFloat(found.price).toFixed(2) : '--';
+                var pct = found.pct_chg != null ? parseFloat(found.pct_chg) : (found.change_pct != null ? parseFloat(found.change_pct) : null);
+                var pctText = pct != null ? (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%' : '--';
+                var cls = pct == null ? 'flat' : (pct > 0 ? 'up' : (pct < 0 ? 'down' : 'flat'));
+
+                var safeCode = tickerCode.replace(/\./g,'_');
+                var el = document.getElementById('ticker-' + safeCode);
+                if (el) {
+                    el.querySelector('.ticker-price').textContent = price;
+                    var chgEl = el.querySelector('.ticker-chg');
+                    chgEl.textContent = pctText;
+                    chgEl.className = 'ticker-chg ' + cls;
+                }
+            });
+        }).fail(function() {
+            // silently fail
+        });
+    }
+
+    // Start ticker polling after page load
+    $(function() {
+        setTimeout(updateMarketTicker, 2000);
+        _tickerInterval = setInterval(updateMarketTicker, 15000);
+    });
+    </script>
+
+<!-- Data Export Modal -->
+<div class="modal fade" id="export-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">数据导出</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">选择股票</label>
+                    <select class="form-select" id="export-stock-select" multiple size="5">
+                        <!-- filled from /api/stocks -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">数据类型</label>
+                    <select class="form-select" id="export-data-type">
+                        <option value="daily">日线数据</option>
+                        <option value="indicators">技术指标</option>
+                    </select>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label class="form-label">开始日期</label>
+                        <input type="date" class="form-control" id="export-start-date">
+                    </div>
+                    <div class="col">
+                        <label class="form-label">结束日期</label>
+                        <input type="date" class="form-control" id="export-end-date">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button class="btn btn-primary" onclick="exportData()">导出CSV</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+    function showExportModal() {
+        $.get('/api/stocks', function(stocks) {
+            var select = $('#export-stock-select');
+            select.empty();
+            stocks.filter(s => s.type === 'stock').forEach(function(s) {
+                select.append('<option value="' + s.code + '">' + s.name + ' (' + s.code + ')</option>');
+            });
+        });
+        var today = new Date().toISOString().split('T')[0];
+        var yearAgo = new Date(Date.now() - 365*24*60*60*1000).toISOString().split('T')[0];
+        $('#export-start-date').val(yearAgo);
+        $('#export-end-date').val(today);
+        new bootstrap.Modal(document.getElementById('export-modal')).show();
+    }
+
+    function exportData() {
+        var codes = $('#export-stock-select').val();
+        var dataType = $('#export-data-type').val();
+        var startDate = $('#export-start-date').val();
+        var endDate = $('#export-end-date').val();
+
+        if (!codes || codes.length === 0) {
+            alert('请选择至少一只股票');
+            return;
+        }
+
+        codes.forEach(function(code) {
+            var url = '/api/data/export?code=' + code + '&type=' + dataType + '&start=' + startDate + '&end=' + endDate;
+            window.open(url, '_blank');
+        });
+    }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

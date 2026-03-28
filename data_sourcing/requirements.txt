@@ -1,0 +1,8 @@
+pandas>=1.5.0
+numpy>=1.23.0
+tushare>=1.2.85
+baostock>=0.8.8
+easyquotation>=0.7.2
+pytdx>=1.72
+mootdx>=0.10.0
+Cython>=3.0.0

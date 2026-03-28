@@ -1,0 +1,475 @@
+{% extends "base.html" %}
+{% block title %}因子挖掘 - 量化交易系统{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>因子挖掘 <small class="text-muted fs-6">Factor Mining</small></h2>
+        <ul class="nav nav-tabs mt-3" id="factor-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#tab-screen">因子筛选</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#tab-valuation">估值分析</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#tab-optimize">因子优化</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="tab-content mt-3">
+<!-- 因子筛选 Tab -->
+<div class="tab-pane fade show active" id="tab-screen">
+<div class="row">
+    <!-- Screening panel -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>因子筛选</h5></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">20日动量 ≥ (%)</label>
+                    <input type="number" class="form-control" id="min-momentum" value="-5" step="0.5">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">RSI(12) 范围</label>
+                    <div class="row">
+                        <div class="col"><input type="number" class="form-control" id="min-rsi" value="0" min="0" max="100" placeholder="最小"></div>
+                        <div class="col-1 text-center align-self-center">~</div>
+                        <div class="col"><input type="number" class="form-control" id="max-rsi" value="70" min="0" max="100" placeholder="最大"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">均线趋势 MA5/MA20 ≥ (%)</label>
+                    <input type="number" class="form-control" id="min-ma-trend" value="-3" step="0.5">
+                </div>
+                <button class="btn btn-primary w-100" onclick="screenStocks()">
+                    <span id="screen-spinner" class="spinner-border spinner-border-sm d-none"></span>
+                    开始筛选
+                </button>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header"><h5>单股因子分析</h5></div>
+            <div class="card-body">
+                <select class="form-select mb-2" id="factor-stock-select">
+                    <option value="">选择股票</option>
+                </select>
+                <button class="btn btn-outline-primary w-100" onclick="analyzeStock()">分析因子</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Results panel -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header"><h5>筛选结果</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0" id="screen-results-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>代码</th><th>名称</th><th>现价</th>
+                                <th>20日动量</th><th>RSI(12)</th><th>均线趋势</th><th>信号</th><th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody><tr><td colspan="8" class="text-center text-muted py-3">点击"开始筛选"查看结果</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Single stock factor details -->
+        <div class="card mt-3" id="factor-detail-card" style="display:none">
+            <div class="card-header"><h5 id="factor-detail-title">因子详情</h5></div>
+            <div class="card-body" id="factor-detail-body"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- 估值分析 Tab -->
+<div class="tab-pane fade" id="tab-valuation">
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">RSI估值分析</h5>
+                <button class="btn btn-primary btn-sm" onclick="loadValuation()">
+                    <span id="val-spinner" class="spinner-border spinner-border-sm d-none"></span>
+                    分析估值
+                </button>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">多周期RSI百分位估值：短期(100日RSI)、中期(100周RSI)、长期(100月RSI)</p>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0" id="valuation-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>代码</th><th>名称</th><th>现价</th>
+                                <th>日RSI</th><th>短期百分位</th><th>短期估值</th>
+                                <th>周RSI</th><th>中期百分位</th><th>中期估值</th>
+                                <th>月RSI</th><th>长期百分位</th><th>长期估值</th>
+                                <th>趋势</th><th>综合估值分</th>
+                            </tr>
+                        </thead>
+                        <tbody><tr><td colspan="14" class="text-center text-muted py-3">点击"分析估值"开始</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- 因子优化 Tab -->
+<div class="tab-pane fade" id="tab-optimize">
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><h5>因子优化设置</h5></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">选择股票</label>
+                    <select class="form-select" id="opt-stock-select">
+                        <option value="">选择股票</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">回测起始日期</label>
+                    <input type="text" class="form-control" id="opt-start-date" value="20200101" placeholder="YYYYMMDD">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">回测结束日期</label>
+                    <input type="text" class="form-control" id="opt-end-date" placeholder="留空=今天">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">初始资金</label>
+                    <input type="number" class="form-control" id="opt-capital" value="1000000">
+                </div>
+                <button class="btn btn-primary w-100" onclick="runFactorOptimize()">
+                    <span id="opt-spinner" class="spinner-border spinner-border-sm d-none"></span>
+                    开始因子优化
+                </button>
+                <p class="text-muted small mt-2">自动遍历所有内置策略及参数化因子，回测找出收益最高的因子组合</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card" id="opt-best-card" style="display:none">
+            <div class="card-header bg-success bg-opacity-10"><h5 class="mb-0">🏆 最优因子</h5></div>
+            <div class="card-body" id="opt-best-body"></div>
+        </div>
+        <div class="card mt-3">
+            <div class="card-header"><h5>全部因子回测结果</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0" id="opt-results-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th><th>策略名称</th><th>总收益%</th><th>年化收益%</th>
+                                <th>最大回撤%</th><th>夏普比率</th><th>交易次数</th><th>胜率%</th><th>盈亏比</th>
+                            </tr>
+                        </thead>
+                        <tbody><tr><td colspan="9" class="text-center text-muted py-3">点击"开始因子优化"运行</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function() {
+    $.get('/api/stocks', function(stocks) {
+        var sel = $('#factor-stock-select');
+        var optSel = $('#opt-stock-select');
+        stocks.filter(s => s.type === 'stock').forEach(function(s) {
+            sel.append('<option value="' + s.code + '">' + s.name + ' (' + s.code + ')</option>');
+            optSel.append('<option value="' + s.code + '">' + s.name + ' (' + s.code + ')</option>');
+        });
+    });
+});
+
+function screenStocks() {
+    var btn = $('button[onclick="screenStocks()"]');
+    btn.prop('disabled', true);
+    $('#screen-spinner').removeClass('d-none');
+    
+    $.ajax({
+        url: '/api/factors/screen',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            min_momentum_20d: parseFloat($('#min-momentum').val()) || -999,
+            min_rsi_12: parseFloat($('#min-rsi').val()) || 0,
+            max_rsi_12: parseFloat($('#max-rsi').val()) || 100,
+            min_ma_trend: parseFloat($('#min-ma-trend').val()) || -999
+        }),
+        success: function(data) {
+            btn.prop('disabled', false);
+            $('#screen-spinner').addClass('d-none');
+            if (data.success) renderScreenResults(data.results);
+        },
+        error: function(xhr) {
+            btn.prop('disabled', false);
+            $('#screen-spinner').addClass('d-none');
+            alert('筛选失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        }
+    });
+}
+
+function renderScreenResults(results) {
+    var tbody = $('#screen-results-table tbody');
+    if (!results || results.length === 0) {
+        tbody.html('<tr><td colspan="8" class="text-center text-muted">没有符合条件的股票</td></tr>');
+        return;
+    }
+    var html = '';
+    results.forEach(function(r) {
+        var mCls = r.momentum_20d > 0 ? 'positive' : 'negative';
+        var mtCls = r.ma_trend > 0 ? 'positive' : 'negative';
+        var sigBadge = r.signal === 'bullish' ? '<span class="badge bg-success">看涨</span>' : '<span class="badge bg-secondary">中性</span>';
+        html += '<tr>';
+        html += '<td><a href="/stock/' + r.code + '">' + r.code + '</a></td>';
+        html += '<td>' + r.name + '</td>';
+        html += '<td>¥' + r.close + '</td>';
+        html += '<td class="' + mCls + '">' + (r.momentum_20d > 0 ? '+' : '') + r.momentum_20d + '%</td>';
+        html += '<td>' + r.rsi_12 + '</td>';
+        html += '<td class="' + mtCls + '">' + (r.ma_trend > 0 ? '+' : '') + r.ma_trend + '%</td>';
+        html += '<td>' + sigBadge + '</td>';
+        html += '<td><button class="btn btn-xs btn-outline-primary btn-sm" onclick="analyzeStockByCode(\'' + r.code + '\')">因子</button></td>';
+        html += '</tr>';
+    });
+    tbody.html(html);
+}
+
+function analyzeStock() {
+    var code = $('#factor-stock-select').val();
+    if (!code) { alert('请选择股票'); return; }
+    analyzeStockByCode(code);
+}
+
+function analyzeStockByCode(code) {
+    $.get('/api/stock/' + code + '/factors', function(data) {
+        if (!data.success) { alert('分析失败: ' + (data.error || '未知错误')); return; }
+        
+        var dims = data.dimensions;
+        var f = data.factors;
+        var totalScore = data.total_score;
+        var rating = data.rating;
+        var ratingColor = data.rating_color;
+        
+        var html = '<div class="row">';
+        // Left: overall rating
+        html += '<div class="col-md-4">';
+        html += '<div class="card text-center mb-2" style="border-color:' + ratingColor + '">';
+        html += '<div class="card-body">';
+        html += '<div class="fs-1 fw-bold" style="color:' + ratingColor + '">' + totalScore + '</div>';
+        html += '<div class="fs-5" style="color:' + ratingColor + '">' + rating + '</div>';
+        html += '</div></div>';
+        
+        // Dimension scores bars — show dominant system first, then the other
+        var dominant = data.dominant || '';
+        var isValue = dominant.indexOf('价值') >= 0 || dominant.indexOf('均衡') >= 0;
+        var valueDims = ['V1','V2','V3','V4','V5','V6','V7'];
+        var trendDims = ['T1','T2','T3','T4','T5','T6','T7'];
+        var primaryDims  = isValue ? valueDims : trendDims;
+        var secondaryDims = isValue ? trendDims : valueDims;
+        var primaryLabel  = isValue ? '价值体系' : '趋势体系';
+        var secondaryLabel = isValue ? '趋势体系' : '价值体系';
+
+        function renderDimsGroup(keys, groupLabel, groupScore) {
+            var gColor = groupScore >= 70 ? '#4caf50' : groupScore >= 55 ? '#ff9800' : '#f44336';
+            var out = '<div class="mb-1 py-1 px-2 rounded" style="background:#f8f9fa">';
+            out += '<div class="d-flex justify-content-between small mb-1"><strong>' + groupLabel + '</strong>';
+            out += '<span class="fw-bold" style="color:' + gColor + '">' + groupScore + '</span></div>';
+            keys.forEach(function(key) {
+                var d = dims[key];
+                if (!d) return;
+                var barColor = d.score >= 70 ? '#4caf50' : d.score >= 55 ? '#ff9800' : '#f44336';
+                out += '<div class="mb-1">';
+                out += '<div class="d-flex justify-content-between" style="font-size:0.78em">';
+                out += '<span>' + d.label + ' <span class="text-muted">(' + (d.weight||'') + ')</span></span>';
+                out += '<span class="fw-bold" style="color:' + barColor + '">' + d.score + '</span></div>';
+                out += '<div class="progress" style="height:5px"><div class="progress-bar" style="width:' + d.score + '%;background:' + barColor + '"></div></div>';
+                out += '<div class="text-muted" style="font-size:0.68em">' + d.detail + '</div>';
+                out += '</div>';
+            });
+            out += '</div>';
+            return out;
+        }
+
+        html += '<div class="card"><div class="card-header py-1">';
+        html += '<strong>维度评分</strong> <span class="badge ms-1" style="background:#6c757d;font-size:0.75em">' + dominant + '</span>';
+        html += '</div><div class="card-body py-2">';
+        html += renderDimsGroup(primaryDims,  primaryLabel,  isValue ? data.value_score : data.popular_score);
+        html += '<div class="my-1"></div>';
+        html += renderDimsGroup(secondaryDims, secondaryLabel, isValue ? data.popular_score : data.value_score);
+        html += '</div></div>';
+        html += '</div>';
+        
+        // Right: factor details table — expanded with new factors
+        html += '<div class="col-md-8"><table class="table table-sm"><thead><tr><th>因子</th><th>数值</th><th>解读</th></tr></thead><tbody>';
+        var fmt1 = function(v){ return v != null ? (v > 0 ? '+' : '') + parseFloat(v).toFixed(2) + '%' : '-'; };
+        var factorRows = [
+            ['RSI(6)',    f.rsi_6 != null ? f.rsi_6.toFixed(1) : '-',  f.rsi_6 > 70 ? '超买⚠️' : f.rsi_6 < 30 ? '超卖💡' : '正常'],
+            ['RSI(12)',   f.rsi_12 != null ? f.rsi_12.toFixed(1) : '-', f.rsi_12 > 70 ? '超买' : f.rsi_12 < 30 ? '超卖💡' : '正常'],
+            ['RSI(24)',   f.rsi_24 != null ? f.rsi_24.toFixed(1) : '-', f.rsi_24 > 70 ? '超买' : f.rsi_24 < 30 ? '超卖💡' : '正常'],
+            ['MACD',     f.macd != null ? f.macd.toFixed(4) : '-',  f.macd > 0 ? '多头区间' : '空头区间'],
+            ['布林位置', f.boll_pos != null ? (f.boll_pos*100).toFixed(0) + '%' : '-', f.boll_pos > 0.8 ? '近上轨⚠️' : f.boll_pos < 0.2 ? '近下轨💡' : '中间区域'],
+            ['KDJ-J',    f.kdj_j != null ? f.kdj_j.toFixed(1) : '-', f.kdj_j < 0 ? '极度超卖💡' : f.kdj_j > 100 ? '极度超买⚠️' : '正常'],
+            ['WR(14)',   f.wr_14 != null ? f.wr_14.toFixed(1) : '-', f.wr_14 < -80 ? '超卖💡' : f.wr_14 > -20 ? '超买⚠️' : '正常'],
+            ['5日动量',  fmt1(f.momentum_5d),   f.momentum_5d > 5 ? '↑强势' : f.momentum_5d < -5 ? '↓弱势' : '平稳'],
+            ['20日动量', fmt1(f.momentum_20d),  f.momentum_20d > 10 ? '💪强势' : f.momentum_20d < -10 ? '弱势' : '平稳'],
+            ['60日动量', fmt1(f.momentum_60d),  f.momentum_60d > 15 ? '强势上涨' : f.momentum_60d < -15 ? '持续下跌' : '震荡'],
+            ['量比',     f.volume_ratio != null ? f.volume_ratio.toFixed(2) : '-', f.volume_ratio > 1.5 ? '放量' : f.volume_ratio < 0.8 ? '缩量' : '正常'],
+            ['500日位置', f.price_pos_500d != null ? f.price_pos_500d.toFixed(0) + '%' : '-', f.price_pos_500d < 20 ? '历史低位💡' : f.price_pos_500d > 80 ? '历史高位⚠️' : '中间位置'],
+            ['PE_TTM',   f.pe_ttm != null ? f.pe_ttm.toFixed(1) + (f.pe_hist_pct != null ? '('+f.pe_hist_pct+'%分位)' : '') : '-',
+                         f.pe_ttm < 0 ? '亏损' : f.pe_hist_pct != null ? (f.pe_hist_pct < 20 ? '低估💡' : f.pe_hist_pct > 80 ? '高估⚠️' : '合理') : '-'],
+            ['PB',       f.pb != null ? f.pb.toFixed(2) + (f.pb_hist_pct != null ? '('+f.pb_hist_pct+'%分位)' : '') : '-',
+                         f.pb != null && f.pb < 1 ? '破净💡' : f.pb_hist_pct != null ? (f.pb_hist_pct < 20 ? '低估💡' : f.pb_hist_pct > 80 ? '高估⚠️' : '合理') : '-'],
+        ];
+        factorRows.forEach(function(r) {
+            html += '<tr><td class="small">' + r[0] + '</td><td class="small">' + r[1] + '</td><td class="text-muted small">' + r[2] + '</td></tr>';
+        });
+        html += '</tbody></table></div></div>';
+        
+        $('#factor-detail-title').text(code + ' 因子详情');
+        $('#factor-detail-body').html(html);
+        $('#factor-detail-card').show();
+    });
+}
+
+function loadValuation() {
+    var btn = $('button[onclick="loadValuation()"]');
+    btn.prop('disabled', true);
+    $('#val-spinner').removeClass('d-none');
+    
+    $.get('/api/factors/valuation', function(data) {
+        btn.prop('disabled', false);
+        $('#val-spinner').addClass('d-none');
+        if (!data.success) { alert('加载失败'); return; }
+        
+        var tbody = $('#valuation-table tbody');
+        if (!data.results || data.results.length === 0) {
+            tbody.html('<tr><td colspan="14" class="text-center text-muted">无数据</td></tr>');
+            return;
+        }
+        
+        var html = '';
+        data.results.forEach(function(r) {
+            var valColor = function(val) {
+                if (val.indexOf('低估') >= 0) return 'text-success fw-bold';
+                if (val.indexOf('高估') >= 0) return 'text-danger fw-bold';
+                return '';
+            };
+            var scoreBg = r.val_score >= 70 ? 'bg-success' : r.val_score >= 50 ? 'bg-warning' : r.val_score >= 30 ? 'bg-secondary' : 'bg-danger';
+            html += '<tr>';
+            html += '<td><a href="/stock/' + r.code + '">' + r.code + '</a></td>';
+            html += '<td>' + r.name + '</td>';
+            html += '<td>¥' + r.close + '</td>';
+            html += '<td>' + (r.rsi_daily || '-') + '</td>';
+            html += '<td>' + r.short_pctile + '%</td>';
+            html += '<td class="' + valColor(r.short_val) + '">' + r.short_val + '</td>';
+            html += '<td>' + (r.rsi_weekly || '-') + '</td>';
+            html += '<td>' + r.mid_pctile + '%</td>';
+            html += '<td class="' + valColor(r.mid_val) + '">' + r.mid_val + '</td>';
+            html += '<td>' + (r.rsi_monthly || '-') + '</td>';
+            html += '<td>' + r.long_pctile + '%</td>';
+            html += '<td class="' + valColor(r.long_val) + '">' + r.long_val + '</td>';
+            html += '<td>' + r.trend_icon + ' ' + r.trend + '</td>';
+            html += '<td><span class="badge ' + scoreBg + '">' + r.val_score + '</span></td>';
+            html += '</tr>';
+        });
+        tbody.html(html);
+    }).fail(function() {
+        btn.prop('disabled', false);
+        $('#val-spinner').addClass('d-none');
+        alert('请求失败');
+    });
+}
+
+function runFactorOptimize() {
+    var code = $('#opt-stock-select').val();
+    if (!code) { alert('请选择股票'); return; }
+    
+    var btn = $('button[onclick="runFactorOptimize()"]');
+    btn.prop('disabled', true);
+    $('#opt-spinner').removeClass('d-none');
+    $('#opt-best-card').hide();
+    $('#opt-results-table tbody').html('<tr><td colspan="9" class="text-center text-muted py-3"><span class="spinner-border spinner-border-sm"></span> 正在回测所有因子，请耐心等待...</td></tr>');
+    
+    $.ajax({
+        url: '/api/factors/optimize',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            code: code,
+            start_date: $('#opt-start-date').val() || '20200101',
+            end_date: $('#opt-end-date').val() || '',
+            initial_capital: parseFloat($('#opt-capital').val()) || 1000000
+        }),
+        timeout: 300000,
+        success: function(data) {
+            btn.prop('disabled', false);
+            $('#opt-spinner').addClass('d-none');
+            if (!data.success) { alert('优化失败: ' + (data.error || '未知错误')); return; }
+            
+            // Show best strategy
+            if (data.best_strategy) {
+                var b = data.best_strategy;
+                var html = '<div class="row">';
+                html += '<div class="col-md-4 text-center">';
+                html += '<div class="fs-2 fw-bold text-success">' + (b.total_return_pct || 0) + '%</div>';
+                html += '<div class="text-muted">总收益率</div>';
+                html += '</div>';
+                html += '<div class="col-md-8">';
+                html += '<h5>' + b.strategy_name + '</h5>';
+                html += '<p class="text-muted small">' + (b.description || '') + '</p>';
+                html += '<div class="row">';
+                html += '<div class="col-4"><strong>年化:</strong> ' + (b.annual_return || 0) + '%</div>';
+                html += '<div class="col-4"><strong>夏普:</strong> ' + (b.sharpe_ratio || 0) + '</div>';
+                html += '<div class="col-4"><strong>胜率:</strong> ' + (b.win_rate || 0) + '%</div>';
+                html += '</div></div></div>';
+                $('#opt-best-body').html(html);
+                $('#opt-best-card').show();
+            }
+            
+            // Render results table
+            var tbody = $('#opt-results-table tbody');
+            if (!data.results || data.results.length === 0) {
+                tbody.html('<tr><td colspan="9" class="text-center text-muted">无结果</td></tr>');
+                return;
+            }
+            var html = '';
+            data.results.forEach(function(r, idx) {
+                var retCls = (r.total_return_pct || 0) > 0 ? 'positive' : (r.total_return_pct || 0) < 0 ? 'negative' : '';
+                html += '<tr' + (idx === 0 ? ' class="table-success"' : '') + '>';
+                html += '<td>' + (idx + 1) + '</td>';
+                html += '<td>' + r.strategy_name + '</td>';
+                html += '<td class="' + retCls + '">' + (r.total_return_pct != null ? r.total_return_pct + '%' : '<span class="text-danger">失败</span>') + '</td>';
+                html += '<td>' + (r.annual_return != null ? r.annual_return + '%' : '-') + '</td>';
+                html += '<td>' + (r.max_drawdown_pct != null ? r.max_drawdown_pct + '%' : '-') + '</td>';
+                html += '<td>' + (r.sharpe_ratio || '-') + '</td>';
+                html += '<td>' + (r.total_trades || '-') + '</td>';
+                html += '<td>' + (r.win_rate != null ? r.win_rate + '%' : '-') + '</td>';
+                html += '<td>' + (r.profit_factor || '-') + '</td>';
+                html += '</tr>';
+            });
+            tbody.html(html);
+        },
+        error: function(xhr) {
+            btn.prop('disabled', false);
+            $('#opt-spinner').addClass('d-none');
+            alert('因子优化失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '请求超时或服务器错误'));
+        }
+    });
+}
+</script>
+{% endblock %}

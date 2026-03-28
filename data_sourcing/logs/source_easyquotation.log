@@ -1,0 +1,1402 @@
+2026-03-21 15:26:53 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 15:26:53 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-21 15:26:53 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3352.103
+2026-03-21 15:26:53 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SZ, close=10.77
+2026-03-21 15:26:53 [source.easyquotation] INFO: Easyquotation 港股日K: 00700.HK, 41 条
+2026-03-21 15:32:14 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 15:32:14 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-21 15:32:14 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3352.103
+2026-03-21 15:32:14 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SZ, close=10.77
+2026-03-21 15:32:14 [source.easyquotation] INFO: Easyquotation 港股日K: 00700.HK, 41 条
+2026-03-21 15:33:58 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 15:33:58 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SZ, close=10.77
+2026-03-21 15:46:46 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 15:46:46 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-21 15:46:46 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-21 15:46:46 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3352.103
+2026-03-21 15:46:46 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SZ, close=10.77
+2026-03-21 15:46:46 [source.easyquotation] INFO: Easyquotation 港股日K: 00700.HK, 41 条
+2026-03-21 15:58:53 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 15:58:53 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SZ, close=10.77
+2026-03-21 15:58:53 [source.easyquotation] INFO: Easyquotation 港股日K: 00700.HK, 15 条
+2026-03-21 15:58:53 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-21 16:02:20 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 16:02:20 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-21 16:02:20 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-21 16:02:20 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3352.103
+2026-03-21 16:02:20 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SZ, close=10.77
+2026-03-21 16:02:20 [source.easyquotation] INFO: Easyquotation 港股日K: 00700.HK, 41 条
+2026-03-21 16:29:46 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 16:29:46 [source.easyquotation] INFO: Easyquotation 港股日K: 00700.HK, 299 条
+2026-03-21 16:29:47 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 16:29:47 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-21 16:29:48 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-21 16:29:48 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3352.103
+2026-03-21 16:29:48 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 00700.HK, close=508.0
+2026-03-21 16:31:59 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 16:31:59 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-21 16:31:59 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=59.74
+2026-03-21 16:32:00 [source.easyquotation] INFO: Easyquotation A股实时: 600036.SH, close=39.75
+2026-03-21 16:32:00 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=103.03
+2026-03-21 16:32:00 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=413.0
+2026-03-21 16:32:01 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=123.7
+2026-03-21 16:32:01 [source.easyquotation] INFO: Easyquotation A股实时: 000858.SZ, close=102.4
+2026-03-21 16:32:02 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.36
+2026-03-21 16:32:02 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-21 16:32:02 [source.easyquotation] INFO: Easyquotation A股实时: 600523.SH, close=14.01
+2026-03-21 16:32:03 [source.easyquotation] INFO: Easyquotation A股实时: 600500.SH, close=4.29
+2026-03-21 16:32:03 [source.easyquotation] INFO: Easyquotation A股实时: 600531.SH, close=13.41
+2026-03-21 16:32:03 [source.easyquotation] INFO: Easyquotation A股实时: 600980.SH, close=21.08
+2026-03-21 16:32:03 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=28.64
+2026-03-21 16:32:03 [source.easyquotation] WARNING: Easyquotation A股无数据: 801010.SH
+2026-03-21 16:33:49 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 16:33:49 [source.easyquotation] WARNING: Easyquotation A股无数据: 801010.SH
+2026-03-21 16:34:20 [source.easyquotation] WARNING: Easyquotation A股无数据: 801020.SH
+2026-03-21 16:34:50 [source.easyquotation] WARNING: Easyquotation A股无数据: 801110.SH
+2026-03-21 16:36:39 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 16:36:39 [source.easyquotation] WARNING: Easyquotation A股无数据: 801010.SH
+2026-03-21 16:46:22 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 16:46:22 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13866.202
+2026-03-21 16:46:22 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4567.0179
+2026-03-21 16:46:23 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1318.3074
+2026-03-21 17:03:19 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 17:03:19 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-21 17:03:19 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13866.202
+2026-03-21 17:03:20 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3352.103
+2026-03-21 17:03:20 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4567.0179
+2026-03-21 17:03:21 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1318.3074
+2026-03-21 17:03:21 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-21 17:03:26 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-21 17:03:27 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=59.74
+2026-03-21 17:03:28 [source.easyquotation] INFO: Easyquotation A股实时: 600036.SH, close=39.75
+2026-03-21 17:03:28 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=103.03
+2026-03-21 17:03:28 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=413.0
+2026-03-21 17:03:29 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=123.7
+2026-03-21 17:03:29 [source.easyquotation] INFO: Easyquotation A股实时: 000858.SZ, close=102.4
+2026-03-21 17:03:29 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.36
+2026-03-21 17:03:29 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-21 17:03:30 [source.easyquotation] INFO: Easyquotation A股实时: 600523.SH, close=14.01
+2026-03-21 17:03:30 [source.easyquotation] INFO: Easyquotation A股实时: 600500.SH, close=4.29
+2026-03-21 17:03:30 [source.easyquotation] INFO: Easyquotation A股实时: 600531.SH, close=13.41
+2026-03-21 17:03:31 [source.easyquotation] INFO: Easyquotation A股实时: 600980.SH, close=21.08
+2026-03-21 17:03:31 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=28.64
+2026-03-21 17:19:30 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 17:19:30 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-21 17:19:30 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-21 17:19:30 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-21 17:19:31 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-21 17:19:35 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=59.74
+2026-03-21 17:19:35 [source.easyquotation] INFO: Easyquotation A股实时: 600036.SH, close=39.75
+2026-03-21 17:19:36 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=103.03
+2026-03-21 17:19:36 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=413.0
+2026-03-21 17:19:36 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=123.7
+2026-03-21 17:19:37 [source.easyquotation] INFO: Easyquotation A股实时: 000858.SZ, close=102.4
+2026-03-21 17:19:37 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.36
+2026-03-21 17:19:37 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-21 17:19:37 [source.easyquotation] INFO: Easyquotation A股实时: 600523.SH, close=14.01
+2026-03-21 17:19:37 [source.easyquotation] INFO: Easyquotation A股实时: 600500.SH, close=4.29
+2026-03-21 17:19:37 [source.easyquotation] INFO: Easyquotation A股实时: 600531.SH, close=13.41
+2026-03-21 17:19:38 [source.easyquotation] INFO: Easyquotation A股实时: 600980.SH, close=21.08
+2026-03-21 17:19:38 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=28.64
+2026-03-21 17:19:38 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-21 17:19:39 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13866.202
+2026-03-21 17:19:39 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3352.103
+2026-03-21 17:19:39 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4567.0179
+2026-03-21 17:19:40 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1318.3074
+2026-03-21 17:19:40 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-21 17:20:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 17:20:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 17:20:46 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 17:20:49 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 17:20:52 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 17:21:16 [source.easyquotation] INFO: Easyquotation A股实时: 600501.SH, close=22.84
+2026-03-21 17:22:12 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 17:22:22 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 17:22:56 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 17:23:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 17:23:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 17:23:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 17:24:12 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 18:01:33 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 18:01:33 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 18:01:33 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 18:01:33 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:09:41 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 19:09:41 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:09:41 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:09:41 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:11:02 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 19:11:03 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:12:00 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 19:12:01 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:13:02 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 19:13:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:14:07 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 19:14:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:16:28 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 19:16:28 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:17:55 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 19:17:55 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:25:20 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 19:25:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:25:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:25:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:25:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:29:38 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:38:42 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 19:38:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:38:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:38:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:49:59 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 19:49:59 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SZ, close=10.77
+2026-03-21 19:56:09 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 19:56:10 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:56:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:57:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:57:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:57:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:57:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:57:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 19:57:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 21:45:26 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-21 21:45:26 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 21:45:26 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 21:45:26 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 21:47:45 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 21:47:56 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 21:48:03 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 22:50:18 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 22:50:39 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 22:50:47 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-21 22:50:55 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:08:33 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 08:08:33 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-22 08:08:35 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=59.74
+2026-03-22 08:08:36 [source.easyquotation] INFO: Easyquotation A股实时: 600036.SH, close=39.75
+2026-03-22 08:08:37 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=103.03
+2026-03-22 08:08:38 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=413.0
+2026-03-22 08:08:39 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=123.7
+2026-03-22 08:08:39 [source.easyquotation] INFO: Easyquotation A股实时: 000858.SZ, close=102.4
+2026-03-22 08:08:40 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.36
+2026-03-22 08:08:40 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-22 08:08:42 [source.easyquotation] INFO: Easyquotation A股实时: 600523.SH, close=14.01
+2026-03-22 08:08:43 [source.easyquotation] INFO: Easyquotation A股实时: 600500.SH, close=4.29
+2026-03-22 08:08:43 [source.easyquotation] INFO: Easyquotation A股实时: 600531.SH, close=13.41
+2026-03-22 08:08:44 [source.easyquotation] INFO: Easyquotation A股实时: 600980.SH, close=21.08
+2026-03-22 08:08:45 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=28.64
+2026-03-22 08:08:46 [source.easyquotation] INFO: Easyquotation A股实时: 600501.SH, close=22.84
+2026-03-22 08:08:47 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SZ, close=10.77
+2026-03-22 08:08:47 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-22 08:08:49 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13866.202
+2026-03-22 08:08:50 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3352.103
+2026-03-22 08:08:51 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4567.0179
+2026-03-22 08:08:52 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1318.3074
+2026-03-22 08:08:52 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-22 08:28:34 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 08:28:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:28:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:28:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:28:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-22 08:31:11 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 08:31:11 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:31:11 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:31:57 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:31:57 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:31:57 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:32:14 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:32:14 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:32:14 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:40:31 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 08:40:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:40:32 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 08:40:48 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 09:30:34 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 09:30:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-22 09:30:50 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-22 09:30:51 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=59.74
+2026-03-22 09:30:52 [source.easyquotation] INFO: Easyquotation A股实时: 600036.SH, close=39.75
+2026-03-22 09:30:53 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=103.03
+2026-03-22 09:30:54 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=413.0
+2026-03-22 09:30:55 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=123.7
+2026-03-22 09:30:56 [source.easyquotation] INFO: Easyquotation A股实时: 000858.SZ, close=102.4
+2026-03-22 09:30:57 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.36
+2026-03-22 09:30:58 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-22 09:30:59 [source.easyquotation] INFO: Easyquotation A股实时: 600523.SH, close=14.01
+2026-03-22 09:30:59 [source.easyquotation] INFO: Easyquotation A股实时: 600500.SH, close=4.29
+2026-03-22 09:31:00 [source.easyquotation] INFO: Easyquotation A股实时: 600531.SH, close=13.41
+2026-03-22 09:31:01 [source.easyquotation] INFO: Easyquotation A股实时: 600980.SH, close=21.08
+2026-03-22 09:31:02 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=28.64
+2026-03-22 09:31:03 [source.easyquotation] INFO: Easyquotation A股实时: 600501.SH, close=22.84
+2026-03-22 09:31:04 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SZ, close=10.77
+2026-03-22 09:31:08 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-22 09:31:11 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13866.202
+2026-03-22 09:31:12 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3352.103
+2026-03-22 09:31:13 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4567.0179
+2026-03-22 09:31:15 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1318.3074
+2026-03-22 09:31:16 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-22 09:32:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 09:32:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 09:32:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 09:32:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 09:32:01 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 739 条
+2026-03-22 09:32:09 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=123.7
+2026-03-22 09:39:15 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 09:39:15 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-22 09:39:37 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-22 10:13:29 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 10:13:29 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-22 10:23:31 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 10:23:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-22 10:23:39 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SZ, close=10.77
+2026-03-22 10:23:40 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-22 10:23:49 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-22 10:23:50 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=59.74
+2026-03-22 10:23:51 [source.easyquotation] INFO: Easyquotation A股实时: 600036.SH, close=39.75
+2026-03-22 10:23:51 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=103.03
+2026-03-22 10:23:52 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=413.0
+2026-03-22 10:23:53 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=123.7
+2026-03-22 10:23:54 [source.easyquotation] INFO: Easyquotation A股实时: 000858.SZ, close=102.4
+2026-03-22 10:23:55 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.36
+2026-03-22 10:23:56 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-22 10:23:57 [source.easyquotation] INFO: Easyquotation A股实时: 600523.SH, close=14.01
+2026-03-22 10:23:58 [source.easyquotation] INFO: Easyquotation A股实时: 600500.SH, close=4.29
+2026-03-22 10:23:58 [source.easyquotation] INFO: Easyquotation A股实时: 600531.SH, close=13.41
+2026-03-22 10:23:59 [source.easyquotation] INFO: Easyquotation A股实时: 600980.SH, close=21.08
+2026-03-22 10:24:00 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=28.64
+2026-03-22 10:24:00 [source.easyquotation] INFO: Easyquotation A股实时: 600501.SH, close=22.84
+2026-03-22 10:24:02 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13866.202
+2026-03-22 10:24:03 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3352.103
+2026-03-22 10:24:04 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4567.0179
+2026-03-22 10:24:04 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1318.3074
+2026-03-22 10:24:05 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-22 10:24:37 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-22 10:25:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 10:26:03 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 10:27:45 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 10:39:50 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 10:39:50 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-22 10:39:54 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-22 10:40:11 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=59.74
+2026-03-22 10:40:11 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-22 10:50:15 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 10:50:15 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=59.74
+2026-03-22 10:50:18 [source.easyquotation] INFO: Easyquotation A股实时: 600036.SH, close=39.75
+2026-03-22 10:50:19 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-22 11:18:36 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 11:18:36 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-22 11:18:40 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=103.03
+2026-03-22 11:18:42 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=413.0
+2026-03-22 11:18:43 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=123.7
+2026-03-22 11:18:44 [source.easyquotation] INFO: Easyquotation A股实时: 000858.SZ, close=102.4
+2026-03-22 11:18:45 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.36
+2026-03-22 11:18:46 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-22 11:18:50 [source.easyquotation] INFO: Easyquotation A股实时: 600523.SH, close=14.01
+2026-03-22 11:18:52 [source.easyquotation] INFO: Easyquotation A股实时: 600500.SH, close=4.29
+2026-03-22 11:18:53 [source.easyquotation] INFO: Easyquotation A股实时: 600531.SH, close=13.41
+2026-03-22 11:18:53 [source.easyquotation] INFO: Easyquotation A股实时: 600980.SH, close=21.08
+2026-03-22 11:18:54 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=28.64
+2026-03-22 11:18:55 [source.easyquotation] INFO: Easyquotation A股实时: 600501.SH, close=22.84
+2026-03-22 11:18:58 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SZ, close=10.77
+2026-03-22 11:19:01 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13866.202
+2026-03-22 11:19:02 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3352.103
+2026-03-22 11:19:03 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4567.0179
+2026-03-22 11:19:05 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1318.3074
+2026-03-22 11:19:05 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-22 11:22:20 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 11:22:20 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1318.3074
+2026-03-22 11:22:50 [source.easyquotation] INFO: Easyquotation A股实时: 000010.SZ, close=4.61
+2026-03-22 11:22:50 [source.easyquotation] INFO: Easyquotation A股实时: 000010.SZ, close=4.61
+2026-03-22 11:22:50 [source.easyquotation] INFO: Easyquotation A股实时: 000010.SZ, close=4.61
+2026-03-22 11:35:05 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 11:35:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 11:36:47 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-22 11:37:35 [source.easyquotation] INFO: Easyquotation A股实时: 600523.SH, close=14.01
+2026-03-22 11:38:48 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 11:38:48 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 11:56:01 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 11:56:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 12:29:18 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 12:29:18 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 13:13:59 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 13:14:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 14:23:47 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 14:23:48 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 15:38:47 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 15:38:48 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 15:49:18 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 15:49:19 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:45:45 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 19:45:45 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:46:03 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:47:04 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:47:16 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:49:04 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:50:50 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:51:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:51:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:51:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:51:18 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=59.74
+2026-03-22 19:51:26 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=413.0
+2026-03-22 19:51:28 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:51:31 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.36
+2026-03-22 19:51:43 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:53:13 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:53:28 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=103.03
+2026-03-22 19:53:28 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=103.03
+2026-03-22 19:53:28 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:53:28 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:53:33 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:53:33 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:53:37 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=103.03
+2026-03-22 19:53:37 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.36
+2026-03-22 19:53:45 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:54:03 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:54:17 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:54:17 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:54:22 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:54:26 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.36
+2026-03-22 19:54:30 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:54:38 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:54:40 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-22 19:54:43 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.36
+2026-03-22 19:54:44 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:54:45 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:54:49 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=59.74
+2026-03-22 19:54:56 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:55:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:55:07 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:55:11 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:55:11 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:55:13 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=59.74
+2026-03-22 19:55:21 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=123.7
+2026-03-22 19:55:23 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=59.74
+2026-03-22 19:55:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:55:30 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:55:30 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.36
+2026-03-22 19:55:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 19:55:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:00:54 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 20:00:54 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=413.0
+2026-03-22 20:00:54 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:00:57 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3352.103
+2026-03-22 20:01:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:01:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:02:13 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:05:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:06:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:06:24 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-22 20:07:14 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:07:17 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-22 20:18:57 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-22 20:18:57 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:25:16 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-22 20:25:28 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-22 20:25:30 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=59.74
+2026-03-22 20:25:31 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=103.03
+2026-03-22 20:25:31 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=413.0
+2026-03-22 20:25:32 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=123.7
+2026-03-22 20:25:33 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.36
+2026-03-22 20:25:34 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-22 20:25:35 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=28.64
+2026-03-22 20:25:36 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-22 20:25:37 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13866.202
+2026-03-22 20:25:37 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3352.103
+2026-03-22 20:25:38 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4567.0179
+2026-03-22 20:25:39 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1318.3074
+2026-03-22 20:25:40 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-22 20:36:36 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-22 20:36:36 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-22 20:36:36 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=105.2
+2026-03-22 20:37:21 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=28.64
+2026-03-22 20:37:23 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-22 20:37:34 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-22 20:38:14 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1445.0
+2026-03-22 20:38:38 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13866.202
+2026-03-22 20:38:57 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1318.3074
+2026-03-22 20:39:15 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25277.32
+2026-03-22 20:39:43 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-22 20:39:58 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3957.0527
+2026-03-22 20:46:19 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 245 条
+2026-03-22 20:49:39 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:49:52 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:51:39 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:53:03 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:53:13 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-22 20:57:54 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:09:12 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 20:09:12 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:10:30 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 20:10:30 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:10:39 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:13:16 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 20:13:16 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:13:22 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:13:52 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:14:22 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:14:52 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:15:27 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:15:59 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:16:09 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 20:16:09 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:16:13 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:16:45 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:17:18 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:17:47 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:18:19 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 20:18:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:19:00 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 20:19:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:19:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:20:07 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 20:20:10 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:20:10 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:20:10 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:20:13 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:20:33 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 20:20:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:21:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:21:43 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:22:18 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 20:22:18 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:22:55 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:23:28 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 20:23:58 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:32:50 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 22:32:50 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:33:18 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:33:54 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:35:13 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 22:35:14 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:35:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:35:51 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:36:25 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:36:55 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:37:26 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 22:37:26 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:38:01 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:38:39 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:39:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:39:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:40:05 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 22:40:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:40:14 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:40:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:40:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:40:45 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:41:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:41:11 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:41:16 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:41:27 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:42:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:42:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:43:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:43:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:44:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:44:39 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 22:44:39 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:45:17 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:45:25 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 22:45:25 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:47:06 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 22:47:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:47:40 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:47:52 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 22:47:52 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:47:58 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:48:04 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:48:33 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:49:12 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 22:49:12 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:49:46 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:50:16 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:52:27 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 22:52:27 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:53:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:53:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:54:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:54:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:58:16 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 22:58:17 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:58:46 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:59:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 22:59:50 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:00:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:00:54 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 23:00:54 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:01:30 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:02:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:02:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:03:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:03:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:04:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:04:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:05:11 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:05:45 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:06:15 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:06:55 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:07:25 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:15:42 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 23:15:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:16:15 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:16:50 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:16:55 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1261.4377
+2026-03-23 23:17:24 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:18:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:18:32 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:19:01 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:19:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:19:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:19:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:20:01 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:20:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:20:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:20:15 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:20:20 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-23 23:20:27 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-23 23:20:41 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:20:46 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:21:22 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:21:22 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:21:28 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:22:01 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:22:09 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:22:09 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:53:00 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-23 23:53:00 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-23 23:53:05 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-23 23:53:07 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-23 23:53:13 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-23 23:53:26 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-23 23:53:43 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-23 23:54:01 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-23 23:54:01 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-23 23:54:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:54:19 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-23 23:54:37 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-23 23:54:46 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-23 23:54:55 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-23 23:54:59 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-23 23:55:14 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-23 23:55:19 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-23 23:55:23 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-23 23:55:32 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-23 23:55:35 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-23 23:55:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:55:38 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-23 23:55:49 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-23 23:55:51 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=102.44
+2026-03-23 23:55:54 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-23 23:55:54 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:56:02 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-23 23:56:13 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=102.44
+2026-03-23 23:56:21 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-23 23:56:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-23 23:56:24 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.37
+2026-03-23 23:56:43 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-23 23:56:56 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=102.44
+2026-03-24 00:00:01 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 00:00:01 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-24 00:00:01 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-24 00:00:01 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:00:01 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=119.7
+2026-03-24 00:00:01 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-24 00:00:01 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-24 00:00:02 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:00:02 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=102.44
+2026-03-24 00:00:02 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-24 00:00:02 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:00:02 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-24 00:00:02 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-24 00:00:03 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:00:03 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=102.44
+2026-03-24 00:00:03 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 00:00:03 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-24 00:00:04 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.37
+2026-03-24 00:00:04 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-24 00:00:04 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 00:00:05 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-24 00:00:05 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-24 00:00:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 00:00:05 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-24 00:00:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 00:00:06 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-24 00:00:07 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.37
+2026-03-24 00:00:07 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-24 00:00:08 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.37
+2026-03-24 00:00:09 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.37
+2026-03-24 00:00:10 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.37
+2026-03-24 00:00:10 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3813.2829
+2026-03-24 00:00:10 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3813.2829
+2026-03-24 00:00:10 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3813.2829
+2026-03-24 00:00:10 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3813.2829
+2026-03-24 00:00:11 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3813.2829
+2026-03-24 00:00:11 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3813.2829
+2026-03-24 00:00:11 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13345.514
+2026-03-24 00:00:12 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13345.514
+2026-03-24 00:00:12 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13345.514
+2026-03-24 00:00:12 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13345.514
+2026-03-24 00:00:12 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13345.514
+2026-03-24 00:00:13 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13345.514
+2026-03-24 00:00:13 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-24 00:00:14 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-24 00:00:14 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-24 00:00:14 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-24 00:00:14 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-24 00:00:14 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-24 00:00:15 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4417.9971
+2026-03-24 00:00:15 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4417.9971
+2026-03-24 00:00:16 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4417.9971
+2026-03-24 00:00:16 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4417.9971
+2026-03-24 00:00:16 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4417.9971
+2026-03-24 00:00:16 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4417.9971
+2026-03-24 00:00:17 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1261.4377
+2026-03-24 00:00:17 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1261.4377
+2026-03-24 00:00:17 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24382.47
+2026-03-24 00:00:17 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24382.47
+2026-03-24 00:00:54 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-24 00:00:55 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-24 00:00:56 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:00:56 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-24 00:00:57 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 00:00:57 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-24 00:01:00 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-24 00:01:00 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4417.9971
+2026-03-24 00:01:01 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1261.4377
+2026-03-24 00:01:01 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24382.47
+2026-03-24 00:01:51 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-24 00:01:52 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:01:53 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-24 00:01:53 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 00:01:54 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-24 00:01:56 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-24 00:01:56 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4417.9971
+2026-03-24 00:01:57 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1261.4377
+2026-03-24 00:01:58 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24382.47
+2026-03-24 00:02:26 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-24 00:02:27 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:02:28 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:02:28 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-24 00:02:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 00:02:29 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:02:30 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-24 00:02:30 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:02:32 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:02:37 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-24 00:02:45 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1261.4377
+2026-03-24 00:02:46 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-24 00:02:46 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24382.47
+2026-03-24 00:02:47 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:02:48 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-24 00:02:48 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-24 00:02:48 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 00:02:49 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-24 00:02:49 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:02:51 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-24 00:02:51 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 00:02:52 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-24 00:02:52 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-24 00:02:53 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4417.9971
+2026-03-24 00:02:55 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1261.4377
+2026-03-24 00:02:55 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-24 00:02:55 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24382.47
+2026-03-24 00:02:56 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4417.9971
+2026-03-24 00:02:57 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1261.4377
+2026-03-24 00:02:57 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24382.47
+2026-03-24 00:03:04 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:03:14 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:03:16 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:03:18 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-24 00:03:19 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:03:19 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-24 00:03:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 00:03:21 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-24 00:03:22 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-24 00:03:23 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4417.9971
+2026-03-24 00:03:24 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1261.4377
+2026-03-24 00:03:26 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24382.47
+2026-03-24 00:07:15 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 00:07:15 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-24 00:07:16 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-24 00:07:21 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:07:22 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-24 00:07:26 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-24 00:07:35 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-24 00:07:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-24 00:07:37 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:08:49 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 00:08:49 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-24 00:08:53 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-24 00:10:33 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 00:10:33 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-24 00:10:33 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1408.07
+2026-03-24 00:10:34 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-24 00:10:34 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=57.47
+2026-03-24 00:10:34 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:10:35 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:10:35 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-24 00:10:35 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=401.99
+2026-03-24 00:10:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 00:10:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-24 00:10:36 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=48.74
+2026-03-24 00:10:37 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=102.44
+2026-03-24 00:10:38 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.37
+2026-03-24 00:10:39 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.37
+2026-03-24 00:10:39 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3813.2829
+2026-03-24 00:10:40 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13345.514
+2026-03-24 00:10:41 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3235.221
+2026-03-24 00:10:41 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4417.9971
+2026-03-24 00:10:42 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1261.4377
+2026-03-24 00:10:42 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24382.47
+2026-03-24 00:10:52 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=119.7
+2026-03-24 00:10:53 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:10:53 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:10:53 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 00:10:57 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=107.63
+2026-03-24 20:57:09 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 20:57:09 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3881.2797
+2026-03-24 20:57:09 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=25063.71
+2026-03-24 20:57:09 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3251.545
+2026-03-24 20:57:09 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SZ, close=10.88
+2026-03-24 20:57:09 [source.easyquotation] INFO: Easyquotation 港股日K: 00700.HK, 40 条
+2026-03-24 21:09:19 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 21:09:19 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:09:52 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:11:12 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 21:11:12 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:11:24 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:11:24 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:11:49 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:12:23 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:49:40 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 21:49:40 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:50:12 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:50:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:50:43 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:51:17 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:51:48 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:52:23 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:52:53 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:53:28 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:54:01 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:54:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:55:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:55:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:56:04 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:56:39 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:57:14 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:57:44 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:58:14 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:58:44 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 21:59:18 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:05:47 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 22:05:47 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 6 条
+2026-03-24 22:05:52 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:05:54 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:06:24 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:06:56 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:07:27 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:07:58 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:08:23 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:08:26 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:08:26 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:08:38 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:09:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:09:03 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:09:10 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:09:10 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:09:11 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:09:18 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:09:41 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:09:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:09:44 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 6 条
+2026-03-24 22:09:49 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:09:55 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:09:55 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:09:57 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:10:27 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:10:32 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:18:58 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 22:18:58 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 6 条
+2026-03-24 22:18:59 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:19:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:19:33 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:19:33 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:19:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:19:45 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:19:49 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 6 条
+2026-03-24 22:20:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:20:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:20:40 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:20:41 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:20:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:21:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:21:19 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:21:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:21:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:22:03 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:22:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:22:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:30:34 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 22:30:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:31:14 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:32:22 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 22:32:23 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:33:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:33:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:34:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:34:51 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:35:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:36:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:37:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:37:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:38:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:38:50 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:39:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:54:00 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 22:54:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 6 条
+2026-03-24 22:54:04 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:54:33 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:55:03 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:55:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:56:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:56:39 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:57:01 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:57:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:57:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:57:09 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:57:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:57:47 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 22:58:18 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:01:20 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 23:01:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:01:50 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:02:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:02:55 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:03:26 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:03:58 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:04:59 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:05:38 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:05:38 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:06:03 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:06:07 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:06:13 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:06:13 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:19:41 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-24 23:19:41 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:20:15 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:20:45 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-24 23:21:16 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:13:06 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 20:13:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:13:38 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:14:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:14:09 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:14:16 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:14:38 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:15:01 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:15:28 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 20:15:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:15:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:15:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:15:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:15:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:15:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:37:52 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 20:37:52 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:37:52 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 6 条
+2026-03-25 20:39:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:40:48 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:45:21 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 20:45:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:49:24 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 20:49:25 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:50:53 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:55:20 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 20:55:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 20:56:50 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:07:48 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 21:07:48 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 6 条
+2026-03-25 21:07:53 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:12:19 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 21:12:19 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:13:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:13:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:13:42 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:13:44 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:13:51 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:15:30 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:16:45 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:16:59 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:17:10 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:18:26 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:19:56 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:21:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:21:37 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:22:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:22:56 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:24:28 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:38:24 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 21:38:24 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:40:14 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:43:21 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 21:43:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:44:48 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:46:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:47:56 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:49:59 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:51:58 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:54:13 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=106.6
+2026-03-25 21:54:15 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=397.81
+2026-03-25 21:54:16 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:54:17 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.02
+2026-03-25 21:55:58 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:55:59 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.02
+2026-03-25 21:57:49 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 21:57:49 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 21:59:28 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:00:50 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:02:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:04:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:05:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:07:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:17:06 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 22:17:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:18:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:20:04 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:21:21 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 22:21:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:22:49 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:24:32 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:26:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:27:19 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 22:27:19 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:28:06 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 22:28:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:28:50 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 22:28:50 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:31:18 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-25 22:31:18 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:32:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:33:56 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:35:24 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:36:43 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:38:11 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:39:40 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:40:55 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:42:10 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:43:25 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:44:40 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:45:55 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:47:10 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:48:43 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:50:12 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:51:54 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:53:54 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:55:54 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:57:35 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=58.79
+2026-03-25 22:57:40 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:59:00 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=397.81
+2026-03-25 22:59:01 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 22:59:02 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.02
+2026-03-25 23:00:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 23:08:25 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=58.79
+2026-03-25 23:08:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 23:09:50 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 23:09:51 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.02
+2026-03-25 23:11:00 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=58.79
+2026-03-25 23:11:01 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=106.6
+2026-03-25 23:11:01 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=397.81
+2026-03-25 23:11:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 23:11:02 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.02
+2026-03-25 23:12:15 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=58.79
+2026-03-25 23:12:16 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=106.6
+2026-03-25 23:12:17 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=397.81
+2026-03-25 23:12:17 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 23:12:18 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.02
+2026-03-25 23:13:24 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=58.79
+2026-03-25 23:13:25 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=106.6
+2026-03-25 23:13:28 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-25 23:14:45 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 18:53:35 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-26 18:53:36 [source.easyquotation] INFO: Easyquotation 港股日K: 00700.HK, 1500 条
+2026-03-26 18:53:36 [source.easyquotation] INFO: Easyquotation 港股日K: 00700.HK, 1500 条
+2026-03-26 18:53:37 [source.easyquotation] INFO: Easyquotation 港股日K: 00700.HK, 1500 条
+2026-03-26 18:54:32 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-26 18:54:32 [source.easyquotation] INFO: Easyquotation 港股日K: 00700.HK, 1500 条
+2026-03-26 18:54:33 [source.easyquotation] INFO: Easyquotation 港股日K: 00700.HK, 1500 条
+2026-03-26 18:54:33 [source.easyquotation] INFO: Easyquotation 港股日K: 00700.HK, 1500 条
+2026-03-26 18:55:57 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-26 18:55:57 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 18:57:24 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 18:58:51 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 19:00:16 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 19:20:16 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-26 19:20:16 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 19:21:53 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 19:23:17 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 19:23:49 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 19:26:01 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 19:27:43 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=56.8
+2026-03-26 19:42:53 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-26 19:42:53 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 19:44:35 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-26 19:44:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 19:51:49 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-26 19:51:49 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 19:53:10 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 19:54:40 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 19:56:22 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-26 19:57:45 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-26 19:57:46 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:30:27 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 10:30:28 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=122.6
+2026-03-28 10:30:31 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.8
+2026-03-28 10:30:33 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=103.78
+2026-03-28 10:30:35 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.7
+2026-03-28 10:30:38 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 10:30:41 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3913.7238
+2026-03-28 10:30:44 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13760.369
+2026-03-28 10:30:45 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3295.88
+2026-03-28 10:30:47 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4502.5698
+2026-03-28 10:30:48 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1300.756
+2026-03-28 10:30:49 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24951.88
+2026-03-28 10:30:56 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1416.02
+2026-03-28 10:30:58 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=56.95
+2026-03-28 10:30:59 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=105.3
+2026-03-28 10:31:01 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=416.18
+2026-03-28 10:32:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:32:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:33:49 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:35:20 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:37:12 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:37:36 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 10:37:37 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:39:04 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:40:37 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:40:39 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:40:53 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 10:42:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:43:37 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:45:07 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:46:37 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:48:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:49:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:51:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:52:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:54:12 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:55:40 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:57:52 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 10:59:48 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 10:59:49 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:01:23 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:03:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:04:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:06:03 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:07:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:09:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:09:15 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 11:09:15 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:10:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:12:04 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:13:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:23:54 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 11:23:54 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1416.02
+2026-03-28 11:23:55 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=56.95
+2026-03-28 11:23:57 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=416.18
+2026-03-28 11:23:57 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-28 11:23:57 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:24:01 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.7
+2026-03-28 11:24:03 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3913.7238
+2026-03-28 11:24:03 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13760.369
+2026-03-28 11:24:06 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24951.88
+2026-03-28 11:24:12 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=105.3
+2026-03-28 11:24:14 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=122.6
+2026-03-28 11:24:16 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.8
+2026-03-28 11:24:18 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=103.78
+2026-03-28 11:24:19 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 11:24:21 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3295.88
+2026-03-28 11:24:22 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4502.5698
+2026-03-28 11:24:24 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1300.756
+2026-03-28 11:25:17 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:26:38 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:27:55 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:29:12 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:30:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:31:48 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:33:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:34:24 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:35:48 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:42:35 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 11:42:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:43:52 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:44:33 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 11:44:33 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1416.02
+2026-03-28 11:44:34 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:44:37 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=56.95
+2026-03-28 11:44:38 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=103.78
+2026-03-28 11:49:07 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 11:49:07 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=105.3
+2026-03-28 11:49:08 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=416.18
+2026-03-28 11:49:10 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=122.6
+2026-03-28 11:49:11 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.8
+2026-03-28 11:49:12 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:49:14 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.7
+2026-03-28 11:49:16 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 11:49:16 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 11:49:17 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3913.7238
+2026-03-28 11:49:17 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3913.7238
+2026-03-28 11:49:18 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13760.369
+2026-03-28 11:49:19 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3295.88
+2026-03-28 11:49:20 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4502.5698
+2026-03-28 11:49:20 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1300.756
+2026-03-28 11:49:21 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24951.88
+2026-03-28 11:50:39 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 11:50:39 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1416.02
+2026-03-28 11:50:44 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=56.95
+2026-03-28 11:50:46 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=105.3
+2026-03-28 11:50:47 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:50:47 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.8
+2026-03-28 11:50:47 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=416.18
+2026-03-28 11:50:49 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=122.6
+2026-03-28 11:50:51 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=103.78
+2026-03-28 11:50:52 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.7
+2026-03-28 11:50:56 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3913.7238
+2026-03-28 11:50:59 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13760.369
+2026-03-28 11:51:00 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3295.88
+2026-03-28 11:51:02 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4502.5698
+2026-03-28 11:51:03 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1300.756
+2026-03-28 11:51:04 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24951.88
+2026-03-28 11:51:17 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 11:52:10 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:53:30 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:54:45 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:57:05 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 11:57:05 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1416.02
+2026-03-28 11:57:06 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=56.95
+2026-03-28 11:57:08 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-28 11:57:09 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=416.18
+2026-03-28 11:57:09 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=122.6
+2026-03-28 11:57:11 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=103.78
+2026-03-28 11:57:15 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 11:57:15 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3913.7238
+2026-03-28 11:57:15 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13760.369
+2026-03-28 11:57:16 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3295.88
+2026-03-28 11:57:18 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4502.5698
+2026-03-28 11:57:20 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1300.756
+2026-03-28 11:57:20 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24951.88
+2026-03-28 11:57:27 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=105.3
+2026-03-28 11:57:31 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.8
+2026-03-28 11:57:33 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.7
+2026-03-28 11:57:48 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=103.78
+2026-03-28 11:58:04 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.8
+2026-03-28 11:58:27 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 11:59:46 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:01:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:02:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:03:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:05:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:06:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:08:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:09:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:10:51 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:12:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:13:47 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:15:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:16:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:18:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:19:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:20:47 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:22:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:23:35 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:25:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:26:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:28:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:29:38 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:31:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:31:33 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:31:33 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:32:23 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:33:43 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:35:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:36:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:37:43 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:39:14 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:40:43 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:47:43 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 12:47:44 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:49:07 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:50:37 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 12:50:37 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-28 12:52:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:00:06 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 13:00:07 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:01:40 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 13:01:40 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:03:09 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:03:28 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:04:31 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:05:52 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:15:02 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 13:15:02 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:16:29 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:17:46 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:23:01 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 13:23:01 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:24:48 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:26:10 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 13:26:11 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:26:36 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 13:26:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-28 13:26:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:26:42 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.7
+2026-03-28 13:26:43 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 13:26:43 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3913.7238
+2026-03-28 13:26:43 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13760.369
+2026-03-28 13:26:44 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3295.88
+2026-03-28 13:26:45 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24951.88
+2026-03-28 13:26:49 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=103.78
+2026-03-28 13:26:49 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=103.78
+2026-03-28 13:26:51 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=103.78
+2026-03-28 13:30:20 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 13:30:20 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1416.02
+2026-03-28 13:30:21 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=56.95
+2026-03-28 13:30:25 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:30:26 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-28 13:30:29 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=103.78
+2026-03-28 13:30:33 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 13:30:34 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3913.7238
+2026-03-28 13:30:34 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13760.369
+2026-03-28 13:30:34 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3295.88
+2026-03-28 13:30:35 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4502.5698
+2026-03-28 13:30:35 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1300.756
+2026-03-28 13:30:36 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24951.88
+2026-03-28 13:30:41 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=105.3
+2026-03-28 13:30:43 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=416.18
+2026-03-28 13:30:44 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=122.6
+2026-03-28 13:30:45 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.8
+2026-03-28 13:30:48 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.7
+2026-03-28 13:30:52 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24951.88
+2026-03-28 13:31:18 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=103.78
+2026-03-28 13:31:47 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 13:33:10 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:06:40 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 15:06:40 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:15:05 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 15:15:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:16:22 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:17:18 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 15:17:18 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:18:20 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 15:18:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:19:37 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 15:19:37 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:32:52 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 15:32:52 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:33:52 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 15:33:52 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=105.3
+2026-03-28 15:33:53 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-28 15:33:54 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=122.6
+2026-03-28 15:33:56 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=103.78
+2026-03-28 15:33:59 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 15:33:59 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3913.7238
+2026-03-28 15:34:02 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24951.88
+2026-03-28 15:34:08 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1416.02
+2026-03-28 15:34:10 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=56.95
+2026-03-28 15:34:12 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=416.18
+2026-03-28 15:34:14 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.8
+2026-03-28 15:34:16 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.7
+2026-03-28 15:34:19 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13760.369
+2026-03-28 15:34:20 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3295.88
+2026-03-28 15:34:21 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4502.5698
+2026-03-28 15:34:22 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1300.756
+2026-03-28 15:35:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:36:51 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:38:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:39:51 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:41:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:42:51 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:44:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:45:51 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:47:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:48:51 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:50:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:51:37 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:53:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:54:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:56:05 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:57:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 15:58:51 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:00:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:01:21 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:02:51 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:04:37 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=56.95
+2026-03-28 16:04:38 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=105.3
+2026-03-28 16:04:39 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=416.18
+2026-03-28 16:04:39 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:06:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:07:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:09:07 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:10:37 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:12:06 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:13:36 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:14:39 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 16:14:39 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:14:43 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 16:15:56 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:18:58 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 16:18:58 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:20:20 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 16:20:20 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1416.02
+2026-03-28 16:20:24 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=56.95
+2026-03-28 16:20:28 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=105.3
+2026-03-28 16:20:30 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=416.18
+2026-03-28 16:20:30 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:20:34 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.8
+2026-03-28 16:20:40 [source.easyquotation] INFO: Easyquotation A股实时: 000568.SZ, close=103.78
+2026-03-28 16:20:42 [source.easyquotation] INFO: Easyquotation A股实时: 600009.SH, close=27.7
+2026-03-28 16:21:31 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=122.6
+2026-03-28 16:21:35 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 16:21:36 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 16:21:37 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3913.7238
+2026-03-28 16:21:38 [source.easyquotation] INFO: Easyquotation A股实时: 000001.SH, close=3913.7238
+2026-03-28 16:21:39 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13760.369
+2026-03-28 16:21:41 [source.easyquotation] INFO: Easyquotation A股实时: 399001.SZ, close=13760.369
+2026-03-28 16:21:42 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3295.88
+2026-03-28 16:21:43 [source.easyquotation] INFO: Easyquotation A股实时: 399006.SZ, close=3295.88
+2026-03-28 16:21:45 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4502.5698
+2026-03-28 16:21:46 [source.easyquotation] INFO: Easyquotation A股实时: 000300.SH, close=4502.5698
+2026-03-28 16:21:48 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1300.756
+2026-03-28 16:21:49 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): HSI.HK, close=24951.88
+2026-03-28 16:22:01 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 16:22:29 [source.easyquotation] INFO: Easyquotation A股实时: 000688.SH, close=1300.756
+2026-03-28 16:22:43 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 16:23:22 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=105.3
+2026-03-28 16:28:16 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 16:28:16 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=56.95
+2026-03-28 16:28:17 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 16:28:21 [source.easyquotation] INFO: Easyquotation A股实时: 002572.SZ, close=12.58
+2026-03-28 17:01:41 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 17:01:41 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 17:02:10 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 17:02:11 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 17:03:37 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 17:05:00 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 17:06:18 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 17:07:46 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 17:14:12 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 17:14:12 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 17:15:27 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 17:15:27 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 17:16:49 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 17:18:13 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 17:18:13 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 17:57:52 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 17:57:53 [source.easyquotation] INFO: Easyquotation A股实时: 600519.SH, close=1416.02
+2026-03-28 17:57:53 [source.easyquotation] INFO: Easyquotation A股实时: 601318.SH, close=56.95
+2026-03-28 17:57:55 [source.easyquotation] INFO: Easyquotation A股实时: 300750.SZ, close=416.18
+2026-03-28 17:57:56 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 5 条
+2026-03-28 17:57:56 [source.easyquotation] INFO: Easyquotation 港股日K: 09988.HK, 1500 条
+2026-03-28 17:59:49 [source.easyquotation] INFO: Easyquotation 初始化成功
+2026-03-28 17:59:49 [source.easyquotation] INFO: Easyquotation A股实时: 002594.SZ, close=105.3
+2026-03-28 17:59:51 [source.easyquotation] INFO: Easyquotation 港股实时(FixedHKQuote): 09988.HK, close=122.6
+2026-03-28 17:59:52 [source.easyquotation] INFO: Easyquotation A股实时: 002304.SZ, close=50.8

@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}AI日报 - 量化交易系统{% endblock %}
+{% block content %}
+<div class="container-fluid mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4><i class="bi bi-newspaper"></i> 📊 AI每日总结与建议</h4>
+        <div>
+            <button class="btn btn-primary btn-sm" onclick="generateReport()">🔄 生成日报</button>
+            <button class="btn btn-success btn-sm ms-2" onclick="sendReport()" id="btnSend" disabled>📤 发送日报</button>
+        </div>
+    </div>
+
+    <div id="loading" class="text-center py-5" style="display:none;">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted">正在分析全部持仓数据...</p>
+    </div>
+
+    <div id="reportContent" style="display:none;">
+        <!-- 市场概览 -->
+        <div class="card mb-3">
+            <div class="card-header"><strong>📈 市场概览</strong></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h5>市场情绪</h5>
+                            <span id="sentiment" class="badge fs-5"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div id="marketAdvice" class="alert alert-info mb-0"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex justify-content-around">
+                            <div class="text-center">
+                                <div class="text-success fw-bold fs-4" id="bullCount">0</div>
+                                <small class="text-muted">看涨</small>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-danger fw-bold fs-4" id="bearCount">0</div>
+                                <small class="text-muted">看跌</small>
+                            </div>
+                            <div class="text-center">
+                                <div class="fw-bold fs-4" id="totalCount">0</div>
+                                <small class="text-muted">总计</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 个股分析表 -->
+        <div class="card mb-3">
+            <div class="card-header"><strong>📋 个股分析</strong></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>股票</th>
+                                <th>行业</th>
+                                <th>收盘价</th>
+                                <th>涨跌幅</th>
+                                <th>RSI(6)</th>
+                                <th>MACD</th>
+                                <th>信号</th>
+                                <th>建议</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 生成时间 -->
+        <p class="text-muted text-end" id="generatedAt"></p>
+    </div>
+
+    <div id="emptyState" class="text-center py-5">
+        <p class="text-muted fs-5">点击「生成日报」按钮，AI将分析所有持仓并给出投资建议</p>
+    </div>
+</div>
+
+<script>
+let reportData = null;
+
+function generateReport() {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('reportContent').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'none';
+
+    fetch('/api/ai/daily-report')
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('loading').style.display = 'none';
+            if (!data.success) {
+                alert('生成失败: ' + (data.error || '未知错误'));
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+            reportData = data.report;
+            renderReport(data.report);
+            document.getElementById('reportContent').style.display = 'block';
+            document.getElementById('btnSend').disabled = false;
+        })
+        .catch(err => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+            alert('请求失败: ' + err.message);
+        });
+}
+
+function renderReport(report) {
+    const ov = report.market_overview;
+    const sentEl = document.getElementById('sentiment');
+    sentEl.textContent = ov.sentiment;
+    sentEl.className = 'badge fs-5 ' + (ov.sentiment === '偏多' ? 'bg-success' : ov.sentiment === '偏空' ? 'bg-danger' : 'bg-warning text-dark');
+    document.getElementById('marketAdvice').textContent = ov.advice;
+    document.getElementById('bullCount').textContent = ov.bullish_count;
+    document.getElementById('bearCount').textContent = ov.bearish_count;
+    document.getElementById('totalCount').textContent = ov.total_stocks;
+
+    const tbody = document.getElementById('stockTableBody');
+    tbody.innerHTML = '';
+    report.stocks.forEach(s => {
+        const chgClass = s.change_pct > 0 ? 'text-danger' : s.change_pct < 0 ? 'text-success' : '';
+        const chgSign = s.change_pct >= 0 ? '+' : '';
+        const rsiClass = s.rsi_6 < 30 ? 'text-success fw-bold' : s.rsi_6 > 70 ? 'text-danger fw-bold' : '';
+
+        let sugBadge = 'bg-secondary';
+        if (s.suggestion.includes('买入') || s.suggestion.includes('加仓')) sugBadge = 'bg-success';
+        else if (s.suggestion.includes('减仓') || s.suggestion.includes('观望')) sugBadge = 'bg-warning text-dark';
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><a href="/stock/${s.code}" class="text-decoration-none">${s.name}<br><small class="text-muted">${s.code}</small></a></td>
+            <td><small>${s.industry || '-'}</small></td>
+            <td>¥${s.close}</td>
+            <td class="${chgClass}">${chgSign}${s.change_pct}%</td>
+            <td class="${rsiClass}">${s.rsi_6}</td>
+            <td>${s.macd}</td>
+            <td><small>${s.signals.join('<br>')}</small></td>
+            <td><span class="badge ${sugBadge}">${s.suggestion}</span></td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    document.getElementById('generatedAt').textContent = '生成时间: ' + report.generated_at;
+}
+
+function sendReport() {
+    if (!confirm('确定要发送日报到配置的通知渠道？')) return;
+    fetch('/api/ai/daily-report/send', {method: 'POST', headers: {'Content-Type': 'application/json'}})
+        .then(r => r.json())
+        .then(data => {
+            alert(data.success ? '日报已发送！' : '发送失败: ' + (data.error || ''));
+        })
+        .catch(err => alert('请求失败: ' + err.message));
+}
+
+// Auto-generate on page load
+generateReport();
+</script>
+{% endblock %}

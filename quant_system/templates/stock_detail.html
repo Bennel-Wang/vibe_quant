@@ -1,0 +1,987 @@
+{% extends "base.html" %}
+
+{% block title %}{{ stock.name if stock else code }} - 股票详情{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2>{{ stock.name if stock else code }} <small class="text-muted">({{ code }})</small>
+            {% if stock and stock.industry %}<span class="badge bg-info ms-2" style="font-size:0.5em;vertical-align:middle">{{ stock.industry }}</span>{% endif %}
+        </h2>
+        <div>
+            <button class="btn btn-primary" onclick="updateStockData()">
+                <span class="spinner-border spinner-border-sm d-none" id="update-spinner"></span>
+                更新数据
+            </button>
+            <button class="btn btn-success" onclick="startRealtimeUpdate()" id="realtime-btn">
+                实时更新
+            </button>
+            <button class="btn btn-danger d-none" onclick="stopRealtimeUpdate()" id="stop-realtime-btn">
+                停止实时
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 备注区域 -->
+<div class="row mt-2">
+    <div class="col-12">
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-muted small">备注：</span>
+            <span id="stock-note-display" class="text-muted" style="cursor:pointer" title="点击编辑" onclick="toggleNoteEdit()">{{ stock.notes if stock and stock.notes else '暂无备注，点击添加' }}</span>
+            <div id="stock-note-edit" style="display:none" class="d-flex gap-2 flex-grow-1">
+                <input type="text" class="form-control form-control-sm" id="stock-note-input" value="{{ stock.notes if stock and stock.notes else '' }}" placeholder="输入备注...">
+                <button class="btn btn-sm btn-primary" onclick="saveStockNote()">保存</button>
+                <button class="btn btn-sm btn-secondary" onclick="cancelNoteEdit()">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="update-modal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">数据更新</h5>
+            </div>
+            <div class="modal-body">
+                <p id="update-message">准备更新...</p>
+                <div class="progress">
+                    <div class="progress-bar" id="update-progress" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="current-price">-</div>
+                <div id="price-change" style="font-size:1em;font-weight:600;margin-top:2px"></div>
+                <div class="metric-label">当前价格 <span id="list-date-badge" class="badge bg-secondary ms-1" style="font-size:0.6em;display:none"></span></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="rsi-value">-</div>
+                <div class="metric-label">RSI(6) <span id="rsi-pct-badge" class="text-muted" style="font-size:0.9em"></span></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="macd-value">-</div>
+                <div class="metric-label">MACD</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="pe-value">-</div>
+                <div class="metric-label">市盈率TTM <span id="pettm-pct-badge" class="text-muted" style="font-size:0.9em"></span></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center" id="score-card">
+            <div class="card-body">
+                <div class="metric-value" id="score-value" style="cursor:pointer" title="点击查看详情">-</div>
+                <div class="metric-label">综合评分 <span id="score-rating" class="badge" style="font-size:0.7em"></span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 综合评分详情面板 -->
+<div class="row mt-2" id="score-detail-panel" style="display:none;">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">综合评分详情</h5>
+                <button class="btn btn-sm btn-outline-secondary" onclick="$('#score-detail-panel').slideToggle()">收起</button>
+            </div>
+            <div class="card-body">
+                <div class="row" id="score-dimensions">
+                    <!-- filled by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">技术图表</h5>
+                <div class="d-flex align-items-center gap-3">
+                    <!-- 指标子图选择 -->
+                    <div class="btn-group" role="group">
+                        <span class="btn btn-outline-secondary btn-sm disabled">指标:</span>
+                        <button type="button" class="btn btn-outline-warning btn-sm active" id="btn-ind-macd" onclick="switchIndicator('macd')">MACD</button>
+                        <button type="button" class="btn btn-outline-warning btn-sm" id="btn-ind-kdj" onclick="switchIndicator('kdj')">KDJ</button>
+                        <button type="button" class="btn btn-outline-warning btn-sm" id="btn-ind-wr" onclick="switchIndicator('wr')">WR</button>
+                    </div>
+                    <!-- RSI周期选择 -->
+                    <div class="btn-group" role="group">
+                        <span class="btn btn-outline-secondary btn-sm disabled">RSI:</span>
+                        <button type="button" class="btn btn-outline-info btn-sm active" id="btn-rsi-6" onclick="switchRsiPeriod(6)">6日</button>
+                        <button type="button" class="btn btn-outline-info btn-sm active" id="btn-rsi-12" onclick="switchRsiPeriod(12)">12日</button>
+                        <button type="button" class="btn btn-outline-info btn-sm active" id="btn-rsi-24" onclick="switchRsiPeriod(24)">24日</button>
+                    </div>
+                    <div class="input-group input-group-sm" style="width:110px">
+                        <span class="input-group-text">窗口 n</span>
+                        <input type="number" id="window-days" class="form-control" value="100" min="1">
+                    </div>
+                    <!-- K线周期选择 -->
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary btn-sm active" id="btn-day" onclick="switchFreq('day')">日K</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="btn-week" onclick="switchFreq('week')">周K</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="btn-month" onclick="switchFreq('month')">月K</button>
+                    </div>
+                    <!-- 图表平移按钮 -->
+                    <div class="btn-group" role="group" title="平移图表时间轴">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="panChart(-1)" title="向前平移">◀ 前移</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="panChart(1)" title="向后平移">后移 ▶</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-2">
+                <ul class="nav nav-tabs" id="chart-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="kline-tab" data-bs-toggle="tab" href="#kline-pane">K线图</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="intraday-tab" data-bs-toggle="tab" href="#intraday-pane">分时图</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="kline-pane">
+                        <!-- K线+MACD+RSI图表（4行子图，无需切换） -->
+                        <div id="kline-chart" style="height: 950px;"></div>
+                    </div>
+                    <div class="tab-pane fade" id="intraday-pane">
+                        <div id="intraday-chart" style="height:400px;"></div>
+                        <div id="intraday-info" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 主力成本 & 筹码分布 -->
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <h5>主力成本 &amp; 筹码分布</h5>
+                <button class="btn btn-sm btn-outline-primary" onclick="loadChipDistribution()">分析</button>
+            </div>
+            <div class="card-body" id="chip-section">
+                <div class="row">
+                    <div class="col-md-4">
+                        <table class="table table-sm">
+                            <tr><td>20日主力成本</td><td id="cost-20d">-</td></tr>
+                            <tr><td>60日主力成本</td><td id="cost-60d">-</td></tr>
+                            <tr><td>120日主力成本</td><td id="cost-120d">-</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-8">
+                        <div id="chip-chart" style="height:200px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>技术指标</h5>
+            </div>
+            <div class="card-body" id="indicators-detail">
+                <p class="text-muted">加载中...</p>
+            </div>
+        </div>
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>AI特征分析</h5>
+            </div>
+            <div class="card-body" id="ai-features">
+                <p class="text-muted">加载中...</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>最新新闻</h5>
+            </div>
+            <div class="card-body" id="news-list">
+                <p class="text-muted">加载中...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var stockCode = '{{ code }}';
+var updateModal, realtimeInterval, rtPollInterval;
+var _prevStockPrice = null;
+
+$(document).ready(function() {
+    updateModal = new bootstrap.Modal(document.getElementById('update-modal'));
+    
+    loadAllData();
+
+    // 当窗口 n 改变时，防抖并立即重载图表
+    $('#window-days').on('input', debounce(function(){
+        loadChart();
+    }, 400));
+
+    // 如果全局实时已开启，自动启动本页轮询
+    if (typeof _globalRtEnabled !== 'undefined' && _globalRtEnabled) {
+        startRtPoll();
+    }
+
+    // 监听全局开关变化
+    $(document).on('globalRtChanged', function(e, enabled) {
+        if (enabled) startRtPoll(); else stopRtPoll();
+    });
+});
+
+// ── 离开页面时自动清理实时轮询和服务端更新 ──
+window.addEventListener('beforeunload', function() {
+    stopRtPoll();
+    // 只在本页自己启动了 per-stock 更新时才停止服务端
+    if (realtimeInterval) {
+        clearInterval(realtimeInterval);
+        realtimeInterval = null;
+        // 异步停止，火忘即可（页面即将卸载）
+        navigator.sendBeacon('/api/data/realtime/stop', '{}');
+    }
+});
+
+function startRtPoll() {
+    if (rtPollInterval) return;
+    fetchStockRealtime();
+    rtPollInterval = setInterval(fetchStockRealtime, 5000);
+}
+
+function stopRtPoll() {
+    if (rtPollInterval) { clearInterval(rtPollInterval); rtPollInterval = null; }
+}
+
+function _updatePriceChange(pctVal) {
+    var el = document.getElementById('price-change');
+    if (!el) return;
+    var sign = pctVal >= 0 ? '+' : '';
+    el.textContent = sign + pctVal.toFixed(2) + '%';
+    el.style.color = pctVal >= 0 ? '#ef5350' : '#26a69a';
+}
+
+function fetchStockRealtime() {
+    $.get('/api/data/realtime/latest', function(resp) {
+        var data = resp.data || {};
+        // 找到当前股票的实时数据（code_key 可能是 sh600519 等格式）
+        var found = null;
+        Object.keys(data).forEach(function(k) {
+            if (data[k].code === stockCode || k === stockCode) found = data[k];
+        });
+        if (!found) return;
+
+        var price = found.price;
+        if (price == null) return;
+
+        // 更新价格显示并闪光
+        var priceEl = document.getElementById('current-price');
+        if (priceEl) {
+            priceEl.textContent = '¥' + parseFloat(price).toFixed(2);
+            if (_prevStockPrice != null && price !== _prevStockPrice) {
+                var cls = parseFloat(price) >= _prevStockPrice ? 'value-flash-up' : 'value-flash-down';
+                priceEl.classList.remove('value-flash-up', 'value-flash-down');
+                void priceEl.offsetWidth;
+                priceEl.classList.add(cls);
+            }
+        }
+        _prevStockPrice = parseFloat(price);
+
+        // 更新涨跌幅
+        if (found.pct_chg != null) {
+            _updatePriceChange(parseFloat(found.pct_chg));
+        }
+    });
+}
+
+function loadAllData() {
+    // 加载K线图
+    loadChart();
+    
+    // 加载技术指标
+    loadIndicators();
+    
+    // 加载上市日期
+    loadListingDate();
+    
+    // 加载综合评分
+    loadScoring();
+    
+    // 加载主力成本 & 筹码分布（默认显示）
+    loadChipDistribution();
+    
+    // 加载新闻
+    loadNews();
+    
+    // 加载AI特征
+    loadAIFeatures();
+}
+
+var currentFreq = 'day';
+var currentRsiPeriod = 6;
+var chartData = null;
+// debounce helper
+function debounce(fn, delay){
+    var t=null; return function(){
+        var args=arguments, ctx=this; clearTimeout(t); t=setTimeout(function(){fn.apply(ctx,args);}, delay);
+    };
+}
+
+function loadChart() {
+    var n = parseInt($('#window-days').val()) || '';
+    var url = '/api/stock/' + stockCode + '/chart?freq=' + currentFreq + (n ? ('&n=' + n) : '');
+    $.ajax({
+        url: url,
+        method: 'GET',
+        timeout: 30000,
+        success: function(data, status, xhr) {
+        if (data.error) {
+            $('#kline-chart').html('<p class="text-danger">加载图表失败: ' + data.error + '</p>');
+            return;
+        }
+        
+        chartData = data;
+
+        try {
+            if (typeof Plotly !== 'undefined' && Plotly.purge) {
+                try { Plotly.purge('kline-chart'); } catch(e) { console.warn('Plotly.purge failed', e); }
+            }
+            Plotly.newPlot('kline-chart', data.data, data.layout).then(function() {
+                // 默认显示基于按钮状态的RSI线
+                updateRsiVisibilityFromButtons();
+
+                // 在首次渲染后触发 autoscale（x/y 轴自适应），以便页面进入时图形最大化显示
+                try {
+                    Plotly.relayout('kline-chart', {'xaxis.autorange': true, 'yaxis.autorange': true});
+                    // 尝试对可能存在的第二/第三y轴也做自适应
+                    Plotly.relayout('kline-chart', {'yaxis2.autorange': true, 'yaxis3.autorange': true});
+                } catch(e) { console.warn('autoscale failed', e); }
+
+                // 注册 hover 事件用于计算并显示 n 天窗口内的相对百分位
+                var chartEl = document.getElementById('kline-chart');
+                if (chartEl) {
+                    chartEl.on('plotly_hover', function(event){
+                        try {
+                            var n = parseInt($('#window-days').val()) || 30;
+                            var info = {};
+                            // We will build richer info including date, raw value and percentile
+                            event.points.forEach(function(pt){
+                                var curve = pt.curveNumber;
+                                var trace = chartData.data[curve];
+                                if (!trace || !trace.name) return;
+                                if (trace.name.indexOf('RSI') !== 0) return;
+                                var yArr = trace.y || [];
+                                var idx = (pt.pointIndex !== undefined) ? pt.pointIndex : pt.pointNumber;
+                                if (idx === undefined) return;
+                                var start = Math.max(0, idx - n + 1);
+                                // collect numeric values in window
+                                var windowVals = [];
+                                for (var k = start; k <= idx && k < yArr.length; k++){
+                                    var v = yArr[k];
+                                    if (v === null || v === undefined || isNaN(v)) continue;
+                                    windowVals.push(v);
+                                }
+                                var raw = (pt.y !== undefined ? pt.y : (yArr[idx]));
+                                var dateStr = (pt.x !== undefined ? pt.x : (chartData.layout.xaxis && chartData.layout.xaxis.tickvals ? chartData.layout.xaxis.tickvals[idx] : ''));
+                                if (windowVals.length === 0 || raw === null || raw === undefined || isNaN(raw)) {
+                                    info[trace.name] = {pct:null, raw:null, date:dateStr, storedPct: (pt.customdata !== undefined ? pt.customdata : null)};
+                                } else {
+                                    var minv = Math.min.apply(null, windowVals);
+                                    var maxv = Math.max.apply(null, windowVals);
+                                    var pct = (maxv === minv) ? 100 : ( (raw - minv) / (maxv - minv) * 100 );
+                                    info[trace.name] = {pct: Math.round(pct*100)/100, raw: Math.round(raw*100)/100, date: dateStr, storedPct: (pt.customdata !== undefined ? pt.customdata : null)};
+                                }
+                            });
+                            // render info
+                            var html = 'RSI (窗口 n=' + ($('#window-days').val() || 30) + '): ';
+                            var parts = [];
+                            for (var k in info){
+                                var val = info[k];
+                                if (!val) continue;
+                                var stored = (val.storedPct !== undefined && val.storedPct !== null) ? (Math.round(val.storedPct*100)/100 + '%') : '-';
+                                if (val.pct === null) parts.push(k + ': - (stored: ' + stored + ')');
+                                else parts.push(k + ': ' + val.raw + ' (' + val.pct + '%) @ ' + val.date + ' (stored: ' + stored + ')');
+                            }
+                            if (parts.length === 0) html += '-'; else html += parts.join(' | ');
+                            $('#rsi-percentages').text(html);
+                        } catch(e){ console.warn('hover handler error', e); }
+                    });
+                    chartEl.on('plotly_unhover', function(){
+                        $('#rsi-percentages').text('RSI 百分位: -');
+                    });
+                }
+            }).catch(function(e){
+                console.error('Plotly.newPlot failed', e);
+                $('#kline-chart').html('<p class="text-danger">Plotly 渲染失败: ' + (e && e.message ? e.message : String(e)) + '</p>');
+                try {
+                    $('#kline-chart').append('<pre style="max-height:200px;overflow:auto;">' + JSON.stringify({keys: Object.keys(data||{}), traces: (data.data||[]).length}, null, 2) + '</pre>');
+                } catch(e2) { console.warn('debug render failed', e2); }
+            });
+        } catch (e) {
+            console.error('绘图异常', e);
+            $('#kline-chart').html('<p class="text-danger">绘图异常: ' + (e && e.message ? e.message : String(e)) + '</p>');
+        }
+        },
+        error: function(xhr, status, err) {
+            var msg = status === 'timeout' ? '图表请求超时，请稍后重试' : ('网络请求失败: ' + status + ' ' + err);
+            $('#kline-chart').html('<p class="text-danger">' + msg + ' <button class="btn btn-sm btn-outline-secondary ml-2" onclick="loadChart()">重试</button></p>');
+        }
+    });
+}
+
+function updateRsiVisibilityFromButtons() {
+    if (!chartData || !chartData.data) return;
+    var activePeriods = [];
+    if ($('#btn-rsi-6').hasClass('active')) activePeriods.push('RSI_6');
+    if ($('#btn-rsi-12').hasClass('active')) activePeriods.push('RSI_12');
+    if ($('#btn-rsi-24').hasClass('active')) activePeriods.push('RSI_24');
+    chartData.data.forEach(function(trace, idx) {
+        if (trace && trace.name && trace.name.indexOf('RSI') === 0) {
+            var show = (activePeriods.indexOf(trace.name) !== -1);
+            Plotly.restyle('kline-chart', {'visible': show}, [idx]);
+        }
+    });
+}
+
+var currentIndicator = 'macd';
+
+function switchIndicator(ind) {
+    currentIndicator = ind;
+    $('#btn-ind-macd, #btn-ind-kdj, #btn-ind-boll, #btn-ind-wr').removeClass('active');
+    $('#btn-ind-' + ind).addClass('active');
+    
+    if (!chartData || !chartData.data) return;
+    
+    var indGroups = {
+        'macd': ['DIF', 'DEA', 'MACD柱'],
+        'kdj': ['KDJ_K', 'KDJ_D', 'KDJ_J'],
+        'boll': ['BOLL_上轨', 'BOLL_中轨', 'BOLL_下轨'],
+        'wr': ['WR_14']
+    };
+    
+    var restyleIndices = [];
+    var restyleVisible = [];
+    chartData.data.forEach(function(trace, idx) {
+        var name = trace.name || '';
+        var isRow3Ind = false;
+        var shouldShow = false;
+        Object.keys(indGroups).forEach(function(gk) {
+            indGroups[gk].forEach(function(prefix) {
+                if (name === prefix) {
+                    isRow3Ind = true;
+                    if (gk === ind) shouldShow = true;
+                }
+            });
+        });
+        if (isRow3Ind) {
+            restyleIndices.push(idx);
+            restyleVisible.push(shouldShow);
+        }
+    });
+    if (restyleIndices.length > 0) {
+        Plotly.restyle('kline-chart', {'visible': restyleVisible}, restyleIndices);
+    }
+
+    // Update row-3 y-axis label and subplot annotation title
+    var yaxisLabels = {'macd': 'MACD', 'kdj': 'KDJ', 'boll': 'BOLL', 'wr': 'WR(%)'};
+    var newLabel = yaxisLabels[ind] || ind.toUpperCase();
+    var layoutUpdate = {'yaxis3.title.text': newLabel};
+    // Update the subplot title annotation for row 3 (index 2 in annotations array)
+    if (chartData.layout && chartData.layout.annotations) {
+        for (var ai = 0; ai < chartData.layout.annotations.length; ai++) {
+            var ann = chartData.layout.annotations[ai];
+            // Row-3 subplot title annotation sits roughly at y~0.38-0.42 in paper coords
+            var annText = ann.text || '';
+            if (annText === 'MACD' || annText === 'KDJ' || annText === 'BOLL' || annText === 'WR(%)') {
+                layoutUpdate['annotations[' + ai + '].text'] = newLabel;
+                break;
+            }
+        }
+    }
+    Plotly.relayout('kline-chart', layoutUpdate);
+}
+
+function switchRsiPeriod(period) {
+    // 切换按钮 active 状态，再更新可见性（现在是多选）
+    $('#btn-rsi-' + period).toggleClass('active');
+    updateRsiVisibilityFromButtons();
+}
+
+function switchFreq(freq) {
+    currentFreq = freq;
+    
+    // 更新K线按钮状态
+    $('#btn-day, #btn-week, #btn-month').removeClass('active');
+    $('#btn-' + freq).addClass('active');
+    
+    // 重新加载图表（会同时更新K线和RSI）
+    loadChart();
+}
+
+function loadIndicators() {
+    $.ajax({
+        url: '/api/stock/' + stockCode + '/indicators',
+        method: 'GET',
+        timeout: 20000,
+        success: function(data) {
+        if (data.error) {
+            $('#indicators-detail').html('<p class="text-danger">无法加载指标数据: ' + data.error + '</p>');
+            ['rsi-value','macd-value','score-value','pe-value'].forEach(function(id){ $('#'+id).text('--'); });
+            return;
+        }
+        
+        var latest = data.latest;
+        $('#current-price').text('¥' + (latest.close ? latest.close.toFixed(2) : '-'));
+        // Show change info if available
+        $.get('/api/data/realtime/latest', function(resp) {
+            var d = resp.data || {};
+            Object.keys(d).forEach(function(k) {
+                if (d[k].code === stockCode || k === stockCode) {
+                    var pct = d[k].pct_chg;
+                    if (pct != null) {
+                        _updatePriceChange(parseFloat(pct));
+                    }
+                }
+            });
+        });
+        function _fmt(v, digits) { return v != null ? v.toFixed(digits) : '-'; }
+        $('#rsi-value').text(_fmt(latest.rsi_6, 2));
+        $('#macd-value').text(_fmt(latest.macd, 4));
+        $('#score-value').text(_fmt(latest.overall_score, 1));
+        $('#pe-value').text(latest.pe_ttm != null ? _fmt(latest.pe_ttm, 2) : '-');
+
+        // RSI百分位显示在 RSI(6) 标签括号中
+        var rsiPct = latest.rsi6_pct100;
+        var rsiPctBadge = $('#rsi-pct-badge');
+        if (rsiPct != null) {
+            rsiPctBadge.text('(' + rsiPct.toFixed(1) + '%)');
+            rsiPctBadge.removeClass('positive negative text-muted');
+            if (rsiPct <= 30) rsiPctBadge.addClass('positive');
+            else if (rsiPct >= 70) rsiPctBadge.addClass('negative');
+            else rsiPctBadge.addClass('text-muted');
+        } else {
+            rsiPctBadge.text('');
+        }
+
+        // PETTM百分位显示在市盈率TTM标签括号中
+        var pePct = latest.pettm_pct10y;
+        var pePctBadge = $('#pettm-pct-badge');
+        if (pePct != null) {
+            pePctBadge.text('(' + pePct.toFixed(1) + '%)');
+            pePctBadge.removeClass('positive negative text-muted');
+            if (pePct <= 30) pePctBadge.addClass('positive');
+            else if (pePct >= 70) pePctBadge.addClass('negative');
+            else pePctBadge.addClass('text-muted');
+        } else {
+            pePctBadge.text('');
+        }
+        
+        // 指标详情
+        var html = '<table class="table table-sm">';
+        html += '<tr><td>RSI(6)</td><td>' + _fmt(latest.rsi_6, 2) + '</td></tr>';
+        html += '<tr><td>RSI(12)</td><td>' + _fmt(latest.rsi_12, 2) + '</td></tr>';
+        html += '<tr><td>RSI(24)</td><td>' + _fmt(latest.rsi_24, 2) + '</td></tr>';
+        html += '<tr><td>MACD DIF</td><td>' + _fmt(latest.macd, 4) + '</td></tr>';
+        html += '<tr><td>MACD Signal</td><td>' + _fmt(latest.macd_signal, 4) + '</td></tr>';
+        html += '<tr><td>MACD Hist</td><td>' + _fmt(latest.macd_histogram, 4) + '</td></tr>';
+        html += '<tr><td>市盈率TTM(PE_TTM)</td><td>' + (latest.pe_ttm != null ? _fmt(latest.pe_ttm, 2) : '-') + '</td></tr>';
+        html += '<tr><td>市净率(PB)</td><td>' + (latest.pb != null ? _fmt(latest.pb, 2) : '-') + '</td></tr>';
+        html += '<tr><td>RSI百分位(历史100期)</td><td>' + (rsiPct != null ? rsiPct.toFixed(1) + '%' : '-') + '</td></tr>';
+        html += '<tr><td>PETTM百分位(历史全量)</td><td>' + (pePct != null ? pePct.toFixed(1) + '%' : '-') + '</td></tr>';
+        html += '</table>';
+        $('#indicators-detail').html(html);
+        },
+        error: function(xhr, status, err) {
+            var msg = status === 'timeout' ? '请求超时，请稍后重试' : ('加载失败: ' + err);
+            $('#indicators-detail').html('<p class="text-danger">' + msg + ' <button class="btn btn-sm btn-outline-secondary ml-2" onclick="loadIndicators()">重试</button></p>');
+            ['rsi-value','macd-value','score-value','pe-value'].forEach(function(id){ $('#'+id).text('--'); });
+        }
+    });
+}
+
+function loadListingDate() {
+    $.get('/api/data/listing_dates/' + stockCode, function(data) {
+        if (data.list_date_fmt) {
+            var badge = $('#list-date-badge');
+            badge.text('上市 ' + data.list_date_fmt);
+            badge.show();
+        }
+    });
+}
+
+function panChart(direction) {
+    var el = document.getElementById('kline-chart');
+    if (!el || !el.layout || !el.layout.xaxis) return;
+    var xrange = el.layout.xaxis.range;
+    if (!xrange || xrange.length < 2) return;
+    var d0 = new Date(xrange[0]);
+    var d1 = new Date(xrange[1]);
+    if (isNaN(d0) || isNaN(d1)) return;
+    var span = d1 - d0;
+    // 整体平移一个完整窗口宽度
+    var shift = span * direction;
+    var newD0 = new Date(d0.getTime() + shift);
+    var newD1 = new Date(d1.getTime() + shift);
+    Plotly.relayout('kline-chart', {
+        'xaxis.range': [newD0.toISOString().slice(0, 10), newD1.toISOString().slice(0, 10)]
+    });
+}
+
+function loadNews() {
+    $.get('/api/news/' + stockCode, function(data) {
+        if (!data || data.length === 0) {
+            $('#news-list').html('<p class="text-muted">暂无新闻数据</p>');
+            return;
+        }
+        
+        var html = '<ul class="list-group">';
+        data.slice(0, 10).forEach(function(news) {
+            var sentimentClass = news.sentiment_label === 'positive' ? 'text-success' : 
+                                (news.sentiment_label === 'negative' ? 'text-danger' : 'text-muted');
+            html += '<li class="list-group-item">';
+            html += '<small class="text-muted">' + (news.date || '-') + '</small><br>';
+            var url = news.url ? news.url : '#';
+            var title = news.title || '-';
+            html += '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + title + '</a>';
+            if (news.sentiment_label) {
+                html += ' <span class="' + sentimentClass + '">(' + news.sentiment_label + ')</span>';
+            }
+            html += '</li>';
+        });
+        html += '</ul>';
+        $('#news-list').html(html);
+    });
+}
+
+function loadAIFeatures() {
+    $.get('/api/features/' + stockCode, function(data) {
+        if (data.error) {
+            $('#ai-features').html('<p class="text-danger">加载失败: ' + data.error + '</p>');
+            return;
+        }
+        
+        var html = '';
+        
+        if (data.ai_analysis) {
+            html += '<h6>AI分析结果</h6>';
+            html += '<p><strong>推荐策略:</strong> ' + (data.ai_analysis.strategy_type || '未知') + '</p>';
+            html += '<p><strong>置信度:</strong> ' + ((data.ai_analysis.confidence || 0) * 100).toFixed(1) + '%</p>';
+            html += '<p><strong>风险等级:</strong> ' + (data.ai_analysis.risk_level || '未知') + '</p>';
+            html += '<p><strong>分析理由:</strong> ' + (data.ai_analysis.reasoning || '无') + '</p>';
+        }
+        
+        if (data.features && data.features.technical) {
+            html += '<h6 class="mt-3">技术特征</h6>';
+            html += '<p><strong>趋势强度:</strong> ' + ((data.features.technical.trend_strength || 0) * 100).toFixed(1) + '%</p>';
+            html += '<p><strong>趋势方向:</strong> ' + (data.features.technical.trend_direction > 0 ? '上升' : '下降') + '</p>';
+        }
+        
+        if (!html) {
+            html = '<p class="text-muted">暂无分析数据</p>';
+        }
+        $('#ai-features').html(html);
+    }).fail(function(xhr) {
+        var msg = '加载失败';
+        try { msg += ': ' + JSON.parse(xhr.responseText).error; } catch(e) {}
+        $('#ai-features').html('<p class="text-danger">' + msg + '</p>');
+    });
+}
+
+function loadScoring() {
+    $.get('/api/stock/' + stockCode + '/factors', function(data) {
+        if (!data.success) {
+            $('#score-value').text('-');
+            return;
+        }
+        var score = data.total_score;
+        var color = data.rating_color || '#999';
+        var dominantTag = data.dominant ? ' [' + data.dominant + ']' : '';
+        $('#score-value').text(score).css('color', color);
+        $('#score-rating').text(data.rating + dominantTag).css('background-color', color);
+
+        // 点击展开详情
+        $('#score-card').off('click').on('click', function() {
+            $('#score-detail-panel').slideToggle();
+        });
+
+        // 绘制维度雷达 + 进度条
+        var dims = data.dimensions;
+        var keys = Object.keys(dims);
+        var html = '';
+        keys.forEach(function(k) {
+            var d = dims[k];
+            var barColor = d.score >= 70 ? '#4caf50' : d.score >= 50 ? '#ff9800' : '#f44336';
+            var weightInfo = d.weight ? ' <span class="text-primary" style="font-size:0.8em">(' + d.weight + ')</span>' : '';
+            html += '<div class="col-md-4 mb-3">';
+            html += '<div class="d-flex justify-content-between"><strong>' + d.label + weightInfo + '</strong><span class="fw-bold" style="color:' + barColor + '">' + d.score + '</span></div>';
+            html += '<div class="progress" style="height:8px"><div class="progress-bar" style="width:' + d.score + '%;background-color:' + barColor + '"></div></div>';
+            html += '<small class="text-muted">' + d.detail + '</small>';
+            html += '</div>';
+        });
+        // 综合分 + 双轨分数
+        var extraInfo = '';
+        if (data.popular_score != null && data.value_score != null) {
+            extraInfo = '<div class="small text-muted mt-1">趋势分=' + data.popular_score + ' | 价值分=' + data.value_score + '</div>';
+        }
+        html += '<div class="col-md-4 mb-3">';
+        html += '<div class="d-flex justify-content-between"><strong>综合评分</strong><span class="fw-bold" style="color:' + color + ';font-size:1.3em">' + score + ' ' + data.rating + dominantTag + '</span></div>';
+        html += '<div class="progress" style="height:10px"><div class="progress-bar" style="width:' + score + '%;background-color:' + color + '"></div></div>';
+        html += extraInfo;
+        html += '</div>';
+        $('#score-dimensions').html(html);
+    });
+}
+
+// 备注编辑
+function toggleNoteEdit() {
+    document.getElementById('stock-note-display').style.display = 'none';
+    document.getElementById('stock-note-edit').style.display = 'flex';
+    document.getElementById('stock-note-input').focus();
+}
+function cancelNoteEdit() {
+    document.getElementById('stock-note-edit').style.display = 'none';
+    document.getElementById('stock-note-display').style.display = '';
+}
+function saveStockNote() {
+    var note = document.getElementById('stock-note-input').value.trim();
+    $.ajax({
+        url: '/api/stocks/' + stockCode + '/notes',
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify({notes: note}),
+        success: function() {
+            var display = document.getElementById('stock-note-display');
+            display.textContent = note || '暂无备注，点击添加';
+            cancelNoteEdit();
+        },
+        error: function() { alert('保存备注失败'); }
+    });
+}
+
+// 更新数据
+function updateStockData() {
+    $('#update-spinner').removeClass('d-none');
+    $('#update-message').text('正在更新数据...');
+    $('#update-progress').css('width', '0%');
+    updateModal.show();
+    
+    $.ajax({
+        url: '/api/data/update',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({codes: [stockCode], type: 'all'}),
+        success: function(result) {
+            if (result.success) {
+                checkUpdateStatus();
+            } else {
+                updateModal.hide();
+                $('#update-spinner').addClass('d-none');
+                alert('更新失败: ' + result.error);
+            }
+        },
+        error: function(xhr) {
+            updateModal.hide();
+            $('#update-spinner').addClass('d-none');
+            alert('更新失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        }
+    });
+}
+
+function checkUpdateStatus() {
+    $.get('/api/data/update/status', function(data) {
+        $('#update-message').text(data.message || '更新中...');
+        $('#update-progress').css('width', data.progress + '%');
+        
+        if (data.is_running) {
+            setTimeout(checkUpdateStatus, 1000);
+        } else {
+            $('#update-progress').css('width', '100%');
+            setTimeout(function() {
+                updateModal.hide();
+                $('#update-spinner').addClass('d-none');
+                alert('更新完成');
+                loadAllData();  // 重新加载所有数据
+            }, 500);
+        }
+    });
+}
+
+// 实时更新（per-stock，与全局开关独立）
+function startRealtimeUpdate() {
+    $('#realtime-btn').addClass('d-none');
+    $('#stop-realtime-btn').removeClass('d-none');
+    
+    $.ajax({
+        url: '/api/data/realtime',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({codes: [stockCode], interval: 5, duration: 300}),
+        success: function(result) {
+            if (result.success) {
+                // 每5秒从快照拉取最新数据（不直接刷新 indicators 以减少服务端压力）
+                realtimeInterval = setInterval(function() {
+                    fetchStockRealtime();
+                    loadIndicators();
+                }, 5000);
+                
+                // 5分钟后自动停止
+                setTimeout(stopRealtimeUpdate, 300000);
+            }
+        },
+        error: function(xhr) {
+            var msg = xhr.responseJSON ? (xhr.responseJSON.error || JSON.stringify(xhr.responseJSON)) : '未知错误';
+            alert('启动实时更新失败: ' + msg);
+            $('#realtime-btn').removeClass('d-none');
+            $('#stop-realtime-btn').addClass('d-none');
+        }
+    });
+}
+
+function stopRealtimeUpdate() {
+    if (realtimeInterval) {
+        clearInterval(realtimeInterval);
+        realtimeInterval = null;
+    }
+    
+    $.ajax({
+        url: '/api/data/realtime/stop',
+        method: 'POST',
+        success: function() {
+            $('#realtime-btn').removeClass('d-none');
+            $('#stop-realtime-btn').addClass('d-none');
+        }
+    });
+}
+
+function loadIntradayChart() {
+    var intradayDiv = document.getElementById('intraday-chart');
+    if (intradayDiv) intradayDiv.innerHTML = '<div class="text-center text-muted py-3">加载分时数据...</div>';
+
+    $.get('/api/stock/' + stockCode + '/intraday', function(data) {
+        if (!data.success) {
+            $('#intraday-chart').html('<p class="text-danger">加载失败: ' + (data.error || '未知错误') + '</p>');
+            return;
+        }
+
+        // Show current stats
+        var color = (data.change_pct || 0) >= 0 ? '#ef5350' : '#26a69a';
+        var sign = (data.change_pct || 0) >= 0 ? '+' : '';
+        var statsHtml = '<div class="row text-center mb-2">' +
+            '<div class="col-3"><div class="small text-muted">开盘</div><div>' + (data.open || '--') + '</div></div>' +
+            '<div class="col-3"><div class="small text-muted">现价</div><div class="fw-bold" style="color:' + color + '">' + (data.current_price || '--') + '</div></div>' +
+            '<div class="col-3"><div class="small text-muted">涨跌幅</div><div style="color:' + color + '">' + sign + ((data.change_pct || 0).toFixed(2)) + '%</div></div>' +
+            '<div class="col-3"><div class="small text-muted">高/低</div><div>' + (data.high || '--') + '/' + (data.low || '--') + '</div></div>' +
+            '</div>';
+        $('#intraday-info').html(statsHtml);
+
+        var snapshots = data.snapshots || [];
+        if (snapshots.length > 0) {
+            // Draw intraday price/average line chart
+            var times = snapshots.map(s => s.time);
+            var prices = snapshots.map(s => s.price);
+            var avgPrices = snapshots.map(s => s.avg_price);
+
+            var priceTrace = {
+                x: times, y: prices,
+                name: '分时价格',
+                type: 'scatter', mode: 'lines',
+                line: {color: color, width: 1.5},
+                fill: 'tozeroy',
+                fillcolor: color === '#ef5350' ? 'rgba(239,83,80,0.1)' : 'rgba(38,166,154,0.1)',
+            };
+            var avgTrace = {
+                x: times, y: avgPrices,
+                name: '日内均价',
+                type: 'scatter', mode: 'lines',
+                line: {color: '#ff9800', width: 1, dash: 'dash'},
+            };
+
+            Plotly.newPlot('intraday-chart', [priceTrace, avgTrace], {
+                height: 350,
+                margin: {t: 10, b: 40, l: 60, r: 10},
+                xaxis: {title: '时间', type: 'category'},
+                yaxis: {title: '价格'},
+                showlegend: true,
+                legend: {x: 0, y: 1}
+            });
+        } else {
+            // No snapshots - show a message with guide to enable realtime
+            $('#intraday-chart').html(
+                '<div class="text-center text-muted py-5">' +
+                '<p>📊 暂无分时数据</p>' +
+                '<p class="small">开启全局实时更新后，将自动采集分时价格数据</p>' +
+                '<button class="btn btn-sm btn-outline-primary" onclick="toggleGlobalRealtime()">开启实时更新</button>' +
+                '</div>'
+            );
+        }
+    }).fail(function() {
+        $('#intraday-chart').html('<p class="text-danger text-center">分时数据请求失败</p>');
+    });
+}
+
+$('#intraday-tab').on('shown.bs.tab', loadIntradayChart);
+
+function loadChipDistribution() {
+    $.get('/api/stock/' + stockCode + '/chip_distribution', function(data) {
+        if (data.success) {
+            var cost = data.major_cost;
+            $('#cost-20d').text('¥' + cost.cost_20d.toFixed(2));
+            $('#cost-60d').text('¥' + cost.cost_60d.toFixed(2));
+            $('#cost-120d').text('¥' + cost.cost_120d.toFixed(2));
+
+            if (data.chip_distribution && data.chip_distribution.price_bins) {
+                var chipTrace = {
+                    x: data.chip_distribution.distribution,
+                    y: data.chip_distribution.price_bins,
+                    type: 'bar', orientation: 'h',
+                    marker: {color: 'rgba(100, 149, 237, 0.7)'},
+                    name: '筹码分布'
+                };
+                var currentPriceLine = {
+                    x: [0, Math.max(...data.chip_distribution.distribution)],
+                    y: [data.chip_distribution.current_price, data.chip_distribution.current_price],
+                    type: 'scatter', mode: 'lines',
+                    line: {color: 'red', width: 2, dash: 'dash'},
+                    name: '现价'
+                };
+                Plotly.newPlot('chip-chart', [chipTrace, currentPriceLine], {
+                    margin: {t: 10, b: 30, l: 60, r: 10},
+                    showlegend: false,
+                    xaxis: {title: '筹码量(%)'},
+                    yaxis: {title: '价格'}
+                });
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

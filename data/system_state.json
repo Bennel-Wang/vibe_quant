@@ -1,0 +1,23 @@
+{
+  "risk_manager": {
+    "total_capital": 1000000.0,
+    "available_cash": 822130.0,
+    "positions": {
+      "09988": {
+        "code": "09988",
+        "name": "阿里巴巴",
+        "shares": 800,
+        "avg_cost": 145.41,
+        "current_price": 119.7
+      },
+      "600009.SH": {
+        "code": "600009.SH",
+        "name": "上海机场",
+        "shares": 3000,
+        "avg_cost": 32.18,
+        "current_price": 27.37
+      }
+    }
+  },
+  "timestamp": "2026-03-28 10:30:55"
+}

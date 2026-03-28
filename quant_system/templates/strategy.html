@@ -1,0 +1,1283 @@
+{% extends "base.html" %}
+
+{% block title %}策略管理 - 量化交易系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>策略 <small class="text-muted fs-6">Strategy</small></h2>
+        <ul class="nav nav-tabs mt-3" id="strategy-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="/strategy">策略管理</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/strategy/alerts">策略提醒</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-4">
+        <div class="card border-success">
+            <div class="card-header bg-success bg-opacity-10 text-success fw-semibold py-2">
+                🟢 买入策略
+            </div>
+            <div class="card-body p-2">
+                <div class="list-group list-group-flush" id="strategy-list-buy">
+                    <p class="text-muted small px-2">加载中...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-danger mt-3">
+            <div class="card-header bg-danger bg-opacity-10 text-danger fw-semibold py-2">
+                🔴 卖出策略
+            </div>
+            <div class="card-body p-2">
+                <div class="list-group list-group-flush" id="strategy-list-sell">
+                    <p class="text-muted small px-2">加载中...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5>创建策略</h5>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#create-strategy-modal">
+                    使用自然语言创建
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>策略详情</h5>
+            </div>
+            <div class="card-body" id="strategy-detail">
+                <p class="text-muted">请选择一个策略查看详情</p>
+            </div>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="card border-success">
+                    <div class="card-header bg-success bg-opacity-10 text-success fw-semibold">
+                        🟢 买入策略
+                    </div>
+                    <div class="card-body">
+                        <label class="form-label small mb-1">选择买入策略</label>
+                        <select class="form-select" id="run-buy-strategy-select">
+                            <option value="">选择策略</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-danger">
+                    <div class="card-header bg-danger bg-opacity-10 text-danger fw-semibold">
+                        🔴 卖出策略
+                    </div>
+                    <div class="card-body">
+                        <label class="form-label small mb-1">选择卖出策略 <span class="text-muted">（不选则与买入相同）</span></label>
+                        <select class="form-select" id="run-sell-strategy-select">
+                            <option value="">与买入策略相同</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5>运行策略</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="form-label small mb-1">股票</label>
+                        <select class="form-select" id="run-stock-select">
+                            <option value="">选择股票</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-3" onclick="runStrategy()">运行策略</button>
+                
+                <div id="strategy-result" class="mt-3"></div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5>策略翻译</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-2 border rounded p-2 bg-light small">
+                    <div class="d-flex justify-content-between align-items-center" style="cursor:pointer" data-bs-toggle="collapse" data-bs-target="#strategy-param-help">
+                        <span class="fw-semibold">📖 支持的参数说明</span>
+                        <span class="text-muted">▾</span>
+                    </div>
+                    <div id="strategy-param-help" class="collapse mt-2">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="fw-semibold text-primary mb-1">时间周期写法</div>
+                                <ul class="mb-1 ps-3">
+                                    <li>日线（默认，无需前缀）</li>
+                                    <li>周线：<code>w_</code> 前缀，或写"周线"</li>
+                                    <li>月线：<code>m_</code> 前缀，或写"月线"</li>
+                                </ul>
+                                <div class="fw-semibold text-primary mb-1">百分位指标（历史分位）</div>
+                                <ul class="mb-1 ps-3">
+                                    <li><code>rsi6_pct100</code> — 日线RSI在过去100日的百分位 (0~100)</li>
+                                    <li><code>w_rsi6_pct100</code> — 周线RSI百分位 (0~100)</li>
+                                    <li><code>m_rsi6_pct100</code> — 月线RSI百分位 (0~100)</li>
+                                    <li><code>pettm_pct10y</code> — PE_TTM在过去10年的百分位 (0~100)</li>
+                                </ul>
+                                <div class="fw-semibold text-primary mb-1">百分位自然语言写法</div>
+                                <ul class="mb-0 ps-3">
+                                    <li>"日线RSI<b>低于历史96%</b>的时间" → <code>rsi6_pct100 &lt; 96</code></li>
+                                    <li>"周线RSI<b>低于历史92%</b>的时间" → <code>w_rsi6_pct100 &lt; 92</code></li>
+                                    <li>"月线RSI<b>低于历史88%</b>的时间" → <code>m_rsi6_pct100 &lt; 88</code></li>
+                                    <li>"PETTM<b>处于历史30%以下</b>" → <code>pettm_pct10y &lt; 30</code></li>
+                                </ul>
+                            </div>
+                            <div class="col-6">
+                                <div class="fw-semibold text-primary mb-1">普通技术指标</div>
+                                <ul class="mb-1 ps-3">
+                                    <li><code>rsi_6 / rsi_12 / rsi_24</code> — 日线RSI（6/12/24周期）</li>
+                                    <li><code>macd_histogram</code> — MACD柱（正=金叉区）</li>
+                                    <li><code>kdj_j</code> — KDJ的J值（&lt;20超卖，&gt;80超买）</li>
+                                    <li><code>boll_position</code> — 布林带位置（0~1）</li>
+                                    <li><code>wr_14</code> — 威廉%R（&lt;-80超卖）</li>
+                                    <li><code>volume_ratio</code> — 量比</li>
+                                    <li><code>overall_score</code> — 综合评分（-100~100）</li>
+                                    <li><code>pe_ttm / pb</code> — 市盈率 / 市净率</li>
+                                </ul>
+                                <div class="fw-semibold text-primary mb-1">均线 &amp; 价格</div>
+                                <ul class="mb-1 ps-3">
+                                    <li><code>ma_5/10/20/60/120/250</code> — 均线</li>
+                                    <li><code>close / open / high / low</code> — 价格</li>
+                                </ul>
+                                <div class="fw-semibold text-primary mb-1">新闻情绪</div>
+                                <ul class="mb-0 ps-3">
+                                    <li><code>news_sentiment</code> — 情感值 (-1~1)</li>
+                                    <li><code>news_positive</code> — 正面新闻占比 (0~1)</li>
+                                </ul>
+                                <div class="fw-semibold text-primary mb-1 mt-1">大盘相对强弱</div>
+                                <ul class="mb-0 ps-3">
+                                    <li><code>rel_strength_5/10/20/60</code> — 股票N日超额收益率（%）= 股票N日涨幅 − 大盘N日涨幅</li>
+                                    <li><code>idx_pct_chg</code> — 大盘日涨跌幅（%）</li>
+                                    <li><code>idx_ret_5/10/20/60</code> — 大盘N日涨幅（%）</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-2 border-top pt-2">
+                            <div class="fw-semibold text-primary mb-1">写法示例</div>
+                            <div class="row g-1">
+                                <div class="col-12"><code class="d-block bg-white rounded px-2 py-1 example-strategy" style="cursor:pointer" title="点击填入">短期走势比大盘强时买入</code></div>
+                                <div class="col-12"><code class="d-block bg-white rounded px-2 py-1 example-strategy" style="cursor:pointer" title="点击填入">短期走势比大盘强3%，且日线RSI低于历史70%的时间时买入5%</code></div>
+                                <div class="col-12"><code class="d-block bg-white rounded px-2 py-1 example-strategy" style="cursor:pointer" title="点击填入">当月线RSI低于历史88%的时间，且周线RSI低于历史92%的时间，且日线RSI低于历史96%的时间时买入5%</code></div>
+                                <div class="col-12"><code class="d-block bg-white rounded px-2 py-1 example-strategy" style="cursor:pointer" title="点击填入">当日线RSI低于30时买入，高于70时卖出</code></div>
+                                <div class="col-12"><code class="d-block bg-white rounded px-2 py-1 example-strategy" style="cursor:pointer" title="点击填入">PETTM处于历史25%以下且月线RSI低于历史85%的时间时买入10%</code></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">自然语言描述</label>
+                    <textarea class="form-control" id="natural-language-input" rows="4" placeholder="例如：当月线RSI低于历史88%的时间，且周线RSI低于历史92%的时间，且日线RSI低于历史96%的时间时买入5%"></textarea>
+                </div>
+                <button class="btn btn-primary w-100" onclick="translateToRules()">转换为量化规则</button>
+                
+                <div class="mt-3" id="translation-result"></div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5>AI决策</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <select class="form-select" id="ai-stock-select">
+                            <option value="">选择股票</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-info w-100" onclick="getAIDecision()">获取AI决策</button>
+                    </div>
+                </div>
+                <div id="ai-decision-result" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 创建策略模态框 -->
+<div class="modal fade" id="create-strategy-modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">创建策略</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">策略名称</label>
+                    <input type="text" class="form-control" id="new-strategy-name">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">策略描述</label>
+                    <textarea class="form-control" id="new-strategy-desc" rows="3" style="white-space: pre-wrap;"></textarea>
+                </div>
+                <!-- 共用操作设置 -->
+                <div class="d-flex gap-4 mb-3 p-2 bg-light rounded border">
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="form-label mb-0 fw-bold">操作方向：</label>
+                        <select class="form-select form-select-sm" id="new-shared-action" style="width:100px">
+                            <option value="buy">买入</option>
+                            <option value="sell">卖出</option>
+                            <option value="hold">持有</option>
+                        </select>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="form-label mb-0 fw-bold">仓位比例：</label>
+                        <input type="number" class="form-control form-control-sm" id="new-shared-ratio"
+                               value="0.5" step="0.1" min="0.1" max="1" style="width:80px">
+                        <span class="text-muted small">(0.1–1.0，所有规则共用)</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-header bg-success bg-opacity-10">
+                                <strong>✅ 正面清单（触发条件）</strong>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted small mb-2">满足条件时触发买入/卖出操作</p>
+                                <div id="new-rules-container"></div>
+                                <button type="button" class="btn btn-sm btn-success mt-2" onclick="addNewRuleRow()">+ 添加规则</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-danger">
+                            <div class="card-header bg-danger bg-opacity-10">
+                                <strong>🚫 负面清单（排除条件）</strong>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted small mb-2">触发时即使满足买卖条件也不操作</p>
+                                <div id="new-exclusion-rules-container"></div>
+                                <button type="button" class="btn btn-sm btn-warning mt-2" onclick="addNewExclusionRuleRow()">+ 添加排除规则</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="createStrategy()">创建</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑策略模态框 -->
+<div class="modal fade" id="edit-strategy-modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑策略</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-strategy-form">
+                    <input type="hidden" id="edit-strategy-name-hidden">
+                    <div class="mb-3">
+                        <label class="form-label">策略名称</label>
+                        <input type="text" class="form-control" id="edit-strategy-name-visible" placeholder="策略显示名称">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">策略描述</label>
+                        <textarea class="form-control" id="edit-strategy-desc" rows="3" style="white-space: pre-wrap;"></textarea>
+                    </div>
+                    <!-- 共用操作设置 -->
+                    <div class="d-flex gap-4 mb-3 p-2 bg-light rounded border">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 fw-bold">操作方向：</label>
+                            <select class="form-select form-select-sm" id="edit-shared-action" style="width:100px">
+                                <option value="buy">买入</option>
+                                <option value="sell">卖出</option>
+                                <option value="hold">持有</option>
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 fw-bold">仓位比例：</label>
+                            <input type="number" class="form-control form-control-sm" id="edit-shared-ratio"
+                                   value="0.5" step="0.1" min="0.1" max="1" style="width:80px">
+                            <span class="text-muted small">(0.1–1.0，所有规则共用)</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-success">
+                                <div class="card-header bg-success bg-opacity-10">
+                                    <strong>✅ 正面清单（触发条件）</strong>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted small mb-2">满足条件时触发买入/卖出操作</p>
+                                    <div id="edit-rules-container"></div>
+                                    <button type="button" class="btn btn-sm btn-success mt-2" onclick="addRuleRow()">+ 添加规则</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-danger">
+                                <div class="card-header bg-danger bg-opacity-10">
+                                    <strong>🚫 负面清单（排除条件）</strong>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted small mb-2">触发时即使满足买卖条件也不操作</p>
+                                    <div id="edit-exclusion-rules-container"></div>
+                                    <button type="button" class="btn btn-sm btn-warning mt-2" onclick="addExclusionRuleRow()">+ 添加排除规则</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="deleteCurrentStrategy()">删除策略</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveStrategyEdit()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 调度器配置模态框 -->
+<div class="modal fade" id="scheduler-config-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">调度器配置</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduler-config-form">
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="scheduler-enabled">
+                            <label class="form-check-label" for="scheduler-enabled">启用调度器</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">定时时间 (逗号分隔)</label>
+                        <input type="text" class="form-control" id="scheduler-times" placeholder="14:25,14:45">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">选中股票 (留空表示全部)</label>
+                        <select class="form-select" id="scheduler-stocks" multiple size="5">
+                        </select>
+                        <small class="text-muted">按住Ctrl键可多选</small>
+                    </div>
+                    <h6>任务配置为每日任务</h6>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveSchedulerConfig()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 根据买入策略名称自动匹配卖出策略（最长公共前缀或去"买入"换"卖出"）
+function _findMatchingSellStrategy(buyName, sellStrats) {
+    if (!buyName || !sellStrats || !sellStrats.length) return null;
+    var base = buyName.replace(/买入$/, '').replace(/买$/, '');
+    for (var i = 0; i < sellStrats.length; i++) {
+        if (sellStrats[i].name === base + '卖出' || sellStrats[i].key === base + '卖出') {
+            return sellStrats[i].key;
+        }
+    }
+    var bestKey = null, bestLen = 1;
+    for (var i = 0; i < sellStrats.length; i++) {
+        var sn = sellStrats[i].name, len = 0;
+        for (var j = 0; j < Math.min(buyName.length, sn.length); j++) {
+            if (buyName[j] === sn[j]) len++; else break;
+        }
+        if (len > bestLen) { bestLen = len; bestKey = sellStrats[i].key; }
+    }
+    return bestKey;
+}
+
+$(document).ready(function() {
+    loadStrategies();
+    loadStocks();
+});
+
+function loadStrategies() {
+    $.get('/api/strategies', function(data) {
+        var buyHtml = '';
+        var sellHtml = '';
+        var buySelectHtml = '<option value="">选择策略</option>';
+        var sellSelectHtml = '<option value="">与买入策略相同</option>';
+        var _sellStratsRun = [];
+
+        data.forEach(function(strategy) {
+            var key = strategy.key || strategy.id || strategy.name || strategy;
+            var displayName = strategy.name || key;
+            var item = '<a href="#" class="list-group-item list-group-item-action py-2" onclick="showStrategyDetail(\'' + key + '\')">' + displayName + '</a>';
+            var opt  = '<option value="' + key + '">' + displayName + '</option>';
+
+            if (strategy.has_buy) { buyHtml += item; buySelectHtml += opt; }
+            if (strategy.has_sell){ sellHtml += item; sellSelectHtml += opt; _sellStratsRun.push({key: key, name: displayName}); }
+            // 旧格式无 has_buy/has_sell 标记，放入买入框
+            if (!strategy.has_buy && !strategy.has_sell) { buyHtml += item; buySelectHtml += opt; }
+        });
+
+        $('#strategy-list-buy').html(buyHtml || '<p class="text-muted small px-2">暂无买入策略</p>');
+        $('#strategy-list-sell').html(sellHtml || '<p class="text-muted small px-2">暂无卖出策略</p>');
+        $('#run-buy-strategy-select').html(buySelectHtml);
+        $('#run-sell-strategy-select').html(sellSelectHtml);
+
+        // 买入策略改变时自动匹配卖出策略
+        $('#run-buy-strategy-select').off('change.automatch').on('change.automatch', function() {
+            var buyName = $(this).find('option:selected').text();
+            var matched = _findMatchingSellStrategy(buyName, _sellStratsRun);
+            if (matched) $('#run-sell-strategy-select').val(matched);
+        });
+    });
+}
+
+function loadStocks() {
+    $.get('/api/stocks', function(data) {
+        var html = '<option value="">选择股票</option>';
+        data.forEach(function(stock) {
+            html += '<option value="' + stock.full_code + '">' + stock.name + ' (' + stock.full_code + ')</option>';
+        });
+        $('#run-stock-select').html(html);
+        $('#ai-stock-select').html(html);
+        
+        // 检查URL参数
+        var urlParams = new URLSearchParams(window.location.search);
+        var code = urlParams.get('code');
+        if (code) {
+            $('#run-stock-select').val(code);
+            $('#ai-stock-select').val(code);
+        }
+    });
+}
+
+function showStrategyDetail(name) {
+    // 高亮选中项
+    $('.list-group-item').removeClass('active');
+    $('.list-group-item[onclick*="' + name + '"]').addClass('active');
+
+    $.get('/api/strategy/' + name, function(data) {
+        if (data.error) {
+            $('#strategy-detail').html('<p class="text-danger">' + data.error + '</p>');
+            return;
+        }
+
+        var html = '<h6>' + (data.name || name) + '</h6>';
+        html += '<p class="text-muted">' + (data.description || '无描述') + '</p>';
+
+        // 分离买入和卖出规则
+        var buyRules = (data.rules || []).filter(function(r) { return r.action === 'buy'; });
+        var sellRules = (data.rules || []).filter(function(r) { return r.action === 'sell'; });
+        var otherRules = (data.rules || []).filter(function(r) { return r.action !== 'buy' && r.action !== 'sell'; });
+
+        if (buyRules.length > 0) {
+            html += '<div class="card border-success mb-3"><div class="card-header bg-success bg-opacity-10 text-success py-1 fw-semibold">🟢 买入条件</div><ul class="list-group list-group-flush">';
+            buyRules.forEach(function(rule) {
+                html += '<li class="list-group-item py-2"><code>' + rule.condition + '</code>';
+                html += '<br><span class="text-muted small">仓位 ' + (rule.position_ratio * 100).toFixed(0) + '% &nbsp;·&nbsp; ' + rule.reason + '</span></li>';
+            });
+            html += '</ul></div>';
+        }
+
+        if (sellRules.length > 0) {
+            html += '<div class="card border-danger mb-3"><div class="card-header bg-danger bg-opacity-10 text-danger py-1 fw-semibold">🔴 卖出条件</div><ul class="list-group list-group-flush">';
+            sellRules.forEach(function(rule) {
+                html += '<li class="list-group-item py-2"><code>' + rule.condition + '</code>';
+                html += '<br><span class="text-muted small">仓位 ' + (rule.position_ratio * 100).toFixed(0) + '% &nbsp;·&nbsp; ' + rule.reason + '</span></li>';
+            });
+            html += '</ul></div>';
+        }
+
+        if (otherRules.length > 0) {
+            html += '<h6 class="text-secondary">其他规则</h6><ul class="list-group mb-3">';
+            otherRules.forEach(function(rule) {
+                html += '<li class="list-group-item py-2"><code>' + rule.condition + '</code> → <strong>' + rule.action + '</strong>';
+                html += '<br><span class="text-muted small">' + rule.reason + '</span></li>';
+            });
+            html += '</ul>';
+        }
+
+        if (data.exclusion_rules && data.exclusion_rules.length > 0) {
+            html += '<h6 class="text-warning mt-2">🚫 排除条件（不操作）</h6><ul class="list-group mb-3">';
+            data.exclusion_rules.forEach(function(rule) {
+                html += '<li class="list-group-item list-group-item-warning py-2"><code>' + rule.condition + '</code>';
+                html += '<br><span class="text-muted small">' + rule.reason + '</span></li>';
+            });
+            html += '</ul>';
+        }
+
+        $('#strategy-detail').html(html);
+    });
+}
+
+function runStrategy() {
+    var buyStrategy = $('#run-buy-strategy-select').val();
+    var sellStrategy = $('#run-sell-strategy-select').val();
+    var code = $('#run-stock-select').val();
+
+    if (!buyStrategy || !code) {
+        alert('请选择买入策略和股票');
+        return;
+    }
+
+    $('#strategy-result').html('<p class="text-muted">运行中...</p>');
+
+    var payload = {code: code, buy_strategy: buyStrategy};
+    if (sellStrategy) payload.sell_strategy = sellStrategy;
+
+    $.ajax({
+        url: '/api/strategy/run',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(payload),
+        success: function(result) {
+            var actionClass = result.action === 'buy' ? 'positive' : (result.action === 'sell' ? 'negative' : 'neutral');
+            var actionText = result.action === 'buy' ? '买入' : (result.action === 'sell' ? '卖出' : '持有');
+            var sellLabel = sellStrategy && sellStrategy !== buyStrategy ? '（卖出策略: ' + sellStrategy + '）' : '';
+
+            var html = '<div class="alert alert-info">';
+            html += '<h6>策略决策结果 <small class="text-muted">' + sellLabel + '</small></h6>';
+            html += '<p><strong>建议操作：</strong><span class="' + actionClass + '">' + actionText + '</span></p>';
+            html += '<p><strong>建议仓位：</strong>' + (result.position_ratio * 100).toFixed(1) + '%</p>';
+            html += '<p><strong>置信度：</strong>' + (result.confidence * 100).toFixed(1) + '%</p>';
+            html += '<p><strong>理由：</strong>' + result.reasoning + '</p>';
+            html += '</div>';
+
+            $('#strategy-result').html(html);
+        },
+        error: function() {
+            $('#strategy-result').html('<p class="text-danger">运行失败</p>');
+        }
+    });
+}
+
+function getAIDecision() {
+    var code = $('#ai-stock-select').val();
+    
+    if (!code) {
+        alert('请选择股票');
+        return;
+    }
+    
+    $('#ai-decision-result').html('<p class="text-muted">AI分析中...</p>');
+    
+    $.ajax({
+        url: '/api/ai/decision',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({code: code}),
+        success: function(result) {
+            var actionClass = result.action === 'buy' ? 'positive' : (result.action === 'sell' ? 'negative' : 'neutral');
+            var actionText = result.action === 'buy' ? '买入' : (result.action === 'sell' ? '卖出' : '持有');
+            
+            var html = '<div class="alert alert-warning">';
+            html += '<h6>AI综合决策</h6>';
+            html += '<p><strong>建议操作：</strong><span class="' + actionClass + '">' + actionText + '</span></p>';
+            html += '<p><strong>建议仓位：</strong>' + (result.position_ratio * 100).toFixed(1) + '%</p>';
+            html += '<p><strong>置信度：</strong>' + (result.confidence * 100).toFixed(1) + '%</p>';
+            html += '<p><strong>分析理由：</strong></p>';
+            html += '<pre style="white-space: pre-wrap;">' + result.reasoning + '</pre>';
+            html += '</div>';
+            
+            $('#ai-decision-result').html(html);
+        },
+        error: function() {
+            $('#ai-decision-result').html('<p class="text-danger">AI决策失败</p>');
+        }
+    });
+}
+
+// 全局变量
+var createStrategyModal = null, editStrategyModal = null, schedulerConfigModal = null;
+var currentEditStrategy = null;
+var ruleCounter = 0;
+
+$(document).ready(function() {
+    var elm = document.getElementById('create-strategy-modal');
+    if (elm) createStrategyModal = new bootstrap.Modal(elm);
+    elm = document.getElementById('edit-strategy-modal');
+    if (elm) editStrategyModal = new bootstrap.Modal(elm);
+    elm = document.getElementById('scheduler-config-modal');
+    if (elm) schedulerConfigModal = new bootstrap.Modal(elm);
+    
+    loadStrategies();
+    loadStocks();
+    // scheduler and notification UI moved to /scheduler page; only call if elements exist
+    if (document.getElementById('scheduler-status') || document.getElementById('scheduler-stocks')) {
+        if (typeof loadSchedulerStatus === 'function') loadSchedulerStatus();
+        if (typeof loadSchedulerStocks === 'function') loadSchedulerStocks();
+    }
+    if (document.getElementById('wechat-status') || document.getElementById('smtp-host')) {
+        if (typeof loadNotificationStatus === 'function') loadNotificationStatus();
+    }
+});
+
+function loadSchedulerStocks() {
+    $.get('/api/stocks', function(data) {
+        var select = $('#scheduler-stocks');
+        select.empty();
+        data.forEach(function(stock) {
+            if (stock.type === 'stock') {
+                select.append('<option value="' + stock.full_code + '">' + stock.name + '</option>');
+            }
+        });
+    });
+}
+
+function loadSchedulerStatus() {
+    $.get('/api/scheduler/status', function(data) {
+        var statusHtml = data.is_running ? 
+            '<span class="badge bg-success">运行中</span>' : 
+            '<span class="badge bg-secondary">已停止</span>';
+        $('#scheduler-status').html(statusHtml);
+        
+        // Show appropriate start/stop button
+        if (data.is_running) {
+            $('#btn-scheduler-start').hide();
+            $('#btn-scheduler-stop').show();
+        } else {
+            $('#btn-scheduler-start').show();
+            $('#btn-scheduler-stop').hide();
+        }
+        
+        var configHtml = '<ul class="list-unstyled">';
+        configHtml += '<li><strong>启用:</strong> ' + (data.config.enabled ? '是' : '否') + '</li>';
+        configHtml += '<li><strong>定时:</strong> ' + (data.config.afternoon_times || []).join(', ') + '</li>';
+        configHtml += '<li><strong>选中股票:</strong> ' + ((data.config.selected_stocks || []).length > 0 ? data.config.selected_stocks.join(', ') : '全部') + '</li>';
+        configHtml += '</ul>';
+        $('#scheduler-config').html(configHtml);
+    });
+}
+
+function toggleScheduler(start) {
+    var url = start ? '/api/scheduler/start' : '/api/scheduler/stop';
+    $.post(url, function(data) {
+        if (data.success) {
+            loadSchedulerStatus();
+        } else {
+            alert(data.error || '操作失败');
+        }
+    });
+}
+
+// 策略翻译 - 存储最近一次翻译结果供填表使用
+var _lastTranslatedRules = [];
+var _lastTranslatedExclRules = [];
+var _lastSharedAction = 'buy';
+var _lastSharedRatio  = 0.5;
+
+// 点击示例填入输入框
+$(document).on('click', '.example-strategy', function() {
+    $('#natural-language-input').val($(this).text().trim());
+});
+
+// 策略翻译
+function translateToRules() {
+    var text = $('#natural-language-input').val();
+    if (!text) {
+        alert('请输入策略描述');
+        return;
+    }
+    
+    $('#translation-result').html('<p class="text-muted">翻译中...</p>');
+    
+    $.ajax({
+        url: '/api/strategy/translate',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({text: text, direction: 'to_rules'}),
+        success: function(result) {
+            if (result.success) {
+                var rules = result.result.rules || [];
+                var exclRules = result.result.exclusion_rules || [];
+                var sharedAction = result.result.shared_action || 'buy';
+                var sharedRatio  = result.result.shared_ratio  != null ? result.result.shared_ratio : 0.5;
+
+                // 保存到全局变量，供填表按钮使用
+                _lastTranslatedRules = rules;
+                _lastTranslatedExclRules = exclRules;
+                _lastSharedAction = sharedAction;
+                _lastSharedRatio  = sharedRatio;
+
+                if (rules.length === 0 && exclRules.length === 0) {
+                    $('#translation-result').html('<p class="text-warning">未能识别出规则，请尝试更明确的描述（如：RSI超卖时买入）</p>');
+                    return;
+                }
+
+                var html = '';
+
+                // ── 共用操作设置 ──────────────────────────────────────────
+                var actionLabel = sharedAction === 'buy' ? '<span class="badge bg-success">买入</span>' :
+                                  sharedAction === 'sell' ? '<span class="badge bg-danger">卖出</span>' :
+                                  '<span class="badge bg-secondary">持有</span>';
+                html += '<div class="d-flex align-items-center gap-3 p-2 mb-3 bg-light border rounded">';
+                html += '<span class="fw-bold text-muted">共用设置：</span>';
+                html += '<div class="d-flex align-items-center gap-1">';
+                html += '<label class="text-muted mb-0 small">操作：</label>';
+                html += '<select id="shared-action-sel" class="form-select form-select-sm" style="width:90px">';
+                html += '<option value="buy"' + (sharedAction==='buy'?' selected':'') + '>买入</option>';
+                html += '<option value="sell"' + (sharedAction==='sell'?' selected':'') + '>卖出</option>';
+                html += '<option value="hold"' + (sharedAction==='hold'?' selected':'') + '>持有</option>';
+                html += '</select></div>';
+                html += '<div class="d-flex align-items-center gap-1">';
+                html += '<label class="text-muted mb-0 small">仓位：</label>';
+                html += '<input id="shared-ratio-inp" type="number" class="form-control form-control-sm" style="width:80px" min="0.1" max="1" step="0.1" value="' + sharedRatio + '">';
+                html += '</div></div>';
+
+                if (rules.length > 0) {
+                    html += '<h6 class="mt-2">📋 触发条件（共' + rules.length + '条，满足时执行上述操作）：</h6>';
+                    rules.forEach(function(rule, idx) {
+                        // AND/OR 连接符（第一条不显示）
+                        if (idx > 0) {
+                            var connLabel = (rule.connector === 'AND') ? 'AND' : 'OR';
+                            var connColor = (rule.connector === 'AND') ? 'primary' : 'info';
+                            html += '<div class="text-center my-1"><span class="badge bg-' + connColor + ' px-3 py-1" style="letter-spacing:2px">' + connLabel + '</span></div>';
+                        }
+                        html += '<div class="list-group-item border rounded mb-1 py-2 px-3">';
+                        html += '<code>' + rule.condition + '</code><br>';
+                        html += '<small class="text-muted">' + rule.reason + '</small>';
+                        html += '</div>';
+                    });
+                    html += '<div class="mb-3"></div>';
+                }
+
+                if (exclRules.length > 0) {
+                    html += '<h6 class="mt-2 text-warning">🚫 负面清单（共' + exclRules.length + '条）：</h6>';
+                    exclRules.forEach(function(rule, idx) {
+                        if (idx > 0) {
+                            html += '<div class="text-center my-1"><span class="badge bg-warning text-dark px-3 py-1" style="letter-spacing:2px">AND</span></div>';
+                        }
+                        html += '<div class="list-group-item list-group-item-warning border rounded mb-1 py-2 px-3">';
+                        html += '<span class="badge bg-warning text-dark me-1">排除</span><code>' + rule.condition + '</code><br>';
+                        html += '<small class="text-muted">' + rule.reason + '</small>';
+                        html += '</div>';
+                    });
+                    html += '<div class="mb-3"></div>';
+                }
+
+                // 一键填入表单按钮
+                html += '<button class="btn btn-sm btn-outline-primary mt-1" onclick="fillTranslatedRules()">将结果填入下方表单</button>';
+
+                $('#translation-result').html(html);
+            } else {
+                $('#translation-result').html('<p class="text-danger">翻译失败: ' + (result.error || '未知错误') + '</p>');
+            }
+        },
+        error: function() {
+            $('#translation-result').html('<p class="text-danger">请求失败，请检查网络</p>');
+        }
+    });
+}
+
+function fillTranslatedRules() {
+    var rules = _lastTranslatedRules;
+    var exclRules = _lastTranslatedExclRules;
+    // 读取共用设置（优先读翻译结果面板的下拉/输入值）
+    var sharedAction = $('#shared-action-sel').val() || _lastSharedAction || 'buy';
+    var sharedRatio  = parseFloat($('#shared-ratio-inp').val()) || _lastSharedRatio || 0.5;
+
+    // 清空现有规则
+    $('#new-rules-container').empty();
+    $('#new-exclusion-rules-container').empty();
+    ruleCounter = 0;
+    excRuleCounter = 0;
+
+    // 将共用设置同步到创建表单的共用设置栏
+    $('#new-shared-action').val(sharedAction);
+    $('#new-shared-ratio').val(sharedRatio);
+
+    // 填入正面规则（只填条件和理由，action/ratio 已在共用栏设置）
+    rules.forEach(function(rule, idx) {
+        var connVal = (idx === 0) ? 'OR' : (rule.connector || 'AND');
+        addNewRuleRow(connVal);
+        $('#new-rule-condition-' + ruleCounter).val(rule.condition);
+        $('#new-rule-reason-' + ruleCounter).val(rule.reason);
+    });
+
+    // 填入负面清单
+    exclRules.forEach(function(rule) {
+        addNewExclusionRuleRow();
+        $('#new-exc-condition-' + excRuleCounter).val(rule.condition);
+        $('#new-exc-reason-' + excRuleCounter).val(rule.reason);
+    });
+
+    if (rules.length > 0 || exclRules.length > 0) {
+        $('html, body').animate({scrollTop: $('#new-rules-container').offset().top - 100}, 400);
+        alert('已填入 ' + rules.length + ' 条触发条件，' + exclRules.length + ' 条负面清单，操作: ' + sharedAction + '，仓位: ' + Math.round(sharedRatio*100) + '%');
+    }
+}
+
+function toggleRuleConnector(btn) {
+    var next = $(btn).data('conn') === 'AND' ? 'OR' : 'AND';
+    $(btn).data('conn', next).text(next);
+    $(btn).removeClass('btn-primary btn-warning')
+          .addClass(next === 'AND' ? 'btn-primary' : 'btn-warning');
+    $(btn).closest('.rule-connector-bar').find('.rule-connector-val').val(next);
+}
+
+function updateRuleConnectors(containerId) {
+    $(containerId + ' > .rule-row, ' + containerId + ' > .exc-rule-row').each(function(idx) {
+        if (idx === 0) {
+            $(this).find('.rule-connector-bar').hide();
+        } else {
+            $(this).find('.rule-connector-bar').show();
+        }
+    });
+}
+
+function _connectorBarHtml(conn, isFirst) {
+    var display = isFirst ? 'none' : 'flex';
+    var cls = conn === 'OR' ? 'btn-warning' : 'btn-primary';
+    return '<div class="rule-connector-bar align-items-center px-2 py-1 bg-light border-bottom" style="display:' + display + '">' +
+        '<div style="flex:1;border-bottom:1px solid #dee2e6;margin:auto"></div>' +
+        '<button type="button" class="btn btn-sm ' + cls + ' px-2 py-0 mx-2 connector-toggle" ' +
+        'style="font-size:0.75em;min-width:44px" data-conn="' + conn + '" onclick="toggleRuleConnector(this)">' + conn + '</button>' +
+        '<div style="flex:1;border-bottom:1px solid #dee2e6;margin:auto"></div>' +
+        '<input type="hidden" class="rule-connector-val" value="' + conn + '">' +
+        '</div>';
+}
+
+// 创建策略
+var excRuleCounter = 0;
+
+function addNewRuleRow(connValue) {
+    ruleCounter++;
+    var isFirst = $('#new-rules-container .rule-row').length === 0;
+    var conn = connValue || 'AND';
+    var html = '<div class="card mb-2 rule-row" data-rule-id="' + ruleCounter + '">';
+    html += _connectorBarHtml(conn, isFirst);
+    html += '<div class="card-body py-2">';
+    html += '<div class="mb-2"><input type="text" class="form-control" placeholder="条件 (如: rsi_6 < 30)" id="new-rule-condition-' + ruleCounter + '"></div>';
+    html += '<div class="mb-1"><input type="text" class="form-control" placeholder="理由 (可选)" id="new-rule-reason-' + ruleCounter + '"></div>';
+    html += '<button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="$(this).closest(\'.rule-row\').remove(); updateRuleConnectors(\'#new-rules-container\')">删除</button>';
+    html += '</div></div>';
+    $('#new-rules-container').append(html);
+}
+
+function addNewExclusionRuleRow(connValue) {
+    excRuleCounter++;
+    var isFirst = $('#new-exclusion-rules-container .exc-rule-row').length === 0;
+    var conn = connValue || 'OR';
+    var html = '<div class="card mb-2 exc-rule-row border-warning" data-exc-id="' + excRuleCounter + '">';
+    html += _connectorBarHtml(conn, isFirst);
+    html += '<div class="card-body py-2">';
+    html += '<div class="mb-2"><input type="text" class="form-control" placeholder="排除条件 (如: rsi_6 > 40 and rsi_6 < 60)" id="new-exc-condition-' + excRuleCounter + '"></div>';
+    html += '<div class="mb-1"><input type="text" class="form-control" placeholder="排除理由 (可选)" id="new-exc-reason-' + excRuleCounter + '"></div>';
+    html += '<button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="$(this).closest(\'.exc-rule-row\').remove(); updateRuleConnectors(\'#new-exclusion-rules-container\')">删除</button>';
+    html += '</div></div>';
+    $('#new-exclusion-rules-container').append(html);
+}
+
+function createStrategy() {
+    var name = $('#new-strategy-name').val();
+    var desc = $('#new-strategy-desc').val();
+    
+    if (!name) {
+        alert('请填写策略名称');
+        return;
+    }
+    
+    // 读取共用操作设置
+    var sharedAction = $('#new-shared-action').val() || 'buy';
+    var sharedRatio  = parseFloat($('#new-shared-ratio').val()) || 0.5;
+
+    // 收集规则（共用 action 和 position_ratio）
+    var rules = [];
+    $('#new-rules-container .rule-row').each(function() {
+        var id = $(this).data('rule-id');
+        rules.push({
+            condition: $('#new-rule-condition-' + id).val(),
+            action: sharedAction,
+            position_ratio: sharedRatio,
+            reason: $('#new-rule-reason-' + id).val(),
+            connector: $(this).find('.rule-connector-val').val() || 'OR'
+        });
+    });
+    
+    // 收集排除规则
+    var exclusion_rules = [];
+    $('#new-exclusion-rules-container .exc-rule-row').each(function() {
+        var id = $(this).data('exc-id');
+        exclusion_rules.push({
+            condition: $('#new-exc-condition-' + id).val(),
+            reason: $('#new-exc-reason-' + id).val(),
+            connector: $(this).find('.rule-connector-val').val() || 'OR'
+        });
+    });
+    
+    $.ajax({
+        url: '/api/strategy/create',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({name: name, description: desc, rules: rules, exclusion_rules: exclusion_rules}),
+        success: function(result) {
+            createStrategyModal.hide();
+            loadStrategies();
+            alert('策略创建成功');
+        },
+        error: function(xhr) {
+            alert('创建失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        }
+    });
+}
+
+// 编辑策略
+function showStrategyDetail(name) {
+    currentEditStrategy = name;
+    $.get('/api/strategy/' + name, function(data) {
+        if (data.error) {
+            $('#strategy-detail').html('<p class="text-danger">' + data.error + '</p>');
+            return;
+        }
+
+        var descHtml = data.description
+            ? data.description.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g, '<br>')
+            : '暂无描述';
+
+        var html = '<h6>' + (data.name || name) + '</h6>';
+        html += '<div class="mb-3">';
+        html += '<label class="form-label">策略描述</label>';
+        html += '<div class="p-2 border rounded bg-light" style="min-height:60px; white-space:pre-wrap;">' + descHtml + '</div>';
+        html += '</div>';
+        html += '<button class="btn btn-sm btn-primary" onclick="openEditStrategyModal()">编辑策略</button>';
+        
+        if (data.rules && data.rules.length > 0) {
+            html += '<h6 class="mt-3">规则列表：</h6>';
+            html += '<ul class="list-group">';
+            data.rules.forEach(function(rule, index) {
+                if (index > 0) {
+                    var conn = rule.connector || 'OR';
+                    var badge = conn === 'AND' ? 'bg-primary' : 'bg-warning text-dark';
+                    html += '<li class="list-group-item text-center py-1 px-2"><span class="badge ' + badge + '">' + conn + '</span></li>';
+                }
+                html += '<li class="list-group-item">';
+                html += '<strong>条件：</strong>' + rule.condition + '<br>';
+                html += '<strong>操作：</strong>' + rule.action + '<br>';
+                html += '<strong>仓位：</strong>' + (rule.position_ratio * 100) + '%<br>';
+                html += '<strong>理由：</strong>' + rule.reason;
+                html += '</li>';
+            });
+            html += '</ul>';
+        }
+        
+        if (data.exclusion_rules && data.exclusion_rules.length > 0) {
+            html += '<h6 class="mt-3">排除规则（负面清单）：</h6>';
+            html += '<ul class="list-group">';
+            data.exclusion_rules.forEach(function(rule, index) {
+                if (index > 0) {
+                    var conn = rule.connector || 'OR';
+                    var badge = conn === 'AND' ? 'bg-primary' : 'bg-warning text-dark';
+                    html += '<li class="list-group-item text-center py-1 px-2"><span class="badge ' + badge + '">' + conn + '</span></li>';
+                }
+                html += '<li class="list-group-item list-group-item-warning">';
+                html += '<strong>条件：</strong>' + rule.condition + '<br>';
+                html += '<strong>理由：</strong>' + rule.reason;
+                html += '</li>';
+            });
+            html += '</ul>';
+        }
+        
+        $('#strategy-detail').html(html);
+    });
+}
+
+function openEditStrategyModal() {
+    if (!currentEditStrategy) return;
+    
+    $.get('/api/strategy/' + currentEditStrategy, function(data) {
+        $('#edit-strategy-name-hidden').val(data.key || data.name);
+        $('#edit-strategy-name-visible').val(data.name || data.key || '');
+        $('#edit-strategy-desc').val(data.description || '');
+        
+        // 从第一条规则读取共用 action / position_ratio
+        var firstRule = data.rules && data.rules[0];
+        $('#edit-shared-action').val(firstRule ? (firstRule.action || 'buy') : 'buy');
+        $('#edit-shared-ratio').val(firstRule ? (firstRule.position_ratio || 0.5) : 0.5);
+        
+        $('#edit-rules-container').empty();
+        if (data.rules) {
+            data.rules.forEach(function(rule, index) {
+                var conn = rule.connector || 'OR';
+                var html = '<div class="card mb-2 rule-row" data-rule-id="' + index + '">';
+                html += _connectorBarHtml(conn, index === 0);
+                html += '<div class="card-body py-2">';
+                html += '<div class="mb-2"><input type="text" class="form-control edit-rule-condition" value="' + (rule.condition || '') + '" placeholder="条件"></div>';
+                html += '<div class="mb-1"><input type="text" class="form-control edit-rule-reason" value="' + (rule.reason || '') + '" placeholder="理由 (可选)"></div>';
+                html += '<button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="$(this).closest(\'.rule-row\').remove(); updateRuleConnectors(\'#edit-rules-container\')">删除</button>';
+                html += '</div></div>';
+                $('#edit-rules-container').append(html);
+            });
+        }
+        
+        // Load exclusion rules
+        $('#edit-exclusion-rules-container').empty();
+        if (data.exclusion_rules) {
+            data.exclusion_rules.forEach(function(rule, index) {
+                var conn = rule.connector || 'OR';
+                var html = '<div class="card mb-2 exc-rule-row border-warning" data-exc-id="' + index + '">';
+                html += _connectorBarHtml(conn, index === 0);
+                html += '<div class="card-body py-2">';
+                html += '<div class="mb-2"><input type="text" class="form-control edit-exc-condition" value="' + (rule.condition || '') + '" placeholder="排除条件"></div>';
+                html += '<div class="mb-1"><input type="text" class="form-control edit-exc-reason" value="' + (rule.reason || '') + '" placeholder="排除理由 (可选)"></div>';
+                html += '<button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="$(this).closest(\'.exc-rule-row\').remove(); updateRuleConnectors(\'#edit-exclusion-rules-container\')">删除</button>';
+                html += '</div></div>';
+                $('#edit-exclusion-rules-container').append(html);
+            });
+        }
+        
+        editStrategyModal.show();
+    });
+}
+
+function addRuleRow(connValue) {
+    var index = $('#edit-rules-container .rule-row').length;
+    var isFirst = index === 0;
+    var conn = connValue || 'AND';
+    var html = '<div class="card mb-2 rule-row" data-rule-id="' + index + '">';
+    html += _connectorBarHtml(conn, isFirst);
+    html += '<div class="card-body py-2">';
+    html += '<div class="mb-2"><input type="text" class="form-control edit-rule-condition" placeholder="条件"></div>';
+    html += '<div class="mb-1"><input type="text" class="form-control edit-rule-reason" placeholder="理由 (可选)"></div>';
+    html += '<button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="$(this).closest(\'.rule-row\').remove(); updateRuleConnectors(\'#edit-rules-container\')">删除</button>';
+    html += '</div></div>';
+    $('#edit-rules-container').append(html);
+}
+
+function addExclusionRuleRow(connValue) {
+    var index = $('#edit-exclusion-rules-container .exc-rule-row').length;
+    var isFirst = index === 0;
+    var conn = connValue || 'OR';
+    var html = '<div class="card mb-2 exc-rule-row border-warning" data-exc-id="' + index + '">';
+    html += _connectorBarHtml(conn, isFirst);
+    html += '<div class="card-body">';
+    html += '<div class="mb-2"><input type="text" class="form-control edit-exc-condition" placeholder="排除条件 (如: rsi_6 > 40 and rsi_6 < 60)"></div>';
+    html += '<div class="mb-2"><input type="text" class="form-control edit-exc-reason" placeholder="排除理由"></div>';
+    html += '<button type="button" class="btn btn-sm btn-danger" onclick="$(this).closest(\'.exc-rule-row\').remove(); updateRuleConnectors(\'#edit-exclusion-rules-container\')">删除</button>';
+    html += '</div></div>';
+    $('#edit-exclusion-rules-container').append(html);
+}
+
+function saveStrategyEdit() {
+    var name = $('#edit-strategy-name-hidden').val();
+    var desc = $('#edit-strategy-desc').val();
+    
+    // 读取共用操作设置
+    var sharedAction = $('#edit-shared-action').val() || 'buy';
+    var sharedRatio  = parseFloat($('#edit-shared-ratio').val()) || 0.5;
+
+    var rules = [];
+    $('#edit-rules-container .rule-row').each(function() {
+        rules.push({
+            condition: $(this).find('.edit-rule-condition').val(),
+            action: sharedAction,
+            position_ratio: sharedRatio,
+            reason: $(this).find('.edit-rule-reason').val(),
+            connector: $(this).find('.rule-connector-val').val() || 'OR'
+        });
+    });
+    
+    var exclusion_rules = [];
+    $('#edit-exclusion-rules-container .exc-rule-row').each(function() {
+        exclusion_rules.push({
+            condition: $(this).find('.edit-exc-condition').val(),
+            reason: $(this).find('.edit-exc-reason').val(),
+            connector: $(this).find('.rule-connector-val').val() || 'OR'
+        });
+    });
+    
+    $.ajax({
+        url: '/api/strategy/' + name + '/update',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({name: $('#edit-strategy-name-visible').val().trim() || undefined, description: desc, rules: rules, exclusion_rules: exclusion_rules}),
+        success: function(result) {
+            editStrategyModal.hide();
+            loadStrategies();
+            showStrategyDetail(name);
+            alert('策略已更新');
+        },
+        error: function(xhr) {
+            alert('更新失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        }
+    });
+}
+
+function deleteCurrentStrategy() {
+    if (!currentEditStrategy) return;
+    if (!confirm('确定要删除策略 ' + currentEditStrategy + ' 吗？')) return;
+    
+    $.ajax({
+        url: '/api/strategy/' + currentEditStrategy,
+        method: 'DELETE',
+        success: function(result) {
+            editStrategyModal.hide();
+            loadStrategies();
+            $('#strategy-detail').html('<p class="text-muted">请选择一个策略查看详情</p>');
+            alert('策略已删除');
+        },
+        error: function(xhr) {
+            alert('删除失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        }
+    });
+}
+
+// 调度器管理
+function runSchedulerNow() {
+    if (!confirm('确定要立即运行定时任务吗？')) return;
+    
+    $.ajax({
+        url: '/api/scheduler/run',
+        method: 'POST',
+        success: function(result) {
+            alert('任务已在后台启动');
+        },
+        error: function(xhr) {
+            alert('启动失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        }
+    });
+}
+
+function editSchedulerConfig() {
+    $.get('/api/scheduler/config', function(data) {
+        $('#scheduler-enabled').prop('checked', data.enabled);
+        $('#scheduler-times').val((data.afternoon_times || []).join(','));
+        
+        var selectedStocks = data.selected_stocks || [];
+        $('#scheduler-stocks option').each(function() {
+            $(this).prop('selected', selectedStocks.includes($(this).val()));
+        });
+        
+        var tasks = data.tasks || {};
+        $('#task-data').prop('checked', tasks.update_data);
+        $('#task-news').prop('checked', tasks.update_news);
+        $('#task-indicators').prop('checked', tasks.update_indicators);
+        $('#task-ai').prop('checked', tasks.ai_analysis);
+        $('#task-notify').prop('checked', tasks.send_notification);
+        
+        schedulerConfigModal.show();
+    });
+}
+
+function saveSchedulerConfig() {
+    var times = $('#scheduler-times').val().split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t; });
+    var selectedStocks = $('#scheduler-stocks').val() || [];
+    
+    var config = {
+        enabled: $('#scheduler-enabled').is(':checked'),
+        afternoon_times: times,
+        selected_stocks: selectedStocks,
+        tasks: {
+            update_data: $('#task-data').is(':checked'),
+            update_news: $('#task-news').is(':checked'),
+            update_indicators: $('#task-indicators').is(':checked'),
+            ai_analysis: $('#task-ai').is(':checked'),
+            send_notification: $('#task-notify').is(':checked')
+        }
+    };
+    
+    $.ajax({
+        url: '/api/scheduler/config',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(config),
+        success: function(result) {
+            schedulerConfigModal.hide();
+            loadSchedulerStatus();
+            alert('配置已保存');
+        },
+        error: function(xhr) {
+            alert('保存失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        }
+    });
+}
+
+// ============== 通知设置 ==============
+function loadNotificationStatus() {
+    $.get('/api/notification/status', function(data) {
+        if (data.wechat) {
+            var badge = data.wechat.enabled ? '<span class="badge bg-success">已配置</span>' : '<span class="badge bg-secondary">未配置</span>';
+            $('#wechat-status').html('状态: ' + badge);
+            if (data.wechat.token_configured) {
+                $('#pushplus-token').attr('placeholder', '已配置（输入新值可更新）');
+            }
+        }
+        if (data.email) {
+            var badge = data.email.enabled ? '<span class="badge bg-success">已配置</span>' : '<span class="badge bg-secondary">未配置</span>';
+            $('#email-status').html('状态: ' + badge);
+            if (data.email.smtp_host) $('#smtp-host').val(data.email.smtp_host);
+            if (data.email.receiver) $('#smtp-receiver').val(data.email.receiver);
+        }
+    });
+}
+
+function saveNotificationConfig() {
+    var cfg = {
+        smtp_host: $('#smtp-host').val(),
+        smtp_port: parseInt($('#smtp-port').val()) || 465,
+        sender: $('#smtp-sender').val(),
+        password: $('#smtp-password').val(),
+        receiver: $('#smtp-receiver').val(),
+        pushplus_token: $('#pushplus-token').val()
+    };
+    $.ajax({
+        url: '/api/notification/config',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(cfg),
+        success: function(data) {
+            alert(data.success ? '通知配置已保存' : ('保存失败: ' + (data.error || '')));
+            loadNotificationStatus();
+        },
+        error: function(xhr) { alert('保存失败'); }
+    });
+}
+
+function testNotification(channel) {
+    $.ajax({
+        url: '/api/notification/test',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({channel: channel}),
+        success: function(data) {
+            if (data.success) {
+                var results = data.results || {};
+                var msgs = [];
+                Object.keys(results).forEach(function(k) { msgs.push(k + ': ' + (results[k] ? '成功' : '失败')); });
+                alert('测试完成: ' + msgs.join(', '));
+            } else {
+                alert('测试失败: ' + (data.error || ''));
+            }
+        },
+        error: function(xhr) { alert('请求失败'); }
+    });
+}
+</script>
+{% endblock %}
