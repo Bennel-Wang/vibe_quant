@@ -1,0 +1,514 @@
+{% extends "base.html" %}
+{% block title %}策略适配 - 量化交易系统{% endblock %}
+
+{% block extra_css %}
+<style>
+.rank-1  { background-color: rgba(239,83,80,0.08) !important; }
+.rank-2  { background-color: rgba(239,83,80,0.04) !important; }
+.rank-3  { background-color: rgba(239,83,80,0.02) !important; }
+.badge-rank { font-size: 12px; }
+.result-positive { color: #ef5350; font-weight: 600; }
+.result-negative { color: #26a69a; font-weight: 600; }
+.result-zero     { color: #9e9e9e; }
+.best-card { border: 2px solid #ef5350; }
+#progress-section { display: none; }
+#result-section   { display: none; }
+.stock-name-cell  { max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>策略 <small class="text-muted fs-6">Strategy</small></h2>
+        <ul class="nav nav-tabs mt-3" id="strategy-tabs">
+            <li class="nav-item">
+                <a class="nav-link" href="/strategy">策略管理</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/strategy/alerts">策略提醒</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/backtest">策略回测</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/strategy/adapt">策略适配</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/strategy/multi_backtest">多策略回测</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <!-- 参数面板 -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">回测参数</h6></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">买入策略</label>
+                    <select class="form-select form-select-sm" id="adapt-buy-strategy">
+                        <option value="">— 不指定 —</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">卖出策略</label>
+                    <select class="form-select form-select-sm" id="adapt-sell-strategy">
+                        <option value="">— 不指定 —</option>
+                    </select>
+                </div>
+                <hr>
+                <div class="mb-3">
+                    <label class="form-label">开始日期</label>
+                    <input type="date" class="form-control form-control-sm" id="adapt-start-date">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">结束日期</label>
+                    <input type="date" class="form-control form-control-sm" id="adapt-end-date">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">初始资金（元）</label>
+                    <input type="number" class="form-control form-control-sm" id="adapt-capital" value="1000000" step="100000" min="10000">
+                </div>
+                <button class="btn btn-primary w-100" onclick="runStrategyAdapt()">
+                    <span id="adapt-spinner" class="spinner-border spinner-border-sm d-none me-1"></span>
+                    开始适配回测
+                </button>
+                <button class="btn btn-outline-secondary w-100 mt-2 d-none" id="adapt-cancel-btn" onclick="cancelAdapt()">取消</button>
+            </div>
+        </div>
+
+        <!-- 策略说明 -->
+        <div class="card mt-3" id="strategy-info-card" style="display:none!important">
+            <div class="card-header"><h6 class="mb-0">已选策略</h6></div>
+            <div class="card-body">
+                <div id="strategy-info-body" class="small text-muted"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="col-md-9">
+        <!-- 进度 -->
+        <div id="progress-section">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-semibold">正在回测…</span>
+                        <span id="progress-counter" class="text-muted small">0 / 0</span>
+                    </div>
+                    <div class="progress mb-2" style="height:10px">
+                        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated"
+                             role="progressbar" style="width:0%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted small" id="progress-current">准备中…</span>
+                        <span class="text-muted small" id="progress-elapsed"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最优股票卡片 -->
+        <div id="result-section">
+            <div class="card best-card mb-3" id="best-stock-card" style="display:none">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">🏆 最适合股票</h6>
+                    <span class="badge bg-danger" id="best-return-badge"></span>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col">
+                            <div class="fw-bold fs-5" id="best-name">—</div>
+                            <div class="text-muted small">股票名称</div>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold fs-5 result-positive" id="best-return">—</div>
+                            <div class="text-muted small">总收益</div>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold fs-5" id="best-annual">—</div>
+                            <div class="text-muted small">年化收益</div>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold fs-5" id="best-drawdown">—</div>
+                            <div class="text-muted small">最大回撤</div>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold fs-5" id="best-sharpe">—</div>
+                            <div class="text-muted small">夏普比率</div>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold fs-5" id="best-winrate">—</div>
+                            <div class="text-muted small">胜率</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 汇总统计 -->
+            <div class="row mb-3" id="summary-row" style="display:none">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body py-2">
+                            <div class="fw-bold" id="stat-total-stocks">—</div>
+                            <div class="text-muted small">回测股票数</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body py-2">
+                            <div class="fw-bold result-positive" id="stat-profitable">—</div>
+                            <div class="text-muted small">盈利股票数</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body py-2">
+                            <div class="fw-bold" id="stat-avg-return">—</div>
+                            <div class="text-muted small">平均收益</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body py-2">
+                            <div class="fw-bold" id="stat-elapsed">—</div>
+                            <div class="text-muted small">耗时</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 结果表格 -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">全部股票回测结果</h6>
+                    <div class="d-flex gap-2 align-items-center">
+                        <input type="text" class="form-control form-control-sm" id="result-filter"
+                               placeholder="筛选股票名/代码…" oninput="filterResultTable()" style="width:180px">
+                        <select class="form-select form-select-sm" id="result-min-trades" onchange="filterResultTable()" style="width:130px">
+                            <option value="0">全部（含0交易）</option>
+                            <option value="1" selected>有交易记录</option>
+                            <option value="3">≥3次交易</option>
+                            <option value="5">≥5次交易</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0" id="adapt-result-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width:40px">#</th>
+                                    <th>股票</th>
+                                    <th>代码</th>
+                                    <th class="text-end" style="cursor:pointer" onclick="sortTable('total_return_pct')">总收益% ↕</th>
+                                    <th class="text-end" style="cursor:pointer" onclick="sortTable('annual_return')">年化% ↕</th>
+                                    <th class="text-end" style="cursor:pointer" onclick="sortTable('max_drawdown_pct')">最大回撤% ↕</th>
+                                    <th class="text-end" style="cursor:pointer" onclick="sortTable('sharpe_ratio')">夏普 ↕</th>
+                                    <th class="text-end" style="cursor:pointer" onclick="sortTable('total_trades')">交易次数 ↕</th>
+                                    <th class="text-end" style="cursor:pointer" onclick="sortTable('win_rate')">胜率% ↕</th>
+                                    <th class="text-end" style="cursor:pointer" onclick="sortTable('profit_factor')">盈亏比 ↕</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adapt-result-tbody">
+                                <tr><td colspan="10" class="text-center text-muted py-4">点击"开始适配回测"查看结果</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var _adaptRunId = null;
+var _adaptSse = null;
+var _adaptResults = [];
+var _sortKey = 'total_return_pct';
+var _sortAsc = false;
+
+// ─── 初始化 ───
+$(function() {
+    var today = new Date();
+    var yearAgo = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000);
+    $('#adapt-end-date').val(today.toISOString().split('T')[0]);
+    $('#adapt-start-date').val(yearAgo.toISOString().split('T')[0]);
+
+    loadStrategies();
+});
+
+function loadStrategies() {
+    $.get('/api/strategies', function(strategies) {
+        var buySelect = $('#adapt-buy-strategy');
+        var sellSelect = $('#adapt-sell-strategy');
+        buySelect.empty().append('<option value="">— 不指定 —</option>');
+        sellSelect.empty().append('<option value="">— 不指定 —</option>');
+
+        var buyList = [], sellList = [], otherList = [];
+        strategies.forEach(function(s) {
+            if (s.name && s.name.endsWith('买入')) buyList.push(s);
+            else if (s.name && s.name.endsWith('卖出')) sellList.push(s);
+            else otherList.push(s);
+        });
+
+        // 买入选项
+        if (buyList.length) {
+            buySelect.append('<optgroup label="买入策略">');
+            buyList.forEach(function(s) {
+                buySelect.append('<option value="' + s.name + '">' + s.name + '</option>');
+            });
+        }
+        otherList.forEach(function(s) {
+            buySelect.append('<option value="' + s.name + '">' + s.name + '</option>');
+        });
+
+        // 卖出选项
+        if (sellList.length) {
+            sellSelect.append('<optgroup label="卖出策略">');
+            sellList.forEach(function(s) {
+                sellSelect.append('<option value="' + s.name + '">' + s.name + '</option>');
+            });
+        }
+        otherList.forEach(function(s) {
+            sellSelect.append('<option value="' + s.name + '">' + s.name + '</option>');
+        });
+
+        // 自动匹配：若买入/卖出策略成对出现，自动选中第一对
+        if (buyList.length > 0) buySelect.val(buyList[0].name);
+        if (sellList.length > 0) {
+            // 找与已选买入同前缀的卖出策略
+            var buyName = buySelect.val() || '';
+            var prefix = buyName.replace(/买入$/, '');
+            var matched = sellList.find(function(s) { return s.name.startsWith(prefix); });
+            sellSelect.val(matched ? matched.name : sellList[0].name);
+        }
+
+        updateStrategyInfo();
+    });
+}
+
+function updateStrategyInfo() {
+    var buy = $('#adapt-buy-strategy').val();
+    var sell = $('#adapt-sell-strategy').val();
+    if (!buy && !sell) { $('#strategy-info-card').hide(); return; }
+    var html = '';
+    if (buy) html += '<div><span class="badge bg-success me-1">买入</span>' + buy + '</div>';
+    if (sell) html += '<div class="mt-1"><span class="badge bg-danger me-1">卖出</span>' + sell + '</div>';
+    $('#strategy-info-body').html(html);
+    $('#strategy-info-card').show();
+}
+
+$('#adapt-buy-strategy, #adapt-sell-strategy').on('change', updateStrategyInfo);
+
+// ─── 运行 ───
+function runStrategyAdapt() {
+    var buy = $('#adapt-buy-strategy').val();
+    var sell = $('#adapt-sell-strategy').val();
+    if (!buy && !sell) { alert('请至少选择一个策略'); return; }
+
+    var startDate = $('#adapt-start-date').val().replace(/-/g, '');
+    var endDate = $('#adapt-end-date').val().replace(/-/g, '');
+    var capital = parseFloat($('#adapt-capital').val()) || 1000000;
+
+    // Reset UI
+    $('#adapt-spinner').removeClass('d-none');
+    $('#adapt-cancel-btn').removeClass('d-none');
+    $('#progress-section').show();
+    $('#result-section').hide();
+    $('#progress-bar').css('width', '0%');
+    $('#progress-current').text('启动中…');
+    $('#progress-counter').text('0 / ?');
+    $('#progress-elapsed').text('');
+    $('#adapt-result-tbody').html('<tr><td colspan="10" class="text-center text-muted py-3">计算中…</td></tr>');
+
+    $.ajax({
+        url: '/api/strategy/adapt/run',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            buy_strategy: buy,
+            sell_strategy: sell,
+            start_date: startDate,
+            end_date: endDate,
+            initial_capital: capital
+        }),
+        success: function(resp) {
+            _adaptRunId = resp.run_id;
+            startAdaptSse(_adaptRunId);
+        },
+        error: function(xhr) {
+            var msg = (xhr.responseJSON && xhr.responseJSON.error) || xhr.responseText || '未知错误';
+            alert('启动失败: ' + msg);
+            resetAdaptUI();
+        }
+    });
+}
+
+function startAdaptSse(runId) {
+    if (_adaptSse) { _adaptSse.close(); _adaptSse = null; }
+    _adaptSse = new EventSource('/api/strategy/adapt/progress?run_id=' + runId);
+    _adaptSse.onmessage = function(e) {
+        var info = JSON.parse(e.data);
+        var done = info.done || 0;
+        var total = info.total || 1;
+        var pct = total > 0 ? Math.round(done / total * 100) : 0;
+        $('#progress-bar').css('width', pct + '%');
+        $('#progress-counter').text(done + ' / ' + total);
+        $('#progress-current').text(info.current_stock || '');
+        if (info.elapsed) $('#progress-elapsed').text('已用时 ' + info.elapsed + 's');
+
+        if (info.status === 'done') {
+            _adaptSse.close(); _adaptSse = null;
+            loadAdaptResult(runId);
+        } else if (info.status === 'error') {
+            _adaptSse.close(); _adaptSse = null;
+            alert('回测过程中出现错误');
+            resetAdaptUI();
+        }
+    };
+    _adaptSse.onerror = function() {
+        _adaptSse.close(); _adaptSse = null;
+        // 可能已完成，直接尝试拉取结果
+        setTimeout(function() { loadAdaptResult(runId); }, 500);
+    };
+}
+
+function loadAdaptResult(runId) {
+    $.get('/api/strategy/adapt/result?run_id=' + runId, function(data) {
+        if (data.status === 'running') {
+            setTimeout(function() { loadAdaptResult(runId); }, 1000);
+            return;
+        }
+        resetAdaptUI();
+        renderAdaptResults(data);
+    }).fail(function() {
+        resetAdaptUI();
+        alert('获取结果失败，请重试');
+    });
+}
+
+function cancelAdapt() {
+    if (_adaptSse) { _adaptSse.close(); _adaptSse = null; }
+    resetAdaptUI();
+}
+
+function resetAdaptUI() {
+    $('#adapt-spinner').addClass('d-none');
+    $('#adapt-cancel-btn').addClass('d-none');
+    $('#progress-section').hide();
+}
+
+// ─── 渲染结果 ───
+function renderAdaptResults(data) {
+    _adaptResults = data.results || [];
+    var best = data.best;
+    var elapsed = data.elapsed || 0;
+
+    // 最优股票卡
+    if (best && best.total_return_pct != null) {
+        $('#best-name').text(best.name + ' (' + best.code + ')');
+        $('#best-return').text(fmtPct(best.total_return_pct));
+        $('#best-annual').text(fmtPct(best.annual_return)).removeClass('result-positive result-negative result-zero').addClass(colorClass(best.annual_return));
+        $('#best-drawdown').text(fmtPct(best.max_drawdown_pct)).removeClass('result-positive result-negative result-zero').addClass(colorClass(-best.max_drawdown_pct));
+        $('#best-sharpe').text(best.sharpe_ratio != null ? best.sharpe_ratio.toFixed(2) : '—');
+        $('#best-winrate').text(best.win_rate != null ? best.win_rate.toFixed(1) + '%' : '—');
+        $('#best-return-badge').text('总收益 ' + fmtPct(best.total_return_pct));
+        $('#best-stock-card').show();
+    } else {
+        $('#best-stock-card').hide();
+    }
+
+    // 汇总
+    var validResults = _adaptResults.filter(function(r) { return r.total_return_pct != null; });
+    var profitable = validResults.filter(function(r) { return r.total_return_pct > 0; }).length;
+    var avgReturn = validResults.length > 0
+        ? validResults.reduce(function(s, r) { return s + r.total_return_pct; }, 0) / validResults.length
+        : 0;
+    $('#stat-total-stocks').text(validResults.length + ' 只');
+    $('#stat-profitable').text(profitable + ' 只');
+    $('#stat-avg-return').text(fmtPct(avgReturn)).removeClass('result-positive result-negative result-zero').addClass(colorClass(avgReturn));
+    $('#stat-elapsed').text(elapsed + ' 秒');
+    $('#summary-row').show();
+
+    $('#result-section').show();
+    renderTable();
+}
+
+function renderTable() {
+    var keyword = ($('#result-filter').val() || '').toLowerCase();
+    var minTrades = parseInt($('#result-min-trades').val()) || 0;
+
+    var filtered = _adaptResults.filter(function(r) {
+        if (r.error && !r.total_return_pct) return false;
+        if (r.total_return_pct == null) return false;
+        if (keyword && !r.name.toLowerCase().includes(keyword) && !r.code.toLowerCase().includes(keyword)) return false;
+        if (minTrades > 0 && (r.total_trades || 0) < minTrades) return false;
+        return true;
+    });
+
+    // Sort
+    filtered.sort(function(a, b) {
+        var va = a[_sortKey], vb = b[_sortKey];
+        if (va == null) return 1;
+        if (vb == null) return -1;
+        return _sortAsc ? va - vb : vb - va;
+    });
+
+    var html = '';
+    filtered.forEach(function(r, idx) {
+        var rankClass = idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : ''));
+        var rankBadge = idx < 3
+            ? '<span class="badge badge-rank ' + ['bg-danger','bg-warning text-dark','bg-secondary'][idx] + '">' + (idx+1) + '</span>'
+            : (idx + 1);
+
+        html += '<tr class="' + rankClass + '">';
+        html += '<td>' + rankBadge + '</td>';
+        html += '<td class="stock-name-cell" title="' + r.name + '">' + r.name + '</td>';
+        html += '<td><span class="badge bg-light text-dark border">' + (r.code || r.full_code || '') + '</span></td>';
+        html += '<td class="text-end ' + colorClass(r.total_return_pct) + '">' + fmtPct(r.total_return_pct) + '</td>';
+        html += '<td class="text-end ' + colorClass(r.annual_return) + '">' + fmtPct(r.annual_return) + '</td>';
+        html += '<td class="text-end ' + colorClass(-Math.abs(r.max_drawdown_pct||0)) + '">' + fmtPct(r.max_drawdown_pct) + '</td>';
+        html += '<td class="text-end">' + (r.sharpe_ratio != null ? r.sharpe_ratio.toFixed(2) : '—') + '</td>';
+        html += '<td class="text-end">' + (r.total_trades != null ? r.total_trades : '—') + '</td>';
+        html += '<td class="text-end">' + (r.win_rate != null ? r.win_rate.toFixed(1) + '%' : '—') + '</td>';
+        html += '<td class="text-end">' + (r.profit_factor != null && r.profit_factor > 0 ? r.profit_factor.toFixed(2) : '—') + '</td>';
+        html += '</tr>';
+    });
+
+    if (!html) {
+        html = '<tr><td colspan="10" class="text-center text-muted py-3">无符合条件的结果</td></tr>';
+    }
+    $('#adapt-result-tbody').html(html);
+}
+
+function filterResultTable() { renderTable(); }
+
+function sortTable(key) {
+    if (_sortKey === key) { _sortAsc = !_sortAsc; }
+    else { _sortKey = key; _sortAsc = false; }
+    renderTable();
+}
+
+// ─── 工具函数 ───
+function fmtPct(v) {
+    if (v == null) return '—';
+    return (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+}
+
+function colorClass(v) {
+    if (v == null) return 'result-zero';
+    if (v > 0) return 'result-positive';
+    if (v < 0) return 'result-negative';
+    return 'result-zero';
+}
+</script>
+{% endblock %}

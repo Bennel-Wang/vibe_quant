@@ -2,40 +2,20 @@
   "中线超跌买入": {
     "name": "中线超跌买入",
     "description": "适合家具股这种利空已经被提前兑现的股票，要求大盘不能太差",
+    "max_position_ratio": 0.15,
     "rules": [
       {
-        "condition": "m_rsi6_pct100 < 85",
+        "condition": "w_rsi6_pct100 < 2",
         "action": "buy",
         "position_ratio": 0.05,
-        "reason": "月RSI百分位(100月) < 85",
-        "connector": "OR"
-      },
-      {
-        "condition": "w_rsi6_pct100 < 98",
-        "action": "buy",
-        "position_ratio": 0.05,
-        "reason": "周RSI百分位(100周) < 98，中期超跌",
+        "reason": "中期超跌",
         "connector": "AND"
       },
       {
-        "condition": "rsi6_pct100 < 90",
+        "condition": "rsi_6 < 20",
         "action": "buy",
         "position_ratio": 0.05,
-        "reason": "日RSI百分位(100日) < 90，短期超跌",
-        "connector": "AND"
-      },
-      {
-        "condition": "m_rsi6_pct100 < 80",
-        "action": "buy",
-        "position_ratio": 0.05,
-        "reason": "月RSI百分位(100月) < 80，长期低估",
-        "connector": "AND"
-      },
-      {
-        "condition": "rel_strength_5 > 0.0",
-        "action": "buy",
-        "position_ratio": 0.05,
-        "reason": "五日相对大盘超额收益>0",
+        "reason": "短期不太高，回调到相对低点",
         "connector": "AND"
       }
     ],
@@ -44,12 +24,20 @@
   "中线超跌卖出": {
     "name": "中线超跌卖出",
     "description": "",
+    "max_position_ratio": 1.0,
     "rules": [
       {
-        "condition": "w_rsi6_pct100 > 30",
+        "condition": "w_rsi6_pct100 > 90",
         "action": "sell",
-        "position_ratio": 0.05,
+        "position_ratio": 0.075,
         "reason": "股价回到正常位置，卖出",
+        "connector": "AND"
+      },
+      {
+        "condition": "rel_strength_5 < 0",
+        "action": "sell",
+        "position_ratio": 0.075,
+        "reason": "相对大盘走弱",
         "connector": "AND"
       }
     ],
@@ -58,6 +46,7 @@
   "RSI超卖反弹买入": {
     "name": "RSI超卖反弹买入",
     "description": "日线RSI深度超卖后出现反弹信号时买入，适合短线波段操作",
+    "max_position_ratio": 1.0,
     "rules": [
       {
         "condition": "rsi_6 < 20",
@@ -87,6 +76,7 @@
   "RSI超买卖出": {
     "name": "RSI超买卖出",
     "description": "日线RSI进入超买区域时分批卖出，锁定短线利润",
+    "max_position_ratio": 1.0,
     "rules": [
       {
         "condition": "rsi_6 > 80",
@@ -108,6 +98,7 @@
   "MACD金叉买入": {
     "name": "MACD金叉买入",
     "description": "MACD发生金叉且价格站上20日均线时买入，趋势跟踪策略",
+    "max_position_ratio": 1.0,
     "rules": [
       {
         "condition": "macd_histogram > 0 and macd > macd_signal and close > ma_20",
@@ -137,6 +128,7 @@
   "MACD死叉卖出": {
     "name": "MACD死叉卖出",
     "description": "MACD发生死叉时卖出，避免趋势反转损失",
+    "max_position_ratio": 1.0,
     "rules": [
       {
         "condition": "macd_histogram < 0 and macd < macd_signal",
@@ -158,6 +150,7 @@
   "均线多头买入": {
     "name": "均线多头买入",
     "description": "5日、20日、60日均线多头排列，价格回调到5日均线附近时买入",
+    "max_position_ratio": 1.0,
     "rules": [
       {
         "condition": "ma_5 > ma_20 and ma_20 > ma_60 and close > ma_5 * 0.98",
@@ -187,6 +180,7 @@
   "均线空头卖出": {
     "name": "均线空头卖出",
     "description": "均线由多头转空头排列时减仓或清仓",
+    "max_position_ratio": 1.0,
     "rules": [
       {
         "condition": "ma_5 < ma_20 and close < ma_20",
@@ -208,6 +202,7 @@
   "布林带下轨买入": {
     "name": "布林带下轨买入",
     "description": "价格触及或跌破布林带下轨时买入，均值回归策略",
+    "max_position_ratio": 1.0,
     "rules": [
       {
         "condition": "close <= boll_lower * 1.01",
@@ -237,6 +232,7 @@
   "布林带上轨卖出": {
     "name": "布林带上轨卖出",
     "description": "价格触及或突破布林带上轨时卖出，锁定均值回归利润",
+    "max_position_ratio": 1.0,
     "rules": [
       {
         "condition": "close >= boll_upper * 0.99",
@@ -258,6 +254,7 @@
   "KDJ超卖买入": {
     "name": "KDJ超卖买入",
     "description": "KDJ指标J值进入超卖区域并出现底背离时买入",
+    "max_position_ratio": 1.0,
     "rules": [
       {
         "condition": "kdj_j < 10",
@@ -279,6 +276,7 @@
   "KDJ超买卖出": {
     "name": "KDJ超买卖出",
     "description": "KDJ指标进入超买区域时减仓",
+    "max_position_ratio": 1.0,
     "rules": [
       {
         "condition": "kdj_j > 90",
@@ -300,6 +298,7 @@
   "低PE价值买入": {
     "name": "低PE价值买入",
     "description": "市盈率处于历史低位且技术面企稳时买入，价值+技术双重验证",
+    "max_position_ratio": 1.0,
     "rules": [
       {
         "condition": "pettm_pct10y < 20 and rsi6_pct100 < 40",
@@ -329,6 +328,7 @@
   "高PE高位卖出": {
     "name": "高PE高位卖出",
     "description": "市盈率处于历史高位且技术面出现顶部信号时减仓",
+    "max_position_ratio": 1.0,
     "rules": [
       {
         "condition": "pettm_pct10y > 80 and rsi6_pct100 > 70",

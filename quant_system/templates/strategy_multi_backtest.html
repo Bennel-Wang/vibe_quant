@@ -1,0 +1,525 @@
+{% extends "base.html" %}
+{% block title %}多策略回测 - 量化交易系统{% endblock %}
+
+{% block extra_css %}
+<style>
+.pair-row td { vertical-align: middle; }
+.result-positive { color: #ef5350; font-weight: 600; }
+.result-negative { color: #26a69a; font-weight: 600; }
+.result-zero     { color: #9e9e9e; }
+.combined-card   { border: 2px solid #1976d2; }
+#progress-section { display: none; }
+#result-section   { display: none; }
+.alloc-sum-warn   { color: #e65100; font-weight: 600; }
+.alloc-sum-ok     { color: #2e7d32; font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>策略 <small class="text-muted fs-6">Strategy</small></h2>
+        <ul class="nav nav-tabs mt-3" id="strategy-tabs">
+            <li class="nav-item">
+                <a class="nav-link" href="/strategy">策略管理</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/strategy/alerts">策略提醒</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/backtest">策略回测</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/strategy/adapt">策略适配</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/strategy/multi_backtest">多策略回测</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <!-- 左侧控制面板 -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">回测参数</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">开始日期</label>
+                    <input type="date" class="form-control form-control-sm" id="mb-start-date">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">结束日期</label>
+                    <input type="date" class="form-control form-control-sm" id="mb-end-date">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">总资金（元）</label>
+                    <input type="number" class="form-control form-control-sm" id="mb-capital" value="1000000" step="100000" min="10000">
+                </div>
+                <button class="btn btn-primary w-100" onclick="runMultiBacktest()">
+                    <span id="mb-spinner" class="spinner-border spinner-border-sm d-none me-1"></span>
+                    开始回测
+                </button>
+                <button class="btn btn-outline-secondary w-100 mt-2 d-none" id="mb-cancel-btn" onclick="cancelMultiBt()">取消</button>
+            </div>
+        </div>
+
+        <!-- 分配说明 -->
+        <div class="card mt-3">
+            <div class="card-header"><h6 class="mb-0">💡 说明</h6></div>
+            <div class="card-body small text-muted">
+                <ul class="mb-0 ps-3">
+                    <li>每行配置一对<strong>买入+卖出策略</strong>与对应<strong>股票</strong></li>
+                    <li>各行按<strong>资金分配%</strong>从总资金中分配独立资本</li>
+                    <li>各组合独立运行，买入/卖出由对应策略各自触发</li>
+                    <li>最终显示<strong>组合权益曲线</strong>及各对明细</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧主内容 -->
+    <div class="col-md-8">
+        <!-- 策略-股票配对表 -->
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">策略-股票配对</h6>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted small">资金分配合计：<span id="alloc-sum" class="alloc-sum-ok">0%</span></span>
+                    <button class="btn btn-sm btn-outline-success" onclick="addPairRow()">＋ 添加一行</button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0" id="pairs-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:32px">#</th>
+                                <th>买入策略</th>
+                                <th>卖出策略</th>
+                                <th>股票</th>
+                                <th style="width:90px">分配%</th>
+                                <th style="width:40px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pairs-tbody">
+                            <!-- rows injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 进度 -->
+        <div id="progress-section">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-semibold">正在回测…</span>
+                        <span id="mb-prog-counter" class="text-muted small">0 / 0</span>
+                    </div>
+                    <div class="progress mb-2" style="height:10px">
+                        <div id="mb-prog-bar" class="progress-bar progress-bar-striped progress-bar-animated" style="width:0%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted small" id="mb-prog-current">准备中…</span>
+                        <span class="text-muted small" id="mb-prog-elapsed"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果区 -->
+        <div id="result-section">
+            <!-- 组合汇总 -->
+            <div class="card combined-card mb-3">
+                <div class="card-header"><h6 class="mb-0">📊 组合汇总</h6></div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col">
+                            <div class="fw-bold fs-5" id="comb-return">—</div>
+                            <div class="text-muted small">组合总收益</div>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold fs-5" id="comb-annual">—</div>
+                            <div class="text-muted small">年化收益</div>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold fs-5" id="comb-maxdd">—</div>
+                            <div class="text-muted small">最大回撤</div>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold fs-5" id="comb-elapsed">—</div>
+                            <div class="text-muted small">耗时</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 组合权益图 -->
+            <div class="card mb-3">
+                <div class="card-header"><h6 class="mb-0">组合权益曲线</h6></div>
+                <div class="card-body p-1">
+                    <div id="combined-equity-chart" style="height:280px"></div>
+                </div>
+            </div>
+
+            <!-- 各对明细 -->
+            <div class="card">
+                <div class="card-header"><h6 class="mb-0">各策略对明细</h6></div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>买入策略</th>
+                                    <th>卖出策略</th>
+                                    <th>股票</th>
+                                    <th class="text-end">分配%</th>
+                                    <th class="text-end">本金</th>
+                                    <th class="text-end">总收益%</th>
+                                    <th class="text-end">年化%</th>
+                                    <th class="text-end">回撤%</th>
+                                    <th class="text-end">夏普</th>
+                                    <th class="text-end">交易</th>
+                                    <th class="text-end">胜率%</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-tbody">
+                                <tr><td colspan="12" class="text-center text-muted py-3">回测后显示明细</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var _mbRunId = null;
+var _mbSse = null;
+var _allStrategies = [];
+var _allStocks = [];
+var _buyList = [], _sellList = [], _otherList = [];
+var _pairCounter = 0;
+
+// ─── 初始化 ───
+$(function() {
+    var today = new Date();
+    var yearAgo = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000);
+    $('#mb-end-date').val(today.toISOString().split('T')[0]);
+    $('#mb-start-date').val(yearAgo.toISOString().split('T')[0]);
+
+    loadData();
+});
+
+function loadData() {
+    // Load strategies and stocks in parallel
+    $.get('/api/strategies', function(strategies) {
+        _allStrategies = strategies;
+        strategies.forEach(function(s) {
+            if (s.name && s.name.endsWith('买入')) _buyList.push(s);
+            else if (s.name && s.name.endsWith('卖出')) _sellList.push(s);
+            else _otherList.push(s);
+        });
+        $.get('/api/stocks', function(stocks) {
+            _allStocks = stocks.filter(function(s) { return s.type === 'stock'; });
+            // Add default rows from paired strategies
+            addDefaultRows();
+        });
+    });
+}
+
+function addDefaultRows() {
+    // Add rows for each paired buy/sell strategy
+    var n = Math.max(_buyList.length, _sellList.length, 1);
+    for (var i = 0; i < n; i++) {
+        var buy = _buyList[i] ? _buyList[i].name : '';
+        var sell = _sellList[i] ? _sellList[i].name : '';
+        var stock = _allStocks[i % _allStocks.length] ? _allStocks[i % _allStocks.length].full_code : '';
+        addPairRow(buy, sell, stock, Math.floor(100 / n));
+    }
+    if (n === 0) addPairRow();
+    updateAllocSum();
+}
+
+function makeBuyOptions(selected) {
+    var html = '<option value="">— 不指定 —</option>';
+    _buyList.forEach(function(s) {
+        html += '<option value="' + esc(s.name) + '"' + (s.name === selected ? ' selected' : '') + '>' + esc(s.name) + '</option>';
+    });
+    _otherList.forEach(function(s) {
+        html += '<option value="' + esc(s.name) + '"' + (s.name === selected ? ' selected' : '') + '>' + esc(s.name) + '</option>';
+    });
+    return html;
+}
+
+function makeSellOptions(selected) {
+    var html = '<option value="">— 不指定 —</option>';
+    _sellList.forEach(function(s) {
+        html += '<option value="' + esc(s.name) + '"' + (s.name === selected ? ' selected' : '') + '>' + esc(s.name) + '</option>';
+    });
+    _otherList.forEach(function(s) {
+        html += '<option value="' + esc(s.name) + '"' + (s.name === selected ? ' selected' : '') + '>' + esc(s.name) + '</option>';
+    });
+    return html;
+}
+
+function makeStockOptions(selected) {
+    var html = '<option value="">— 选择股票 —</option>';
+    _allStocks.forEach(function(s) {
+        var val = s.full_code || s.code;
+        html += '<option value="' + esc(val) + '"' + (val === selected ? ' selected' : '') + '>' + esc(s.name) + '(' + s.code + ')</option>';
+    });
+    return html;
+}
+
+function addPairRow(buyName, sellName, stockCode, allocPct) {
+    _pairCounter++;
+    var idx = _pairCounter;
+    buyName = buyName || '';
+    sellName = sellName || '';
+    stockCode = stockCode || '';
+    allocPct = allocPct != null ? allocPct : 25;
+
+    var row = '<tr class="pair-row" data-idx="' + idx + '">' +
+        '<td><span class="text-muted small">' + $('#pairs-tbody tr').length + 1 + '</span></td>' +
+        '<td><select class="form-select form-select-sm buy-select" onchange="updateAllocSum()">' + makeBuyOptions(buyName) + '</select></td>' +
+        '<td><select class="form-select form-select-sm sell-select" onchange="updateAllocSum()">' + makeSellOptions(sellName) + '</select></td>' +
+        '<td><select class="form-select form-select-sm stock-select">' + makeStockOptions(stockCode) + '</select></td>' +
+        '<td><input type="number" class="form-control form-control-sm alloc-input" value="' + allocPct + '" min="1" max="100" step="1" onchange="updateAllocSum()"></td>' +
+        '<td><button class="btn btn-sm btn-outline-danger" onclick="removePairRow(this)">✕</button></td>' +
+        '</tr>';
+    $('#pairs-tbody').append(row);
+    renumberRows();
+    updateAllocSum();
+}
+
+function removePairRow(btn) {
+    $(btn).closest('tr').remove();
+    renumberRows();
+    updateAllocSum();
+}
+
+function renumberRows() {
+    $('#pairs-tbody tr').each(function(i, tr) {
+        $(tr).find('td:first span').text(i + 1);
+    });
+}
+
+function updateAllocSum() {
+    var sum = 0;
+    $('.alloc-input').each(function() { sum += parseFloat($(this).val()) || 0; });
+    var el = $('#alloc-sum');
+    el.text(sum + '%');
+    if (sum > 100) {
+        el.removeClass('alloc-sum-ok').addClass('alloc-sum-warn');
+    } else {
+        el.removeClass('alloc-sum-warn').addClass('alloc-sum-ok');
+    }
+}
+
+// ─── 收集配对数据 ───
+function collectPairs() {
+    var pairs = [];
+    $('#pairs-tbody tr').each(function() {
+        var buy = $(this).find('.buy-select').val();
+        var sell = $(this).find('.sell-select').val();
+        var stock = $(this).find('.stock-select').val();
+        var alloc = parseFloat($(this).find('.alloc-input').val()) || 10;
+        pairs.push({ buy_strategy: buy, sell_strategy: sell, stock_code: stock, allocation: alloc });
+    });
+    return pairs;
+}
+
+// ─── 运行 ───
+function runMultiBacktest() {
+    var pairs = collectPairs();
+    var validPairs = pairs.filter(function(p) { return p.stock_code && (p.buy_strategy || p.sell_strategy); });
+    if (validPairs.length === 0) {
+        alert('请至少填写一行有效的策略-股票配对（需选择股票和至少一个策略）');
+        return;
+    }
+
+    var startDate = $('#mb-start-date').val().replace(/-/g, '');
+    var endDate = $('#mb-end-date').val().replace(/-/g, '');
+    var capital = parseFloat($('#mb-capital').val()) || 1000000;
+
+    $('#mb-spinner').removeClass('d-none');
+    $('#mb-cancel-btn').removeClass('d-none');
+    $('#progress-section').show();
+    $('#result-section').hide();
+    $('#mb-prog-bar').css('width', '0%');
+    $('#mb-prog-current').text('启动中…');
+    $('#mb-prog-counter').text('0 / ' + validPairs.length);
+
+    $.ajax({
+        url: '/api/strategy/multi_backtest/run',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            pairs: validPairs,
+            start_date: startDate,
+            end_date: endDate,
+            total_capital: capital
+        }),
+        success: function(resp) {
+            _mbRunId = resp.run_id;
+            startMbSse(_mbRunId);
+        },
+        error: function(xhr) {
+            var msg = (xhr.responseJSON && xhr.responseJSON.error) || xhr.responseText || '未知错误';
+            alert('启动失败: ' + msg);
+            resetMbUI();
+        }
+    });
+}
+
+function startMbSse(runId) {
+    if (_mbSse) { _mbSse.close(); _mbSse = null; }
+    _mbSse = new EventSource('/api/strategy/multi_backtest/progress?run_id=' + runId);
+    _mbSse.onmessage = function(e) {
+        var info = JSON.parse(e.data);
+        var done = info.done || 0;
+        var total = info.total || 1;
+        var pct = total > 0 ? Math.round(done / total * 100) : 0;
+        $('#mb-prog-bar').css('width', pct + '%');
+        $('#mb-prog-counter').text(done + ' / ' + total);
+        $('#mb-prog-current').text(info.current || '');
+        if (info.elapsed) $('#mb-prog-elapsed').text('已用时 ' + info.elapsed + 's');
+
+        if (info.status === 'done') {
+            _mbSse.close(); _mbSse = null;
+            loadMbResult(runId);
+        } else if (info.status === 'error') {
+            _mbSse.close(); _mbSse = null;
+            alert('回测过程中出现错误');
+            resetMbUI();
+        }
+    };
+    _mbSse.onerror = function() {
+        _mbSse.close(); _mbSse = null;
+        setTimeout(function() { loadMbResult(runId); }, 500);
+    };
+}
+
+function loadMbResult(runId) {
+    $.get('/api/strategy/multi_backtest/result?run_id=' + runId, function(data) {
+        if (data.status === 'running') {
+            setTimeout(function() { loadMbResult(runId); }, 1000);
+            return;
+        }
+        resetMbUI();
+        renderMbResults(data);
+    }).fail(function() {
+        resetMbUI();
+        alert('获取结果失败，请重试');
+    });
+}
+
+function cancelMultiBt() {
+    if (_mbSse) { _mbSse.close(); _mbSse = null; }
+    resetMbUI();
+}
+
+function resetMbUI() {
+    $('#mb-spinner').addClass('d-none');
+    $('#mb-cancel-btn').addClass('d-none');
+    $('#progress-section').hide();
+}
+
+// ─── 渲染结果 ───
+function renderMbResults(data) {
+    var pairs = data.pair_results || [];
+    var ec = data.combined_equity_curve || [];
+    var elapsed = data.elapsed || 0;
+
+    // 组合汇总
+    $('#comb-return')
+        .text(data.combined_return_pct != null ? fmtPct(data.combined_return_pct) : '—')
+        .removeClass('result-positive result-negative result-zero')
+        .addClass(colorClass(data.combined_return_pct));
+    $('#comb-annual')
+        .text(data.combined_annual != null ? fmtPct(data.combined_annual) : '—')
+        .removeClass('result-positive result-negative result-zero')
+        .addClass(colorClass(data.combined_annual));
+    $('#comb-maxdd')
+        .text(data.combined_max_dd != null ? fmtPct(data.combined_max_dd) : '—')
+        .removeClass('result-positive result-negative result-zero')
+        .addClass(colorClass(-Math.abs(data.combined_max_dd || 0)));
+    $('#comb-elapsed').text(elapsed + ' 秒');
+
+    // 权益曲线图
+    if (ec.length > 0) {
+        var dates = ec.map(function(r) { return r.date; });
+        var equities = ec.map(function(r) { return r.equity; });
+        var trace = {
+            x: dates, y: equities, type: 'scatter', mode: 'lines',
+            name: '组合权益',
+            line: { color: '#1976d2', width: 2 },
+            fill: 'tozeroy', fillcolor: 'rgba(25,118,210,0.08)'
+        };
+        var layout = {
+            margin: { t: 10, r: 20, b: 40, l: 60 },
+            xaxis: { title: '', type: 'date' },
+            yaxis: { title: '组合净值（元）' },
+            hovermode: 'x unified',
+            showlegend: false,
+            paper_bgcolor: 'transparent',
+            plot_bgcolor: 'transparent'
+        };
+        Plotly.newPlot('combined-equity-chart', [trace], layout, { responsive: true, displayModeBar: false });
+    }
+
+    // 各对明细
+    var html = '';
+    pairs.forEach(function(p, i) {
+        var hasError = !!p.error;
+        html += '<tr>';
+        html += '<td>' + (i + 1) + '</td>';
+        html += '<td><span class="badge bg-success bg-opacity-75 text-white">' + esc(p.buy_strategy || '—') + '</span></td>';
+        html += '<td><span class="badge bg-danger bg-opacity-75 text-white">' + esc(p.sell_strategy || '—') + '</span></td>';
+        html += '<td>' + esc(p.stock_name || p.stock_code || '—') + '</td>';
+        html += '<td class="text-end">' + (p.allocation_pct != null ? p.allocation_pct + '%' : '—') + '</td>';
+        html += '<td class="text-end">' + (p.pair_capital != null ? '¥' + Math.round(p.pair_capital).toLocaleString() : '—') + '</td>';
+        if (hasError) {
+            html += '<td colspan="6" class="text-center text-muted small">' + esc(p.error) + '</td>';
+        } else {
+            html += '<td class="text-end ' + colorClass(p.total_return_pct) + '">' + fmtPct(p.total_return_pct) + '</td>';
+            html += '<td class="text-end ' + colorClass(p.annual_return) + '">' + fmtPct(p.annual_return) + '</td>';
+            html += '<td class="text-end ' + colorClass(-Math.abs(p.max_drawdown_pct || 0)) + '">' + fmtPct(p.max_drawdown_pct) + '</td>';
+            html += '<td class="text-end">' + (p.sharpe_ratio != null ? p.sharpe_ratio.toFixed(2) : '—') + '</td>';
+            html += '<td class="text-end">' + (p.total_trades != null ? p.total_trades : '—') + '</td>';
+            html += '<td class="text-end">' + (p.win_rate != null ? p.win_rate.toFixed(1) + '%' : '—') + '</td>';
+        }
+        html += '</tr>';
+    });
+    if (!html) html = '<tr><td colspan="12" class="text-center text-muted py-3">无结果</td></tr>';
+    $('#detail-tbody').html(html);
+
+    $('#result-section').show();
+}
+
+// ─── 工具函数 ───
+function fmtPct(v) {
+    if (v == null) return '—';
+    return (v >= 0 ? '+' : '') + parseFloat(v).toFixed(2) + '%';
+}
+function colorClass(v) {
+    if (v == null) return 'result-zero';
+    if (v > 0) return 'result-positive';
+    if (v < 0) return 'result-negative';
+    return 'result-zero';
+}
+function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+{% endblock %}

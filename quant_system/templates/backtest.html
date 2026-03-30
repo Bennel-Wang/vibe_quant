@@ -5,7 +5,24 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h2>策略回测</h2>
+        <h2>策略 <small class="text-muted fs-6">Strategy</small></h2>
+        <ul class="nav nav-tabs mt-3" id="strategy-tabs">
+            <li class="nav-item">
+                <a class="nav-link" href="/strategy">策略管理</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/strategy/alerts">策略提醒</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/backtest">策略回测</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/strategy/adapt">策略适配</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/strategy/multi_backtest">多策略回测</a>
+            </li>
+        </ul>
     </div>
 </div>
 
@@ -61,7 +78,7 @@
                 <div id="backtest-results">
                     <p class="text-muted text-center">请设置回测参数并点击"开始回测"</p>
                 </div>
-                <div id="equity-chart" style="height: 400px; display: none;"></div>
+                <div id="equity-chart" style="height: 800px; display: none;"></div>
             </div>
         </div>
     </div>
@@ -163,7 +180,11 @@ function displayResults(result){
         html += '<tr><td>初始资金</td><td>¥'+(result.initial_capital!=null?Number(result.initial_capital).toLocaleString():'-')+'</td></tr>';
         html += '<tr><td>最终资金</td><td>¥'+(result.final_capital!=null?Number(result.final_capital).toLocaleString():'-')+'</td></tr>';
         var total_pct = (result.total_return_pct!=null?Number(result.total_return_pct):0);
-        html += '<tr><td>总收益</td><td class="'+(total_pct>=0?'positive':'negative')+'">'+(result.total_return_pct!=null?Number(result.total_return_pct).toFixed(2)+'%':'-')+'</td></tr>';
+        html += '<tr><td>总收益（总资金基准）</td><td class="'+(total_pct>=0?'positive':'negative')+'">'+(result.total_return_pct!=null?Number(result.total_return_pct).toFixed(2)+'%':'-')+'</td></tr>';
+        var dep_pct = (result.deployed_return_pct!=null?Number(result.deployed_return_pct):total_pct);
+        var max_pos_pct = (result.max_position_ratio!=null?Math.round(Number(result.max_position_ratio)*100):100);
+        html += '<tr><td>最大仓位收益（上限'+max_pos_pct+'%资金）</td><td class="'+(dep_pct>=0?'positive':'negative')+'">'+dep_pct.toFixed(2)+'%</td></tr>';
+        html += '<tr id="market-beat-row"><td>跑赢同期大盘</td><td class="text-muted">计算中...</td></tr>';
         html += '<tr><td>年化收益</td><td>'+(fmtNum(result.annual_return,2)!='-'?fmtNum(result.annual_return,2)+'%':'-')+'</td></tr>';
         html += '<tr><td>夏普比率</td><td>'+(fmtNum(result.sharpe_ratio,2)!='-'?fmtNum(result.sharpe_ratio,2):'-')+'</td></tr>';
         html += '</table></div>';
@@ -174,6 +195,10 @@ function displayResults(result){
         html += '<tr><td>总交易次数</td><td>'+(result.total_trades!=null?result.total_trades:'-')+'</td></tr>';
         html += '<tr><td>胜率</td><td>'+(fmtNum(result.win_rate,2)!='-'?fmtNum(result.win_rate,2)+'%':'-')+'</td></tr>';
         html += '<tr><td>盈亏比</td><td>'+(fmtNum(result.profit_factor,2)!='-'?fmtNum(result.profit_factor,2):'-')+'</td></tr>';
+        // 加权平均资金持有率
+        var wcpd = result.weighted_capital_per_day;
+        var wcpdStr = (wcpd != null) ? Number(wcpd).toLocaleString('zh-CN', {maximumFractionDigits:2}) + ' 元/天' : '-';
+        html += '<tr><td>平均资金持有时间</td><td>' + wcpdStr + '</td></tr>';
         html += '</table></div></div>';
 
         if (result.trades && result.trades.length>0){
@@ -199,17 +224,34 @@ function displayResults(result){
     }catch(e){ console.error('displayResults error', e); $('#backtest-results').html('<p class="text-danger text-center">显示结果失败</p>'); }
 }
 
+function loadMarketBeat(code, startDate, endDate, strategyReturnPct) {
+    // startDate/endDate in YYYYMMDD or YYYY-MM-DD
+    var params = '?code=' + encodeURIComponent(code) +
+                 '&start_date=' + encodeURIComponent(startDate) +
+                 '&end_date=' + encodeURIComponent(endDate);
+    $.get('/api/backtest/market_return' + params, function(d) {
+        var $cell = $('#market-beat-row td:last');
+        if (d.error) { $cell.text('-'); return; }
+        var beat = strategyReturnPct - d.index_return_pct;
+        var sign = beat >= 0 ? '+' : '';
+        var cls  = beat >= 0 ? 'positive' : 'negative';
+        $cell.removeClass('text-muted').addClass(cls)
+             .html(sign + beat.toFixed(2) + '% <small class="text-muted">（' + d.index_name + ' ' +
+                   (d.index_return_pct >= 0 ? '+' : '') + d.index_return_pct.toFixed(2) + '%）</small>');
+    }).fail(function() { $('#market-beat-row td:last').text('-'); });
+}
+
+
 function loadEquityChart(data, run_id){
     try{
         $('#equity-chart').show();
         var payload = data || {};
         if (run_id) payload.run_id = run_id;
         $.ajax({url:'/api/backtest/chart',method:'POST',contentType:'application/json',data:JSON.stringify(payload),success:function(chartData){ try{ if (!chartData.error){
-                    // Ensure y-axis label for cumulative returns
                     if (chartData.layout) {
                         var ly = chartData.layout;
-                        if (ly.yaxis2) { ly.yaxis2.title = '累计收益(%)'; }
-                        else if (ly.yaxis) { ly.yaxis.title = '累计收益(%)'; }
+                        ly.height = 800;
+                        if (ly.yaxis2) { ly.yaxis2.title = { text: '累计收益(%)' }; }
                     }
                     Plotly.newPlot('equity-chart', chartData.data, chartData.layout); } else { console.warn('chart error', chartData.error); $('#equity-chart').html('<p class="text-danger">图表数据错误</p>'); } }catch(e){ console.error('绘制图表失败', e); } }, error:function(){ console.warn('获取回测图表失败'); $('#equity-chart').html('<p class="text-danger">获取图表失败</p>'); }});
     }catch(e){ console.error('loadEquityChart error', e); }
@@ -236,11 +278,11 @@ $(function(){
                 if (!run_id){ $('#backtest-results').html('<p class="text-danger text-center">无法获取 run_id</p>'); return; }
                 $('#backtest-results').html('<div id="bt-progress">进度: <span id="bt-progress-text">0%</span> (<span id="bt-eta">-</span>)</div><div class="progress"><div id="bt-progress-bar" class="progress-bar" role="progressbar" style="width:0%"></div></div>');
                 var es = new EventSource('/api/backtest/progress?run_id='+encodeURIComponent(run_id));
-                es.onmessage = function(e){ try{ var info = JSON.parse(e.data); if (info.total && info.total>0){ var pct=Math.round((info.processed/info.total)*100); $('#bt-progress-text').text(pct+'%'); $('#bt-progress-bar').css('width', pct+'%'); } if (info.eta!=null && info.eta!=undefined) $('#bt-eta').text('ETA '+Math.round(info.eta)+'s'); if (info.status==='done' || info.status==='error'){ es.close(); $.get('/api/backtest/result?run_id='+encodeURIComponent(run_id), function(res){ if (res && res.status==='done' && res.result){ displayResults(res.result); loadEquityChart(data, run_id);} else if (res && res.status==='error'){ $('#backtest-results').html('<p class="text-danger text-center">回测出错: '+(res.error||'未知错误')+'</p>'); } else { $('#backtest-results').html('<p class="text-danger text-center">回测结果不可用</p>'); } }); } }catch(err){ console.error('进度解析失败', err, e.data);} };
+                es.onmessage = function(e){ try{ var info = JSON.parse(e.data); if (info.total && info.total>0){ var pct=Math.round((info.processed/info.total)*100); $('#bt-progress-text').text(pct+'%'); $('#bt-progress-bar').css('width', pct+'%'); } if (info.eta!=null && info.eta!=undefined) $('#bt-eta').text('ETA '+Math.round(info.eta)+'s'); if (info.status==='done' || info.status==='error'){ es.close(); $.get('/api/backtest/result?run_id='+encodeURIComponent(run_id), function(res){ if (res && res.status==='done' && res.result){ displayResults(res.result); loadEquityChart(data, run_id); loadMarketBeat(data.code, data.start_date, data.end_date, Number(res.result.total_return_pct||0));} else if (res && res.status==='error'){ $('#backtest-results').html('<p class="text-danger text-center">回测出错: '+(res.error||'未知错误')+'</p>'); } else { $('#backtest-results').html('<p class="text-danger text-center">回测结果不可用</p>'); } }); } }catch(err){ console.error('进度解析失败', err, e.data);} };
                 es.onerror=function(err){ console.error('SSE错误', err); };
             }else{
                 // 兼容旧行为：同步返回结果
-                try{ displayResults(resp); loadEquityChart(data);}catch(e){ $('#backtest-results').html('<p class="text-danger text-center">回测返回数据格式不正确</p>'); }
+                try{ displayResults(resp); loadEquityChart(data); loadMarketBeat(data.code, data.start_date, data.end_date, Number(resp.total_return_pct||0));}catch(e){ $('#backtest-results').html('<p class="text-danger text-center">回测返回数据格式不正确</p>'); }
             }
         }, error:function(xhr){ var error = xhr.responseJSON?xhr.responseJSON.error:'回测提交失败'; $('#backtest-results').html('<p class="text-danger text-center">'+error+'</p>'); }});
     });

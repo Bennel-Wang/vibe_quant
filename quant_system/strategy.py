@@ -556,6 +556,22 @@ class StrategyParser:
 KDJ_J超卖:<20 | KDJ_J超买:>80 | 布林下轨:boll_position<0.2 | 量比放量:volume_ratio>2
 大盘乐观:overall_score>40 | 大盘悲观:overall_score<-40
 
+=== 趋势结构与波浪形态翻译指南 ===
+"多头排列 / 均线向上排列 / 趋势向上": ma_5 > ma_20 and ma_20 > ma_60
+"一浪比一浪高 / 向上趋势形成": ma_5 > ma_20 and ma_20 > ma_60（等同多头排列）
+"回调不破前期高点 / 回调不破支撑": close > ma_20（价格在20均线之上）
+"突破点买入 / 价格突破": boll_position > 0.8 or (pct_chg > 2 and close > ma_20)
+"回调点买入 / 逢回调买入": close > ma_60 and close < ma_20（回调至ma60-ma20之间，多头排列下）
+"板块或大盘乐观 / 市场乐观": overall_score > 40（或 w_overall_score > 40 for 中长线）
+"中线 / 中期趋势": 优先使用周线指标(w_前缀)，如 w_ma_5 > w_ma_20 表示中期上升趋势
+"周线多头排列 / 中线向上": w_ma_5 > w_ma_20 and w_ma_20 > w_ma_60
+"周线回调买入": w_close > w_ma_20 and w_boll_position < 0.5（周线回调但仍在均线上方）
+
+=== 复合趋势买入条件（示例）===
+"向上趋势中突破买入": condition="ma_5 > ma_20 and ma_20 > ma_60 and boll_position > 0.8 and overall_score > 40"
+"向上趋势中回调买入": condition="ma_5 > ma_20 and close > ma_60 and close < ma_20 and overall_score > 40"
+"中线超跌+大盘乐观买入": condition="w_rsi6_pct100 < 30 and ma_5 > ma_60 and overall_score > 40"
+
 === 输出格式（严格JSON，不含注释）===
 {{
   "rules": [
@@ -668,6 +684,7 @@ class QuantStrategy:
         self.description = description
         self.rules: List[StrategyRule] = []
         self.exclusion_rules: List[StrategyRule] = []
+        self.max_position_ratio: float = 1.0  # 该策略允许的最大仓位上限 (0-1)
         self.parser = StrategyParser()
     
     def from_natural_language(self, description: str):
@@ -890,11 +907,11 @@ class QuantStrategy:
         # 决策逻辑
         if buy_signals > sell_signals and buy_signals > 0:
             action = "buy"
-            position_ratio = min(total_position / buy_signals, 1.0)
+            position_ratio = min(total_position / buy_signals, self.max_position_ratio)
             confidence = min(buy_signals / len(self.rules) * 2, 1.0) if self.rules else 0
         elif sell_signals > buy_signals and sell_signals > 0:
             action = "sell"
-            position_ratio = min(abs(total_position) / sell_signals, 1.0)
+            position_ratio = min(abs(total_position) / sell_signals, self.max_position_ratio)
             confidence = min(sell_signals / len(self.rules) * 2, 1.0) if self.rules else 0
         else:
             action = "hold"
@@ -923,6 +940,7 @@ class QuantStrategy:
         return {
             'name': self.name,
             'description': self.description,
+            'max_position_ratio': self.max_position_ratio,
             'rules': [asdict(r) for r in self.rules],
             'exclusion_rules': [asdict(r) for r in self.exclusion_rules],
         }
@@ -931,6 +949,8 @@ class QuantStrategy:
     def from_dict(cls, data: Dict) -> 'QuantStrategy':
         """从字典创建"""
         strategy = cls(name=data.get('name', ''), description=data.get('description', ''))
+        raw_max = data.get('max_position_ratio', 1.0)
+        strategy.max_position_ratio = max(0.0, min(1.0, float(raw_max)))
         for rule_data in data.get('rules', []):
             strategy.rules.append(StrategyRule(**rule_data))
         for exc_data in data.get('exclusion_rules', []):
@@ -946,7 +966,7 @@ class StrategyManager:
         self._strategies_file = os.path.join(
             config.get('data_storage.data_dir', './data'), 'strategies.json'
         )
-        self._load_builtin_strategies()
+        #self._load_builtin_strategies()
         self._load_strategies()
     
     def _load_builtin_strategies(self):
@@ -1327,6 +1347,8 @@ def merge_buy_sell_strategies(buy_strat: QuantStrategy, sell_strat: QuantStrateg
     combined.rules.extend([r for r in sell_strat.rules if r.action == 'sell'])
     combined.exclusion_rules.extend(buy_strat.exclusion_rules)
     combined.exclusion_rules.extend(sell_strat.exclusion_rules)
+    # 取买入策略的最大仓位上限（决定建仓规模）
+    combined.max_position_ratio = buy_strat.max_position_ratio
     return combined
 
 

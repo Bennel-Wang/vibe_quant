@@ -264,6 +264,11 @@ function loadStocks() {
 
         _indexCodes = new Set(indices.map(s => s.full_code || s.code));
 
+        // 清除因竞态条件（_indexCodes 尚未就绪时）误插入实时行情表的指数行
+        _indexCodes.forEach(function(fc) {
+            $('#realtime-summary-body tr[data-fullcode="' + fc + '"]').remove();
+        });
+
         var select = $('#stock-select');
         select.empty().append('<option value="">选择股票</option>');
         stocks.forEach(function(stock) {

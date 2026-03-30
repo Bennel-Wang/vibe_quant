@@ -46,7 +46,9 @@ class BacktestResult:
     initial_capital: float
     final_capital: float
     total_return: float
-    total_return_pct: float
+    total_return_pct: float       # 以总资金为基准的收益率
+    deployed_return_pct: float    # 以策略最大仓位上限资金为基准的收益率
+    max_position_ratio: float     # 策略最大仓位上限
     annual_return: float
     max_drawdown: float
     max_drawdown_pct: float
@@ -168,116 +170,117 @@ class BacktestEngine:
                      start_date: str, end_date: str,
                      initial_capital: float = None,
                      per_trade_ratio: float = None,
-                     progress_callback: Optional[Callable[[Dict[str, Any]], None]] = None) -> BacktestResult:
+                     progress_callback: Optional[Callable[[Dict[str, Any]], None]] = None,
+                     precomputed_df: pd.DataFrame = None) -> BacktestResult:
         """
         运行回测（增强版：增加详细调试日志以便定位失败）。
         新增参数：
           per_trade_ratio  — 每笔交易固定占初始总资金的比例（如 0.1 = 10%）。
                              设置后每次买入/卖出金额相同，忽略策略规则中的 position_ratio。
           progress_callback— 回测过程中推送进度信息的回调函数。
-        """
-        """
-        运行回测
-        
-        Args:
-            code: 股票代码
-            strategy: 策略对象
-            start_date: 开始日期 (YYYYMMDD)
-            end_date: 结束日期 (YYYYMMDD)
-            initial_capital: 初始资金
-        
-        Returns:
-            回测结果
+          precomputed_df   — 预计算好的含全部指标的 DataFrame（跳过数据获取/指标计算）。
+                             调用方需保证 df 已包含日线+周线/月线指标、基准相对强弱等列。
         """
         if initial_capital is None:
             initial_capital = self.initial_capital
         # 每笔固定交易比例：覆盖策略规则中的 position_ratio，保证每次买卖金额相同
         _per_trade = per_trade_ratio  # None 表示沿用策略规则中各自的 position_ratio
         
-        stock = stock_manager.get_stock_by_code(code)
+        # ── 数据准备：若提供了 precomputed_df 则跳过所有获取/计算步骤 ──
+        if precomputed_df is not None:
+            df = precomputed_df.copy()
+            if 'date' in df.columns:
+                df['date'] = pd.to_datetime(df['date'])
+            logger.info(f"使用预计算DataFrame回测 {code}, 策略 {strategy.name}, 行数={len(df)}")
+        else:
+            stock = stock_manager.get_stock_by_code(code)
         
-        # 获取历史数据
-        logger.info(f"开始回测 {code} 使用策略 {strategy.name}, 区间: {start_date} - {end_date}")
-        df = unified_data.get_historical_data(code, start_date, end_date)
-        
-        if df.empty:
-            logger.error(f"无法获取 {code} 的历史数据 (start={start_date}, end={end_date})")
-            raise ValueError(f"无法获取 {code} 的历史数据")
-        logger.info(f"获取历史数据行数: {len(df)}, 列: {list(df.columns)}")
-        logger.debug(f"历史数据样例: {df.head(3).to_dict(orient='records')}")
-        
-        # 计算技术指标
-        try:
-            df = technical_indicators.calculate_all_indicators(code, start_date, end_date)
-        except Exception as e:
-            logger.exception(f"计算技术指标时抛出异常: {e}")
-            raise
-        
-        if df.empty:
-            logger.error(f"计算技术指标返回空 DataFrame for {code}")
-            raise ValueError(f"无法计算 {code} 的技术指标")
-        logger.info(f"指标DataFrame大小: {df.shape}, 列: {list(df.columns)}")
-        logger.debug(f"指标样例: {df.head(3).to_dict(orient='records')}")
-
-        # 确保 boll_position 存在
-        if 'boll_position' not in df.columns and 'boll_upper' in df.columns:
-            _rng = df['boll_upper'] - df['boll_lower']
-            df['boll_position'] = (
-                (df['close'] - df['boll_lower']) / _rng.replace(0, np.nan)
-            ).clip(0, 1).fillna(0.5)
-
-        # 合并周线/月线指标（添加 w_/m_ 前缀列）
-        if 'date' in df.columns:
-            df['date'] = pd.to_datetime(df['date'])
-        df = self._merge_weekly_monthly(code, df)
-
-        # 按日期范围过滤（技术指标需要回看数据，计算完再过滤）
-        if 'date' in df.columns:
+            # 获取历史数据
+            logger.info(f"开始回测 {code} 使用策略 {strategy.name}, 区间: {start_date} - {end_date}")
+            df = unified_data.get_historical_data(code, start_date, end_date)
+            
+            if df.empty:
+                logger.error(f"无法获取 {code} 的历史数据 (start={start_date}, end={end_date})")
+                raise ValueError(f"无法获取 {code} 的历史数据")
+            logger.info(f"获取历史数据行数: {len(df)}, 列: {list(df.columns)}")
+            logger.debug(f"历史数据样例: {df.head(3).to_dict(orient='records')}")
+            
+            # 计算技术指标
             try:
-                sd = pd.to_datetime(str(start_date), format='%Y%m%d', errors='coerce')
-                ed = pd.to_datetime(str(end_date), format='%Y%m%d', errors='coerce') if end_date else None
-                if pd.notna(sd):
-                    df = df[df['date'] >= sd]
-                if ed is not None and pd.notna(ed):
-                    df = df[df['date'] <= ed]
-                df = df.reset_index(drop=True)
-                logger.info(f"按日期过滤后数据: {len(df)} 行, {start_date} ~ {end_date}")
+                df = technical_indicators.calculate_all_indicators(code, start_date, end_date)
             except Exception as e:
-                logger.warning(f"日期过滤失败: {e}")
+                logger.exception(f"计算技术指标时抛出异常: {e}")
+                raise
+            
+            if df.empty:
+                logger.error(f"计算技术指标返回空 DataFrame for {code}")
+                raise ValueError(f"无法计算 {code} 的技术指标")
+            logger.info(f"指标DataFrame大小: {df.shape}, 列: {list(df.columns)}")
+            logger.debug(f"指标样例: {df.head(3).to_dict(orient='records')}")
 
-        if df.empty:
-            raise ValueError(f"过滤日期范围后数据为空 {code} ({start_date}-{end_date})")
+            # 确保 boll_position 存在
+            if 'boll_position' not in df.columns and 'boll_upper' in df.columns:
+                _rng = df['boll_upper'] - df['boll_lower']
+                df['boll_position'] = (
+                    (df['close'] - df['boll_lower']) / _rng.replace(0, np.nan)
+                ).clip(0, 1).fillna(0.5)
 
-        # ── 加载基准指数（上证综指）并计算超额收益 ───────────────────────────────
-        _BENCHMARK = '000001.SH'
-        try:
-            _idx_raw = unified_data.get_historical_data(_BENCHMARK, start_date, end_date)
-            if _idx_raw is not None and not _idx_raw.empty:
-                _idx = _idx_raw.copy()
-                _idx['date'] = pd.to_datetime(_idx['date'])
-                _idx = _idx.sort_values('date').reset_index(drop=True)
-                _idx['idx_pct_chg'] = _idx['close'].pct_change() * 100
+            # 合并周线/月线指标（添加 w_/m_ 前缀列）
+            if 'date' in df.columns:
+                df['date'] = pd.to_datetime(df['date'])
+            df = self._merge_weekly_monthly(code, df)
+
+            # 按日期范围过滤（技术指标需要回看数据，计算完再过滤）
+            if 'date' in df.columns:
+                try:
+                    sd = pd.to_datetime(str(start_date), format='%Y%m%d', errors='coerce')
+                    ed = pd.to_datetime(str(end_date), format='%Y%m%d', errors='coerce') if end_date else None
+                    if pd.notna(sd):
+                        df = df[df['date'] >= sd]
+                    if ed is not None and pd.notna(ed):
+                        df = df[df['date'] <= ed]
+                    df = df.reset_index(drop=True)
+                    logger.info(f"按日期过滤后数据: {len(df)} 行, {start_date} ~ {end_date}")
+                except Exception as e:
+                    logger.warning(f"日期过滤失败: {e}")
+
+            if df.empty:
+                raise ValueError(f"过滤日期范围后数据为空 {code} ({start_date}-{end_date})")
+
+            # ── 加载基准指数（上证综指）并计算超额收益 ───────────────────────────────
+            _BENCHMARK = '000001.SH'
+            try:
+                _idx_raw = unified_data.get_historical_data(_BENCHMARK, start_date, end_date)
+                if _idx_raw is not None and not _idx_raw.empty:
+                    _idx = _idx_raw.copy()
+                    _idx['date'] = pd.to_datetime(_idx['date'])
+                    _idx = _idx.sort_values('date').reset_index(drop=True)
+                    _idx['idx_pct_chg'] = _idx['close'].pct_change() * 100
+                    for _n in [5, 10, 20, 60]:
+                        _idx[f'idx_ret_{_n}'] = _idx['close'].pct_change(_n) * 100
+                        df[f'stock_ret_{_n}'] = df['close'].pct_change(_n) * 100
+                    _idx_cols = ['date', 'idx_pct_chg'] + [f'idx_ret_{_n}' for _n in [5, 10, 20, 60]]
+                    df = pd.merge_asof(df.sort_values('date'), _idx[_idx_cols], on='date', direction='backward')
+                    for _n in [5, 10, 20, 60]:
+                        df[f'rel_strength_{_n}'] = df[f'stock_ret_{_n}'] - df[f'idx_ret_{_n}']
+                    logger.info(f"已加载基准指数 {_BENCHMARK}，计算超额收益完成")
+                else:
+                    raise ValueError("指数数据为空")
+            except Exception as _bex:
+                logger.warning(f"加载基准指数失败，相对强弱指标默认为0: {_bex}")
                 for _n in [5, 10, 20, 60]:
-                    _idx[f'idx_ret_{_n}'] = _idx['close'].pct_change(_n) * 100
-                    df[f'stock_ret_{_n}'] = df['close'].pct_change(_n) * 100
-                _idx_cols = ['date', 'idx_pct_chg'] + [f'idx_ret_{_n}' for _n in [5, 10, 20, 60]]
-                df = pd.merge_asof(df.sort_values('date'), _idx[_idx_cols], on='date', direction='backward')
-                for _n in [5, 10, 20, 60]:
-                    df[f'rel_strength_{_n}'] = df[f'stock_ret_{_n}'] - df[f'idx_ret_{_n}']
-                logger.info(f"已加载基准指数 {_BENCHMARK}，计算超额收益完成")
-            else:
-                raise ValueError("指数数据为空")
-        except Exception as _bex:
-            logger.warning(f"加载基准指数失败，相对强弱指标默认为0: {_bex}")
-            for _n in [5, 10, 20, 60]:
-                df[f'rel_strength_{_n}'] = 0.0
-                df[f'idx_ret_{_n}'] = 0.0
-            df['idx_pct_chg'] = 0.0
+                    df[f'rel_strength_{_n}'] = 0.0
+                    df[f'idx_ret_{_n}'] = 0.0
+                df['idx_pct_chg'] = 0.0
 
         capital = initial_capital
         position = 0  # 持仓股数
         trades = []
         equity_curve = []
+        # 策略允许的最大总仓位投入上限（按成本计，避免随价格下跌反复补仓）
+        _max_pos_ratio = getattr(strategy, 'max_position_ratio', 1.0) or 1.0
+        _max_position_value = initial_capital * _max_pos_ratio
+        _cost_basis = 0.0  # 当前持仓的实际投入成本（买入总额，不含已卖出部分）
         
         # 进度/性能度量
         import time as _time
@@ -422,6 +425,14 @@ class BacktestEngine:
                 trade_ratio = _per_trade if _per_trade is not None else decision.position_ratio
                 buy_amount = initial_capital * trade_ratio
 
+                # 强制执行最大仓位上限：已投入成本 + 本次买入不得超过上限（按成本计，防止跌价后反复补仓）
+                remaining_room = _max_position_value - _cost_basis
+                if remaining_room <= 0:
+                    # 已达仓位上限，本日跳过买入
+                    buy_amount = 0
+                else:
+                    buy_amount = min(buy_amount, remaining_room)
+
                 # 考虑滑点
                 buy_price = price * (1 + self.slippage)
 
@@ -437,6 +448,7 @@ class BacktestEngine:
                     if total_cost <= capital:
                         capital -= total_cost
                         position += shares
+                        _cost_basis += actual_amount  # 记录投入成本
 
                         trades.append(TradeRecord(
                             date=date,
@@ -475,8 +487,14 @@ class BacktestEngine:
                     commission = actual_amount * self.commission_rate
                     total_received = actual_amount - commission
                     
+                    old_position = position
                     capital += total_received
                     position -= sell_shares
+                    # 按比例缩减成本计数，清仓后归零以允许重新建仓
+                    if old_position > 0:
+                        _cost_basis *= (position / old_position)
+                    if position == 0:
+                        _cost_basis = 0.0
                     
                     trades.append(TradeRecord(
                         date=date,
@@ -498,8 +516,31 @@ class BacktestEngine:
                 'position_value': position * price,
                 'position': position,
                 'price': price,
+                'signal_action': decision.action,
+                'signal_reason': decision.reasoning,
             })
         
+        # 回测结束时，若仍有持仓，按最后一日收盘价强制平仓，确保交易记录完整
+        if position > 0 and equity_curve:
+            last_bar = equity_curve[-1]
+            close_price = last_bar['price']
+            commission_rate = 0.0003
+            commission = close_price * position * commission_rate
+            actual_amount = close_price * position - commission
+            capital += actual_amount
+            trades.append(TradeRecord(
+                date=last_bar['date'],
+                action="sell",
+                code=code,
+                price=close_price,
+                shares=position,
+                amount=actual_amount,
+                commission=commission,
+                reason="回测结束强制平仓"
+            ))
+            position = 0
+            _cost_basis = 0.0
+
         # 计算回测结果
         equity_df = pd.DataFrame(equity_curve)
         
@@ -507,6 +548,11 @@ class BacktestEngine:
             final_equity = equity_df['equity'].iloc[-1] if not equity_df.empty else initial_capital
             total_return = final_equity - initial_capital
             total_return_pct = (total_return / initial_capital) * 100
+            
+            # 以策略最大仓位上限资金为基准的收益率（反映实际使用资金的效率）
+            max_pos = getattr(strategy, 'max_position_ratio', 1.0) or 1.0
+            deployed_capital = initial_capital * max_pos
+            deployed_return_pct = (total_return / deployed_capital) * 100 if deployed_capital > 0 else 0
             
             # 计算年化收益
             days = len(equity_df)
@@ -568,6 +614,8 @@ class BacktestEngine:
             final_capital=final_equity,
             total_return=total_return,
             total_return_pct=total_return_pct,
+            deployed_return_pct=deployed_return_pct,
+            max_position_ratio=max_pos,
             annual_return=annual_return,
             max_drawdown=max_drawdown,
             max_drawdown_pct=max_drawdown_pct,
@@ -594,229 +642,11 @@ class BacktestEngine:
                              df: pd.DataFrame,
                              start_date: str, end_date: str,
                              initial_capital: float = None) -> BacktestResult:
-        """
-        Run backtest using a pre-computed indicator DataFrame.
-        Skips data fetching and indicator calculation — use this when you need
-        to run multiple strategies on the same stock to avoid redundant computation.
-
-        Args:
-            code: stock code
-            strategy: strategy to run
-            df: pre-computed DataFrame from calculate_all_indicators (must have
-                'date' and 'close' columns plus indicator columns)
-            start_date/end_date: only used for date-filtering and result metadata
-            initial_capital: override default capital if provided
-        """
-        if initial_capital is None:
-            initial_capital = self.initial_capital
-
-        if df.empty:
-            raise ValueError(f"提供的DataFrame为空，无法回测 {code}")
-
-        # 确保 boll_position 存在
-        if 'boll_position' not in df.columns and 'boll_upper' in df.columns:
-            _rng = df['boll_upper'] - df['boll_lower']
-            df['boll_position'] = (
-                (df['close'] - df['boll_lower']) / _rng.replace(0, np.nan)
-            ).clip(0, 1).fillna(0.5)
-
-        # 合并周线/月线指标
-        if 'date' in df.columns:
-            df['date'] = pd.to_datetime(df['date'])
-        df = self._merge_weekly_monthly(code, df)
-
-        # Filter by date range
-        try:
-            sd = pd.to_datetime(str(start_date), format='%Y%m%d', errors='coerce')
-            ed = pd.to_datetime(str(end_date), format='%Y%m%d', errors='coerce')
-            if pd.notna(sd):
-                df = df[df['date'] >= sd]
-            if pd.notna(ed):
-                df = df[df['date'] <= ed]
-            df = df.reset_index(drop=True)
-        except Exception:
-            pass
-
-        if df.empty:
-            raise ValueError(f"过滤日期范围后数据为空 {code} ({start_date}-{end_date})")
-
-        # Run the strategy loop (reuse same logic as run_backtest)
-        import time as _time
-        capital = initial_capital
-        position = 0
-        trades = []
-        equity_curve = []
-        slippage = self.slippage
-        commission_rate = self.commission_rate
-        start_time = _time.time()
-
-        for idx, row in df.iterrows():
-            date = row['date']
-            price = row['close']
-
-            def _safe(val, default):
-                try:
-                    if pd.isna(val):
-                        return default
-                except (TypeError, ValueError):
-                    pass
-                return val
-
-            indicators = {
-                # ── 价格 ─────────────────────────────────────────────
-                'price':  price,
-                'close':  price,
-                'open':   _safe(row.get('open'),   price),
-                'high':   _safe(row.get('high'),   price),
-                'low':    _safe(row.get('low'),    price),
-                'volume': _safe(row.get('volume'), 0),
-                'amount': _safe(row.get('amount'), 0),
-                'pct_chg':_safe(row.get('pct_chg'), 0),
-                'change': _safe(row.get('change'),  0),
-                # ── 基本面 ───────────────────────────────────────────
-                'pe_ttm': _safe(row.get('pe_ttm'), 0),
-                'pb':     _safe(row.get('pb'),     0),
-                # ── 百分位指标 ────────────────────────────────────────
-                'rsi6_pct100':  _safe(row.get('rsi6_pct100'),  50),
-                'pettm_pct10y': _safe(row.get('pettm_pct10y'), 50),
-                # ── RSI ──────────────────────────────────────────────
-                'rsi_6':  _safe(row.get('rsi_6'),  50),
-                'rsi_12': _safe(row.get('rsi_12'), 50),
-                'rsi_24': _safe(row.get('rsi_24'), 50),
-                # ── MACD ─────────────────────────────────────────────
-                'macd':           _safe(row.get('macd'),           0),
-                'macd_signal':    _safe(row.get('macd_signal'),    0),
-                'macd_histogram': _safe(row.get('macd_histogram'), 0),
-                # ── KDJ ──────────────────────────────────────────────
-                'kdj_k': _safe(row.get('kdj_k'), 50),
-                'kdj_d': _safe(row.get('kdj_d'), 50),
-                'kdj_j': _safe(row.get('kdj_j'), 50),
-                # ── 布林带 ───────────────────────────────────────────
-                'boll_upper':    _safe(row.get('boll_upper'),    0),
-                'boll_middle':   _safe(row.get('boll_middle'),   0),
-                'boll_lower':    _safe(row.get('boll_lower'),    0),
-                'boll_position': _safe(row.get('boll_position'), 0.5),
-                # ── 其他技术 ─────────────────────────────────────────
-                'wr_14':         _safe(row.get('wr_14'),         -50),
-                'volatility':    _safe(row.get('volatility'),    0),
-                'volume_ratio':  _safe(row.get('volume_ratio'),  1),
-                'overall_score': _safe(row.get('overall_score'), 0),
-                # ── 新闻默认值 ───────────────────────────────────────
-                'news_sentiment': 0,
-                'news_count':     0,
-                'news_positive':  0,
-            }
-            # MA 双格式
-            for n in [5, 10, 20, 60, 120, 250]:
-                val = _safe(row.get(f'ma_{n}', row.get(f'ma{n}')), 0)
-                indicators[f'ma_{n}'] = val
-                indicators[f'ma{n}']  = val
-            # 周线 / 月线（已合并入 df）
-            for _pfx in ('w_', 'm_'):
-                for _col, _def in self._WM_DEFAULTS.items():
-                    indicators[f'{_pfx}{_col}'] = _safe(row.get(f'{_pfx}{_col}'), _def)
-                for _col in self._WM_COLS:
-                    if f'{_pfx}{_col}' not in indicators:
-                        indicators[f'{_pfx}{_col}'] = _safe(row.get(f'{_pfx}{_col}'), 0)
-
-            decision = self._execute_strategy(strategy, code, indicators)
-
-            if decision.action == "buy" and decision.position_ratio > 0:
-                buy_amount = capital * decision.position_ratio
-                buy_price = price * (1 + slippage)
-                # 严格整手（100股倍数），不足1手则放弃本次买入
-                shares = int(buy_amount / buy_price / 100) * 100
-                if shares > 0:
-                    actual_amount = shares * buy_price
-                    commission = actual_amount * commission_rate
-                    total_cost = actual_amount + commission
-                    if total_cost <= capital:
-                        capital -= total_cost
-                        position += shares
-                        trades.append(TradeRecord(
-                            date=date, action="buy", code=code,
-                            price=buy_price, shares=shares,
-                            amount=actual_amount, commission=commission,
-                            reason=decision.reasoning
-                        ))
-
-            elif decision.action == "sell" and decision.position_ratio > 0 and position > 0:
-                # 严格整手；全仓清仓时卖出全部持仓（消除尾数）
-                if decision.position_ratio >= 1.0:
-                    sell_shares = position
-                else:
-                    desired_shares = int(position * decision.position_ratio)
-                    sell_shares = (desired_shares // 100) * 100
-                if sell_shares > 0:
-                    sell_price = price * (1 - slippage)
-                    actual_amount = sell_shares * sell_price
-                    commission = actual_amount * commission_rate
-                    capital += actual_amount - commission
-                    position -= sell_shares
-                    trades.append(TradeRecord(
-                        date=date, action="sell", code=code,
-                        price=sell_price, shares=sell_shares,
-                        amount=actual_amount, commission=commission,
-                        reason=decision.reasoning
-                    ))
-
-            equity = capital + position * price
-            equity_curve.append({
-                'date': date, 'equity': equity,
-                'cash': capital, 'position_value': position * price,
-                'position': position, 'price': price,
-            })
-
-        equity_df = pd.DataFrame(equity_curve)
-        final_equity = equity_df['equity'].iloc[-1] if not equity_df.empty else initial_capital
-        total_return = final_equity - initial_capital
-        total_return_pct = (total_return / initial_capital) * 100
-        days = len(equity_df)
-        years = days / 252
-        annual_return = ((final_equity / initial_capital) ** (1 / years) - 1) * 100 if years > 0 else 0
-        equity_df['cummax'] = equity_df['equity'].cummax()
-        equity_df['drawdown'] = (equity_df['equity'] - equity_df['cummax']) / equity_df['cummax']
-        max_drawdown_pct = equity_df['drawdown'].min() * 100
-        max_drawdown = equity_df['drawdown'].min() * equity_df['cummax'].max()
-        equity_df['daily_return'] = equity_df['equity'].pct_change()
-        std = equity_df['daily_return'].std()
-        sharpe_ratio = (equity_df['daily_return'].mean() / std) * np.sqrt(252) if std != 0 else 0
-
-        buy_trades = [t for t in trades if t.action == "buy"]
-        sell_trades = [t for t in trades if t.action == "sell"]
-        profits = []
-        for sell in sell_trades:
-            buy_shares = 0
-            buy_cost = 0
-            for buy in reversed(buy_trades):
-                if buy.date <= sell.date and buy_shares < sell.shares:
-                    shares = min(buy.shares, sell.shares - buy_shares)
-                    buy_shares += shares
-                    buy_cost += shares * buy.price
-            if buy_shares > 0:
-                profits.append((sell.price - buy_cost / buy_shares) / (buy_cost / buy_shares) * 100)
-
-        winning_trades = len([p for p in profits if p > 0])
-        losing_trades = len([p for p in profits if p <= 0])
-        total_trades = len(sell_trades)
-        win_rate = (winning_trades / total_trades * 100) if total_trades > 0 else 0
-        avg_profit = np.mean([p for p in profits if p > 0]) if winning_trades > 0 else 0
-        avg_loss = np.mean([p for p in profits if p <= 0]) if losing_trades > 0 else 0
-        gross_profit = sum([p for p in profits if p > 0])
-        gross_loss = abs(sum([p for p in profits if p <= 0]))
-        profit_factor = gross_profit / gross_loss if gross_loss != 0 else float('inf')
-
-        return BacktestResult(
-            code=code, strategy_name=strategy.name,
-            start_date=start_date, end_date=end_date,
-            initial_capital=initial_capital, final_capital=final_equity,
-            total_return=total_return, total_return_pct=total_return_pct,
-            annual_return=annual_return,
-            max_drawdown=max_drawdown, max_drawdown_pct=max_drawdown_pct,
-            sharpe_ratio=sharpe_ratio, total_trades=total_trades,
-            winning_trades=winning_trades, losing_trades=losing_trades,
-            win_rate=win_rate, avg_profit=avg_profit, avg_loss=avg_loss,
-            profit_factor=profit_factor, trades=trades, equity_curve=equity_df,
+        """已废弃：直接委托给 run_backtest(precomputed_df=df)，保留向后兼容。"""
+        return self.run_backtest(
+            code, strategy, start_date, end_date,
+            initial_capital=initial_capital,
+            precomputed_df=df,
         )
 
     def _execute_strategy(self, strategy: QuantStrategy, code: str,
@@ -853,29 +683,49 @@ class BacktestEngine:
         excluded = eval_chain(strategy.exclusion_rules) if strategy.exclusion_rules else False
 
         if excluded:
-            exc_conds = ' / '.join(r.condition for r in strategy.exclusion_rules)
+            # Find the specific exclusion rule that fired
+            exc_reason = next(
+                (r.reason or r.condition for r in strategy.exclusion_rules if eval_cond(r.condition)),
+                strategy.exclusion_rules[0].reason or strategy.exclusion_rules[0].condition
+            )
             return StrategyDecision(code=code, action='hold', position_ratio=0, confidence=0.5,
-                                   reasoning=f'负面清单触发: {exc_conds}',
+                                   reasoning=f'排除条件触发: {exc_reason}',
                                    rules_triggered=[],
                                    timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
         if buy_fired and not sell_fired:
             action = 'buy'
-            position_ratio = min(sum(r.position_ratio for r in buy_rules) / len(buy_rules), 1.0)
+            position_ratio = min(sum(r.position_ratio for r in buy_rules) / len(buy_rules), strategy.max_position_ratio)
             confidence = 1.0
-            reasoning = ' | '.join(r.condition for r in buy_rules)
+            reasoning = ' | '.join(r.reason or r.condition for r in buy_rules)
             triggered = [r.condition for r in buy_rules]
         elif sell_fired and not buy_fired:
             action = 'sell'
-            position_ratio = min(sum(r.position_ratio for r in sell_rules) / len(sell_rules), 1.0)
+            position_ratio = min(sum(r.position_ratio for r in sell_rules) / len(sell_rules), strategy.max_position_ratio)
             confidence = 1.0
-            reasoning = ' | '.join(r.condition for r in sell_rules)
+            reasoning = ' | '.join(r.reason or r.condition for r in sell_rules)
             triggered = [r.condition for r in sell_rules]
         else:
             action = 'hold'
             position_ratio = 0
             confidence = 0.5
-            reasoning = '无信号' if not (buy_fired or sell_fired) else '买卖信号冲突'
+            if buy_fired and sell_fired:
+                reasoning = '买卖信号冲突'
+            elif buy_rules:
+                # Find the first buy rule that failed to explain why we didn't buy
+                first_failed = next(
+                    (r.reason or r.condition for r in buy_rules if not eval_cond(r.condition)),
+                    None
+                )
+                reasoning = f'不满足: {first_failed}' if first_failed else '无买入信号'
+            elif sell_rules:
+                first_failed = next(
+                    (r.reason or r.condition for r in sell_rules if not eval_cond(r.condition)),
+                    None
+                )
+                reasoning = f'不满足: {first_failed}' if first_failed else '无卖出信号'
+            else:
+                reasoning = '无规则'
             triggered = []
 
         return StrategyDecision(

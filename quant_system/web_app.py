@@ -36,8 +36,38 @@ logger = logging.getLogger(__name__)
 BACKTEST_PROGRESS: Dict[str, Dict] = {}
 BACKTEST_RESULTS: Dict[str, Dict] = {}
 
+# 策略适配（遍历股票）进度与结果存储
+ADAPT_PROGRESS: Dict[str, Dict] = {}
+ADAPT_RESULTS: Dict[str, Dict] = {}
+
 # Intraday snapshot storage: code -> list of {time, price, volume, avg_price}
 INTRADAY_SNAPSHOTS: Dict[str, list] = {}
+
+
+def is_trading_time(market: str = None) -> bool:
+    """判断当前是否在交易时间内（北京时间）。
+    market=None 表示任一市场在交易即返回 True。
+    A股: 周一至周五 09:30-11:30 / 13:00-15:00
+    港股: 周一至周五 09:30-12:00 / 13:00-16:00
+    """
+    now = datetime.now()
+    if now.weekday() >= 5:  # 周六/周日
+        return False
+    minutes = now.hour * 60 + now.minute
+
+    def _a_share():
+        return (9 * 60 + 30 <= minutes <= 11 * 60 + 30) or (13 * 60 <= minutes <= 15 * 60)
+
+    def _hk():
+        return (9 * 60 + 30 <= minutes <= 12 * 60) or (13 * 60 <= minutes <= 16 * 60)
+
+    if market == 'hk':
+        return _hk()
+    if market in ('sh', 'sz'):
+        return _a_share()
+    # market=None：任一市场有交易即返回 True
+    return _a_share() or _hk()
+
 
 # 创建Flask应用
 app = Flask(__name__, 
@@ -119,15 +149,26 @@ def index():
 def api_stocks():
     """获取股票列表"""
     stocks = stock_manager.get_all_stocks()
+
+    def _safe(v):
+        """将 NaN/None 等非 JSON 值转为空字符串"""
+        if v is None:
+            return ''
+        if isinstance(v, float) and v != v:  # NaN check
+            return ''
+        return v
+
     data = [{
         'code': s.code,
         'name': s.name,
         'market': s.market,
         'type': s.type,
         'full_code': s.full_code,
-        'notes': s.notes,
-        'industry': s.industry,
-        'strategy': s.strategy,
+        'notes': _safe(s.notes),
+        'industry': _safe(s.industry),
+        'strategy': _safe(s.strategy),
+        'buy_strategy': _safe(getattr(s, 'buy_strategy', '')),
+        'sell_strategy': _safe(getattr(s, 'sell_strategy', '')),
         'category': 'index' if s.type == 'index' else ('sector' if s.type == 'sector' else 'stock'),
     } for s in stocks]
     return jsonify(data)
@@ -170,7 +211,8 @@ def api_stocks_add():
                         suffix = ts_code.split('.')[1].upper() if '.' in ts_code else ''
                         market = {'SH': 'sh', 'SZ': 'sz', 'HK': 'hk'}.get(suffix, 'sh')
                     name = row['name']
-                    industry = row.get('industry', '') or ''
+                    _ind = row.get('industry', '')
+                    industry = '' if pd.isna(_ind) else (str(_ind).strip() or '')
                 else:
                     return jsonify({'error': f'未找到名为 "{name}" 的股票'}), 400
             else:
@@ -209,7 +251,8 @@ def api_stocks_add():
                 if not name or name == code:
                     name = row['name']
                 if not industry:
-                    industry = row.get('industry', '') or ''
+                    _ind = row.get('industry', '')
+                    industry = '' if pd.isna(_ind) else (str(_ind).strip() or '')
                 validated = True
 
         if name and name != code:
@@ -1382,6 +1425,8 @@ def api_run_backtest():
                     'initial_capital': _to_primitive(result.initial_capital),
                     'final_capital': _to_primitive(result.final_capital),
                     'total_return_pct': _to_primitive(result.total_return_pct),
+                    'deployed_return_pct': _to_primitive(result.deployed_return_pct),
+                    'max_position_ratio': _to_primitive(result.max_position_ratio),
                     'annual_return': _to_primitive(result.annual_return),
                     'max_drawdown_pct': _to_primitive(result.max_drawdown_pct),
                     'sharpe_ratio': _to_primitive(result.sharpe_ratio),
@@ -1400,6 +1445,12 @@ def api_run_backtest():
                     # 将权益曲线序列化为可保存/绘图的结构
                     'equity_curve': []
                 }
+                # 加权平均资金持有率（元/天）
+                try:
+                    wcpd = _calc_weighted_capital_per_day(response['trades'])
+                    response['weighted_capital_per_day'] = round(wcpd, 2) if wcpd is not None else None
+                except Exception:
+                    response['weighted_capital_per_day'] = None
                 try:
                     if getattr(result, 'equity_curve', None) is not None:
                         # equity_curve 可能为 DataFrame
@@ -1506,6 +1557,74 @@ def api_backtest_result():
     return jsonify(res)
 
 
+def _calc_weighted_capital_per_day(trades: list):
+    """
+    计算加权平均资金持有率（元/天）。
+
+    用户定义的公式：
+      对每笔买→卖配对（FIFO）：value_i = A_i / D_i（元/天）
+      权重 w_i = A_i / Σ(A_j)
+      结果 = Σ(w_i × value_i) = Σ(A_i² / D_i) / Σ(A_i)
+
+    Returns: float（元/天），无有效配对时返回 None。
+    """
+    from datetime import datetime as _dt
+    from collections import deque
+
+    def _parse_date(s):
+        s = str(s).strip()[:10]  # 取 YYYY-MM-DD 部分
+        for fmt in ('%Y-%m-%d', '%Y%m%d'):
+            try:
+                return _dt.strptime(s, fmt)
+            except ValueError:
+                continue
+        return None
+
+    buy_queue = deque()   # elements: [date_obj, amount_remaining]
+    numerator   = 0.0     # Σ(A_i² / D_i)
+    denominator = 0.0     # Σ(A_i)
+
+    for t in trades:
+        action = t.get('action', '')
+        amount = float(t.get('amount') or 0)
+        date   = _parse_date(t.get('date', ''))
+        if date is None or amount <= 0:
+            continue
+
+        if action == 'buy':
+            buy_queue.append([date, amount])
+        elif action == 'sell':
+            remaining = amount
+            while remaining > 1e-6 and buy_queue:
+                buy_date, buy_amt = buy_queue[0]
+                days = (date - buy_date).days
+                if days <= 0:
+                    days = 1   # same-day round-trip counts as 1 day
+                matched = min(buy_amt, remaining)
+                numerator   += matched * matched / days
+                denominator += matched
+                remaining   -= matched
+                if buy_amt <= matched + 1e-6:
+                    buy_queue.popleft()
+                else:
+                    buy_queue[0][1] -= matched
+
+    if denominator <= 0:
+        return None
+    return numerator / denominator
+
+def _get_market_index_code(stock_code):
+    """根据股票代码后缀判断对应大盘指数代码和名称"""
+    if not stock_code:
+        return '000001.SH', '上证指数'
+    upper = stock_code.upper()
+    if upper.endswith('.HK'):
+        return 'HSI.HK', '恒生指数'
+    if upper.endswith('.SZ'):
+        return '399001.SZ', '深证成指'
+    return '000001.SH', '上证指数'
+
+
 @app.route('/api/backtest/chart', methods=['POST'])
 def api_backtest_chart():
     """获取回测图表。支持传入 run_id（优先从已保存的回测结果读取），否则会同步运行回测（回退）。"""
@@ -1588,20 +1707,29 @@ def api_backtest_chart():
         dates = [str(r.get('date')) for r in ec_list]
         equities = [r.get('equity') for r in ec_list]
         prices = [r.get('price') for r in ec_list]
+        # Per-point hover: action + reason from equity curve
+        _action_label = {'buy': '买入', 'sell': '卖出', 'hold': '观望'}
+        hover_texts = []
+        for r in ec_list:
+            act = r.get('signal_action', '')
+            rsn = r.get('signal_reason', '')
+            label = _action_label.get(act, act)
+            hover_texts.append(f'{label}: {rsn}' if rsn else label)
 
         fig = make_subplots(
-            rows=2, cols=1,
+            rows=3, cols=1,
             shared_xaxes=True,
-            row_heights=[0.7, 0.3],
+            row_heights=[0.5, 0.25, 0.25],
             vertical_spacing=0.03,
-            subplot_titles=('股价走势', '累计收益(%)')
+            subplot_titles=('股价走势', '累计收益(%)', '大盘走势')
         )
 
-        # Row 1: stock price curve
+        # Row 1: stock price curve with per-point signal hover
         fig.add_trace(go.Scatter(
             x=dates, y=prices, name='股价',
             line=dict(color='black', width=1),
-            hovertemplate='日期: %{x}<br>股价: %{y:.2f}<extra></extra>'
+            customdata=hover_texts,
+            hovertemplate='日期: %{x}<br>股价: %{y:.2f}<br>%{customdata}<extra></extra>'
         ), row=1, col=1)
 
         # Buy/sell markers on price chart
@@ -1633,34 +1761,121 @@ def api_backtest_chart():
                 hovertext=sell_text, hovertemplate='%{hovertext}<extra></extra>'
             ), row=1, col=1)
 
-        # Row 2: cumulative return %
+        # Row 2: cumulative return % — two lines: total-capital basis and deployed-capital basis
         initial_capital = next((e for e in equities if e is not None), 1000000)
+        max_pos_ratio = result_data.get('max_position_ratio', 1.0) or 1.0
+        deployed_capital = initial_capital * max_pos_ratio
         cumulative_returns = [
             (e / initial_capital - 1) * 100 if e is not None else None
             for e in equities
         ]
         fig.add_trace(go.Scatter(
-            x=dates, y=cumulative_returns, name='累计收益(%)',
+            x=dates, y=cumulative_returns, name='总资金收益(%)',
             line=dict(color='#26a69a', width=2),
             fill='tozeroy',
             fillcolor='rgba(38,166,154,0.1)',
-            hovertemplate='日期: %{x}<br>累计收益: %{y:.2f}%<extra></extra>'
+            hovertemplate='日期: %{x}<br>总资金收益: %{y:.2f}%<extra></extra>'
         ), row=2, col=1)
+        # Only show deployed-capital line when max_position_ratio < 1 (otherwise identical)
+        if max_pos_ratio < 0.999:
+            deployed_returns = [
+                (e - initial_capital) / deployed_capital * 100 if e is not None else None
+                for e in equities
+            ]
+            fig.add_trace(go.Scatter(
+                x=dates, y=deployed_returns,
+                name=f'实际仓位收益(% · 上限{int(max_pos_ratio*100)}%资金)',
+                line=dict(color='#ef5350', width=2, dash='dot'),
+                hovertemplate='日期: %{x}<br>实际仓位收益: %{y:.2f}%<extra></extra>'
+            ), row=2, col=1)
         fig.add_hline(y=0, line_dash="dash", line_color="gray", opacity=0.5, row=2, col=1)
+
+        # Row 3: market index trend (沪指/深指/恒生指数 depending on stock exchange)
+        index_code, index_name = _get_market_index_code(code)
+        try:
+            # dates[] is in YYYY-MM-DD; convert to YYYYMMDD for the data fetch
+            fetch_start = dates[0].replace('-', '') if dates else ''
+            fetch_end = dates[-1].replace('-', '') if dates else ''
+            if fetch_start and fetch_end:
+                idx_df = unified_data.get_historical_data(index_code, fetch_start, fetch_end)
+                if idx_df is not None and not idx_df.empty:
+                    idx_df = idx_df.sort_values('date').copy()
+                    # Normalize dates to YYYY-MM-DD to match equity curve x-axis
+                    idx_df['date_str'] = idx_df['date'].astype(str).str.replace(
+                        r'^(\d{4})(\d{2})(\d{2})$', r'\1-\2-\3', regex=True
+                    )
+                    # Only include dates within the equity curve range
+                    idx_df = idx_df[
+                        (idx_df['date_str'] >= dates[0]) &
+                        (idx_df['date_str'] <= dates[-1])
+                    ]
+                    fig.add_trace(go.Scatter(
+                        x=idx_df['date_str'].tolist(),
+                        y=idx_df['close'].tolist(),
+                        name=index_name,
+                        line=dict(color='#1565C0', width=1.5),
+                        hovertemplate='日期: %{x}<br>' + index_name + ': %{y:.2f}<extra></extra>'
+                    ), row=3, col=1)
+        except Exception as _idx_ex:
+            logger.warning(f"获取大盘数据失败 {index_code}: {_idx_ex}")
 
         fig.update_layout(
             title=f'{code} 回测 - 价格与累计收益',
-            height=600,
+            height=800,
             showlegend=True
         )
         fig.update_yaxes(title_text='股价', row=1, col=1)
         fig.update_yaxes(title_text='累计收益(%)', row=2, col=1)
+        fig.update_yaxes(title_text=index_name, row=3, col=1)
 
         return jsonify(json.loads(json.dumps(fig, cls=PlotlyJSONEncoder)))
 
     except Exception as e:
         logger.exception(f"生成回测图表失败: {e}")
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/backtest/market_return')
+def api_backtest_market_return():
+    """计算同期大盘指数收益率，用于与策略回测结果对比"""
+    try:
+        code = request.args.get('code', '')
+        start_date = request.args.get('start_date', '').replace('-', '')
+        end_date = request.args.get('end_date', '').replace('-', '')
+        if not code or not start_date or not end_date:
+            return jsonify({'error': '缺少参数'}), 400
+
+        index_code, index_name = _get_market_index_code(code)
+        idx_df = unified_data.get_historical_data(index_code, start_date, end_date)
+        if idx_df is None or idx_df.empty:
+            return jsonify({'error': f'无法获取 {index_name} 数据'}), 404
+
+        # Filter to the requested date range (data_source may return full history)
+        idx_df = idx_df.sort_values('date')
+        idx_df = idx_df[
+            (idx_df['date'].astype(str) >= start_date) &
+            (idx_df['date'].astype(str) <= end_date)
+        ]
+        if idx_df.empty:
+            return jsonify({'error': f'{index_name} 在该时间段内无数据'}), 404
+
+        first_close = float(idx_df['close'].iloc[0])
+        last_close = float(idx_df['close'].iloc[-1])
+        if first_close == 0:
+            return jsonify({'error': '指数起始价格为0'}), 500
+
+        index_return_pct = (last_close / first_close - 1) * 100
+        return jsonify({
+            'index_code': index_code,
+            'index_name': index_name,
+            'index_return_pct': round(index_return_pct, 2),
+            'start_close': round(first_close, 2),
+            'end_close': round(last_close, 2),
+        })
+    except Exception as e:
+        logger.exception(f"计算大盘收益失败: {e}")
+        return jsonify({'error': str(e)}), 500
+
 
 
 @app.route('/api/risk/portfolio')
@@ -2004,6 +2219,11 @@ def api_create_strategy():
         # 创建策略
         strategy = QuantStrategy(name=name, description=description)
         
+        # 设置最大仓位
+        max_position_ratio = data.get('max_position_ratio')
+        if max_position_ratio is not None:
+            strategy.max_position_ratio = max(0.0, min(1.0, float(max_position_ratio)))
+        
         # 添加规则
         for rule_data in rules:
             strategy.add_rule(
@@ -2085,6 +2305,7 @@ def api_update_strategy(name):
         description = data.get('description')
         rules = data.get('rules')
         exclusion_rules = data.get('exclusion_rules')
+        max_position_ratio = data.get('max_position_ratio')
 
         strategy = strategy_manager.strategies[actual_key]
 
@@ -2093,6 +2314,9 @@ def api_update_strategy(name):
         
         if description is not None:
             strategy.description = description
+        
+        if max_position_ratio is not None:
+            strategy.max_position_ratio = max(0.0, min(1.0, float(max_position_ratio)))
         
         if rules is not None:
             strategy.rules = []
@@ -3006,6 +3230,11 @@ def api_data_realtime_global():
                 update_count = 0
                 try:
                     while update_task_status['is_running'] and global_realtime_state['enabled']:
+                        # 非交易时间：休眠60秒后继续等待，不拉取数据
+                        if not is_trading_time():
+                            update_task_status['message'] = '非交易时间，暂停实时更新'
+                            time.sleep(60)
+                            continue
                         update_count += 1
                         update_task_status['message'] = f'全局第 {update_count} 次实时更新...'
                         try:
@@ -3107,11 +3336,15 @@ def api_data_realtime_latest():
     except Exception as e:
         logger.error(f"批量评分附加失败: {e}")
 
-    # Store intraday snapshot
+    # Store intraday snapshot — 仅在交易时间内采集
     now_str = datetime.now().strftime('%H:%M')
     for code_key, data in result.items():
         # 使用 full_code 作为 key，避免同代码不同市场冲突
         full_code = data.get('full_code', code_key)
+        # 根据股票市场判断是否处于交易时间
+        stock_market = data.get('market', '')
+        if not is_trading_time(stock_market if stock_market else None):
+            continue
         price = data.get('price')
         if price:
             if full_code not in INTRADAY_SNAPSHOTS:
@@ -3886,7 +4119,6 @@ def _backtest_one_strategy_with_end(code, strategy_name, end_date_str, sell_stra
         result = backtest_engine.run_backtest(
             code, strategy_obj, start_date, end_date_str,
             initial_capital=1000000,
-            per_trade_ratio=0.1,   # 每笔固定占总资金10%，确保每次买卖金额相同
         )
         return result.total_return_pct if result else 0.0
     except Exception as e:
@@ -4605,35 +4837,116 @@ def api_factors_optimize():
         if precomputed_df is None or precomputed_df.empty:
             return jsonify({'error': f'无法获取 {code} 的历史数据'}), 400
 
-        # Collect all available strategies
-        all_strategies = {}
+        # ── 与 run_backtest() 保持一致：补充周线/月线指标 ──
+        if 'date' in precomputed_df.columns:
+            precomputed_df['date'] = pd.to_datetime(precomputed_df['date'])
+        if 'boll_position' not in precomputed_df.columns and 'boll_upper' in precomputed_df.columns:
+            import numpy as _np
+            _rng = precomputed_df['boll_upper'] - precomputed_df['boll_lower']
+            precomputed_df['boll_position'] = (
+                (precomputed_df['close'] - precomputed_df['boll_lower']) / _rng.replace(0, _np.nan)
+            ).clip(0, 1).fillna(0.5)
+        precomputed_df = backtest_engine._merge_weekly_monthly(code, precomputed_df)
+
+        # ── 补充基准指数相对强弱（rel_strength_*）──
+        _BENCHMARK = '000001.SH'
+        try:
+            _idx_raw = unified_data.get_historical_data(_BENCHMARK, start_date, end_date)
+            if _idx_raw is not None and not _idx_raw.empty:
+                _idx = _idx_raw.copy()
+                _idx['date'] = pd.to_datetime(_idx['date'])
+                _idx = _idx.sort_values('date').reset_index(drop=True)
+                _idx['idx_pct_chg'] = _idx['close'].pct_change() * 100
+                for _n in [5, 10, 20, 60]:
+                    _idx[f'idx_ret_{_n}'] = _idx['close'].pct_change(_n) * 100
+                    precomputed_df[f'stock_ret_{_n}'] = precomputed_df['close'].pct_change(_n) * 100
+                _idx_cols = ['date', 'idx_pct_chg'] + [f'idx_ret_{_n}' for _n in [5, 10, 20, 60]]
+                precomputed_df = pd.merge_asof(
+                    precomputed_df.sort_values('date'), _idx[_idx_cols],
+                    on='date', direction='backward'
+                )
+                for _n in [5, 10, 20, 60]:
+                    precomputed_df[f'rel_strength_{_n}'] = (
+                        precomputed_df[f'stock_ret_{_n}'] - precomputed_df[f'idx_ret_{_n}']
+                    )
+            else:
+                raise ValueError("指数数据为空")
+        except Exception as _bex:
+            logger.warning(f"因子优化加载基准指数失败，相对强弱指标默认为0: {_bex}")
+            for _n in [5, 10, 20, 60]:
+                precomputed_df[f'rel_strength_{_n}'] = 0.0
+                precomputed_df[f'idx_ret_{_n}'] = 0.0
+            precomputed_df['idx_pct_chg'] = 0.0
+
+        # 按日期范围过滤
+        try:
+            sd = pd.to_datetime(str(start_date), format='%Y%m%d', errors='coerce')
+            ed = pd.to_datetime(str(end_date), format='%Y%m%d', errors='coerce') if end_date else None
+            if pd.notna(sd):
+                precomputed_df = precomputed_df[precomputed_df['date'] >= sd]
+            if ed is not None and pd.notna(ed):
+                precomputed_df = precomputed_df[precomputed_df['date'] <= ed]
+            precomputed_df = precomputed_df.reset_index(drop=True)
+        except Exception as _fe:
+            logger.warning(f"因子优化日期过滤失败: {_fe}")
+
+        from .strategy import merge_buy_sell_strategies
+
+        def _json_safe(val, ndigits=2):
+            import math
+            if isinstance(val, float) and (math.isinf(val) or math.isnan(val)):
+                return 0
+            return round(val, ndigits)
+
+        # ── 1. 用户自定义策略：按名称结尾分为买入/卖出两组，然后按序配对 ──
+        user_buy = []
+        user_sell = []
         for key in strategy_manager.list_strategies():
             strat = strategy_manager.get_strategy(key)
-            if strat and strat.rules:
-                all_strategies[key] = strat
+            if not strat or not strat.rules:
+                continue
+            if strat.name.endswith('买入'):
+                user_buy.append((key, strat))
+            elif strat.name.endswith('卖出'):
+                user_sell.append((key, strat))
 
-        # Generate parameterized factor strategies
-        factor_strategies = _generate_factor_strategies()
-        all_strategies.update(factor_strategies)
+        # 将买/卖策略逐一配对（按出现顺序），假设数量相同
+        user_pairs = []
+        for i in range(max(len(user_buy), len(user_sell))):
+            buy_item  = user_buy[i]  if i < len(user_buy)  else None
+            sell_item = user_sell[i] if i < len(user_sell) else None
+            user_pairs.append((buy_item, sell_item))
 
+        # ── 2. 参数化因子策略（自带买卖规则，视作完整策略对）──
+        #factor_strategies = _generate_factor_strategies()
+
+        # ── 3. 回测：先跑用户策略对，再跑因子策略 ──
         results = []
-        for key, strategy in all_strategies.items():
+
+        for buy_item, sell_item in user_pairs:
+            buy_key,  buy_strat  = buy_item  if buy_item  else (None, None)
+            sell_key, sell_strat = sell_item if sell_item else (None, None)
+            buy_name  = buy_strat.name  if buy_strat  else '—'
+            sell_name = sell_strat.name if sell_strat else '—'
+            pair_key  = f"{buy_key or 'none'}+{sell_key or 'none'}"
+
+            if buy_strat and sell_strat:
+                merged = merge_buy_sell_strategies(buy_strat, sell_strat)
+            elif buy_strat:
+                merged = buy_strat
+            else:
+                merged = sell_strat
+
             try:
-                result = backtest_engine.run_backtest_with_df(
-                    code, strategy, precomputed_df, start_date, end_date, initial_capital
+                result = backtest_engine.run_backtest(
+                    code, merged, start_date, end_date, initial_capital,
+                    precomputed_df=precomputed_df
                 )
-
-                def _json_safe(val, ndigits=2):
-                    """Replace inf/nan with JSON-safe values"""
-                    import math
-                    if isinstance(val, float) and (math.isinf(val) or math.isnan(val)):
-                        return 0
-                    return round(val, ndigits)
-
                 results.append({
-                    'strategy_key': key,
-                    'strategy_name': strategy.name,
-                    'description': strategy.description,
+                    'strategy_key': pair_key,
+                    'buy_strategy_name': buy_name,
+                    'sell_strategy_name': sell_name,
+                    'description': merged.description,
                     'total_return_pct': _json_safe(result.total_return_pct, 2),
                     'annual_return': _json_safe(result.annual_return, 2),
                     'max_drawdown_pct': _json_safe(result.max_drawdown_pct, 2),
@@ -4643,15 +4956,47 @@ def api_factors_optimize():
                     'profit_factor': _json_safe(result.profit_factor, 4),
                 })
             except Exception as e:
-                logger.debug(f"因子优化回测 {key} 失败: {e}")
+                logger.debug(f"因子优化回测 {pair_key} 失败: {e}")
                 results.append({
-                    'strategy_key': key,
-                    'strategy_name': strategy.name,
-                    'description': strategy.description,
+                    'strategy_key': pair_key,
+                    'buy_strategy_name': buy_name,
+                    'sell_strategy_name': sell_name,
+                    'description': merged.description if merged else '',
                     'total_return_pct': None,
                     'annual_return': None,
                     'error': str(e),
                 })
+
+        # for key, strategy in factor_strategies.items():
+        #     try:
+        #         result = backtest_engine.run_backtest(
+        #             code, strategy, start_date, end_date, initial_capital,
+        #             precomputed_df=precomputed_df
+        #         )
+        #         results.append({
+        #             'strategy_key': key,
+        #             'buy_strategy_name': strategy.name,
+        #             'sell_strategy_name': '（含卖出）',
+        #             'description': strategy.description,
+        #             'total_return_pct': _json_safe(result.total_return_pct, 2),
+        #             'annual_return': _json_safe(result.annual_return, 2),
+        #             'max_drawdown_pct': _json_safe(result.max_drawdown_pct, 2),
+        #             'sharpe_ratio': _json_safe(result.sharpe_ratio, 4),
+        #             'total_trades': result.total_trades,
+        #             'win_rate': _json_safe(result.win_rate, 2),
+        #             'profit_factor': _json_safe(result.profit_factor, 4),
+        #         })
+        #     except Exception as e:
+        #         logger.debug(f"因子优化回测 {key} 失败: {e}")
+        #         results.append({
+        #             'strategy_key': key,
+        #             'buy_strategy_name': strategy.name,
+        #             'sell_strategy_name': '（含卖出）',
+        #             'description': strategy.description,
+        #             'total_return_pct': None,
+        #             'annual_return': None,
+        #             'error': str(e),
+        #         })
 
         # Sort by return (None last)
         results.sort(key=lambda x: x.get('total_return_pct') if x.get('total_return_pct') is not None else -9999, reverse=True)
@@ -4817,6 +5162,566 @@ def api_get_listing_date(code: str):
         return jsonify({'error': str(e)}), 500
 
 
+# ============== 策略适配 ==============
+
+@app.route('/strategy_adapt')
+@app.route('/strategy/adapt')
+def page_strategy_adapt():
+    """策略适配页面：对一对买入/卖出策略遍历所有股票回测"""
+    return render_template('strategy_adapt.html')
+
+
+@app.route('/api/strategy/adapt/run', methods=['POST'])
+def api_strategy_adapt_run():
+    """启动策略适配后台任务，返回 run_id"""
+    try:
+        data = request.json or {}
+        buy_strategy_name = data.get('buy_strategy', '')
+        sell_strategy_name = data.get('sell_strategy', '')
+        start_date = data.get('start_date', '20200101')
+        end_date = data.get('end_date', '') or datetime.now().strftime('%Y%m%d')
+        initial_capital = float(data.get('initial_capital', 1000000))
+
+        if not buy_strategy_name and not sell_strategy_name:
+            return jsonify({'error': '请至少选择一个策略'}), 400
+
+        buy_strat = strategy_manager.get_strategy(buy_strategy_name) if buy_strategy_name else None
+        sell_strat = strategy_manager.get_strategy(sell_strategy_name) if sell_strategy_name else None
+
+        if not buy_strat and not sell_strat:
+            return jsonify({'error': '策略不存在，请检查策略名称'}), 400
+
+        from .strategy import merge_buy_sell_strategies
+        if buy_strat and sell_strat:
+            merged = merge_buy_sell_strategies(buy_strat, sell_strat)
+        elif buy_strat:
+            merged = buy_strat
+        else:
+            merged = sell_strat
+
+        import threading, uuid, time as _time
+        run_id = str(uuid.uuid4())
+        ADAPT_PROGRESS[run_id] = {
+            'status': 'running', 'done': 0, 'total': 0,
+            'current_stock': '', 'elapsed': 0,
+        }
+
+        def _worker():
+            import math as _math
+            t0 = _time.time()
+
+            def _json_safe(val, nd=2):
+                if isinstance(val, float) and (_math.isinf(val) or _math.isnan(val)):
+                    return 0
+                return round(val, nd) if val is not None else None
+
+            # Pre-load benchmark index data once
+            _BENCHMARK = '000001.SH'
+            try:
+                idx_raw = unified_data.get_historical_data(_BENCHMARK, start_date, end_date)
+                if idx_raw is not None and not idx_raw.empty:
+                    idx_df = idx_raw.copy()
+                    idx_df['date'] = pd.to_datetime(idx_df['date'])
+                    idx_df = idx_df.sort_values('date').reset_index(drop=True)
+                    for _n in [5, 10, 20, 60]:
+                        idx_df[f'idx_ret_{_n}'] = idx_df['close'].pct_change(_n) * 100
+                    idx_df['idx_pct_chg'] = idx_df['close'].pct_change() * 100
+                    idx_cols = ['date', 'idx_pct_chg'] + [f'idx_ret_{_n}' for _n in [5, 10, 20, 60]]
+                    idx_df = idx_df[idx_cols]
+                else:
+                    idx_df = None
+            except Exception:
+                idx_df = None
+
+            stocks = [s for s in stock_manager.get_all_stocks()
+                      if s.type not in ('index', 'sector')]
+            ADAPT_PROGRESS[run_id]['total'] = len(stocks)
+
+            results = []
+            for i, stock in enumerate(stocks):
+                code = stock.full_code
+                ADAPT_PROGRESS[run_id].update({
+                    'done': i,
+                    'current_stock': f"{stock.name}({stock.code})",
+                    'elapsed': round(_time.time() - t0, 1),
+                })
+                try:
+                    df = technical_indicators.calculate_all_indicators(code, start_date, end_date)
+                    if df is None or df.empty:
+                        continue
+                    if 'date' in df.columns:
+                        df['date'] = pd.to_datetime(df['date'])
+                    if 'boll_position' not in df.columns and 'boll_upper' in df.columns:
+                        import numpy as _np
+                        _rng = df['boll_upper'] - df['boll_lower']
+                        df['boll_position'] = (
+                            (df['close'] - df['boll_lower']) / _rng.replace(0, _np.nan)
+                        ).clip(0, 1).fillna(0.5)
+                    df = backtest_engine._merge_weekly_monthly(code, df)
+
+                    if idx_df is not None:
+                        try:
+                            for _n in [5, 10, 20, 60]:
+                                df[f'stock_ret_{_n}'] = df['close'].pct_change(_n) * 100
+                            df = pd.merge_asof(
+                                df.sort_values('date'), idx_df,
+                                on='date', direction='backward'
+                            )
+                            for _n in [5, 10, 20, 60]:
+                                df[f'rel_strength_{_n}'] = (
+                                    df[f'stock_ret_{_n}'] - df[f'idx_ret_{_n}']
+                                )
+                        except Exception:
+                            for _n in [5, 10, 20, 60]:
+                                df[f'rel_strength_{_n}'] = 0.0
+                    else:
+                        for _n in [5, 10, 20, 60]:
+                            df[f'rel_strength_{_n}'] = 0.0
+
+                    # Filter date range
+                    try:
+                        sd = pd.to_datetime(str(start_date), format='%Y%m%d', errors='coerce')
+                        ed = pd.to_datetime(str(end_date), format='%Y%m%d', errors='coerce')
+                        if pd.notna(sd):
+                            df = df[df['date'] >= sd]
+                        if pd.notna(ed):
+                            df = df[df['date'] <= ed]
+                        df = df.reset_index(drop=True)
+                    except Exception:
+                        pass
+
+                    result = backtest_engine.run_backtest(
+                        code, merged, start_date, end_date, initial_capital,
+                        precomputed_df=df
+                    )
+                    results.append({
+                        'code': stock.code,
+                        'full_code': code,
+                        'name': stock.name,
+                        'market': stock.market,
+                        'total_return_pct': _json_safe(result.total_return_pct, 2),
+                        'annual_return': _json_safe(result.annual_return, 2),
+                        'max_drawdown_pct': _json_safe(result.max_drawdown_pct, 2),
+                        'sharpe_ratio': _json_safe(result.sharpe_ratio, 4),
+                        'total_trades': result.total_trades,
+                        'win_rate': _json_safe(result.win_rate, 2),
+                        'profit_factor': _json_safe(result.profit_factor, 4),
+                    })
+                except Exception as e:
+                    logger.debug(f"策略适配回测 {code} 失败: {e}")
+                    results.append({
+                        'code': stock.code,
+                        'full_code': code,
+                        'name': stock.name,
+                        'market': getattr(stock, 'market', ''),
+                        'total_return_pct': None,
+                        'error': str(e),
+                    })
+
+            results.sort(
+                key=lambda x: x.get('total_return_pct') if x.get('total_return_pct') is not None else -9999,
+                reverse=True
+            )
+            best = next((r for r in results if r.get('total_return_pct') is not None), None)
+
+            ADAPT_RESULTS[run_id] = {
+                'status': 'done',
+                'buy_strategy': buy_strategy_name,
+                'sell_strategy': sell_strategy_name,
+                'start_date': start_date,
+                'end_date': end_date,
+                'results': results,
+                'best': best,
+                'elapsed': round(_time.time() - t0, 1),
+            }
+            ADAPT_PROGRESS[run_id].update({
+                'status': 'done', 'done': len(stocks),
+                'elapsed': round(_time.time() - t0, 1),
+            })
+
+        thread = threading.Thread(target=_worker, daemon=True)
+        thread.start()
+        return jsonify({'run_id': run_id}), 202
+
+    except Exception as e:
+        logger.exception(f"api_strategy_adapt_run error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/strategy/adapt/progress')
+def api_strategy_adapt_progress():
+    """SSE: 策略适配进度流"""
+    from flask import Response
+    run_id = request.args.get('run_id')
+    if not run_id:
+        return jsonify({'error': 'Missing run_id'}), 400
+
+    def gen():
+        import time as _time, json as _json
+        while True:
+            info = ADAPT_PROGRESS.get(run_id)
+            if info is None:
+                yield f"data: {_json.dumps({'status': 'not_found'})}\n\n"
+                break
+            try:
+                yield f"data: {_json.dumps(info)}\n\n"
+            except Exception:
+                yield "data: {\"status\":\"error\"}\n\n"
+            if info.get('status') in ('done', 'error'):
+                break
+            _time.sleep(1)
+
+    return Response(gen(), mimetype='text/event-stream')
+
+
+@app.route('/api/strategy/adapt/result')
+def api_strategy_adapt_result():
+    """获取策略适配结果"""
+    run_id = request.args.get('run_id')
+    if not run_id:
+        return jsonify({'error': 'Missing run_id'}), 400
+    res = ADAPT_RESULTS.get(run_id)
+    if res is None:
+        prog = ADAPT_PROGRESS.get(run_id)
+        if prog:
+            return jsonify({'status': 'running', 'progress': prog}), 202
+        return jsonify({'error': 'run_id not found'}), 404
+    return jsonify(res)
+
+
+# ============== 多策略回测 ==============
+
+# 多策略回测进度与结果存储
+MULTI_BT_PROGRESS: Dict[str, Dict] = {}
+MULTI_BT_RESULTS: Dict[str, Dict] = {}
+
+
+@app.route('/strategy/multi_backtest')
+def page_multi_backtest():
+    """多策略组合回测页面"""
+    return render_template('strategy_multi_backtest.html')
+
+
+@app.route('/api/strategy/multi_backtest/run', methods=['POST'])
+def api_multi_backtest_run():
+    """
+    多策略组合回测：每对(买入策略, 卖出策略, 股票)独立分配资金，共享资金池按比例分配。
+    请求体示例：
+    {
+      "pairs": [
+        {"buy_strategy": "中线超跌买入", "sell_strategy": "中线超跌卖出",
+         "stock_code": "600519.SH", "allocation": 40},
+        ...
+      ],
+      "start_date": "20240101",
+      "end_date": "20250101",
+      "total_capital": 1000000
+    }
+    """
+    try:
+        data = request.json or {}
+        pairs_input = data.get('pairs', [])
+        start_date = data.get('start_date', '20200101')
+        end_date = data.get('end_date', '') or datetime.now().strftime('%Y%m%d')
+        total_capital = float(data.get('total_capital', 1000000))
+
+        if not pairs_input:
+            return jsonify({'error': '请至少添加一组策略-股票配对'}), 400
+
+        from .strategy import merge_buy_sell_strategies
+        import threading, uuid, time as _time
+        run_id = str(uuid.uuid4())
+        MULTI_BT_PROGRESS[run_id] = {
+            'status': 'running', 'done': 0, 'total': len(pairs_input),
+            'current': '', 'elapsed': 0,
+        }
+
+        def _worker():
+            import math as _math
+            t0 = _time.time()
+
+            def _json_safe(val, nd=2):
+                if val is None:
+                    return None
+                if isinstance(val, float) and (_math.isinf(val) or _math.isnan(val)):
+                    return 0
+                return round(val, nd)
+
+            # Pre-load benchmark once
+            _BENCHMARK = '000001.SH'
+            try:
+                idx_raw = unified_data.get_historical_data(_BENCHMARK, start_date, end_date)
+                if idx_raw is not None and not idx_raw.empty:
+                    idx_df = idx_raw.copy()
+                    idx_df['date'] = pd.to_datetime(idx_df['date'])
+                    idx_df = idx_df.sort_values('date').reset_index(drop=True)
+                    for _n in [5, 10, 20, 60]:
+                        idx_df[f'idx_ret_{_n}'] = idx_df['close'].pct_change(_n) * 100
+                    idx_df['idx_pct_chg'] = idx_df['close'].pct_change() * 100
+                    idx_cols = ['date', 'idx_pct_chg'] + [f'idx_ret_{_n}' for _n in [5, 10, 20, 60]]
+                    idx_df = idx_df[idx_cols]
+                else:
+                    idx_df = None
+            except Exception:
+                idx_df = None
+
+            # 标准化 allocation：把各 pair 的百分比归一化为资金分配额
+            total_alloc = sum(float(p.get('allocation', 0)) for p in pairs_input)
+            if total_alloc <= 0:
+                # 均分
+                total_alloc = 100.0
+                for p in pairs_input:
+                    p['allocation'] = 100.0 / len(pairs_input)
+
+            pair_results = []
+            # equity curves 按日期对齐用
+            all_equity_series = []  # list of {date -> equity_value}
+
+            for i, pair in enumerate(pairs_input):
+                buy_name = pair.get('buy_strategy', '')
+                sell_name = pair.get('sell_strategy', '')
+                stock_code = pair.get('stock_code', '')
+                alloc_pct = float(pair.get('allocation', 100.0 / len(pairs_input)))
+                pair_capital = total_capital * (alloc_pct / total_alloc)
+
+                MULTI_BT_PROGRESS[run_id].update({
+                    'done': i,
+                    'current': f"{buy_name}+{sell_name} / {stock_code}",
+                    'elapsed': round(_time.time() - t0, 1),
+                })
+
+                if not stock_code:
+                    pair_results.append({
+                        'index': i, 'buy_strategy': buy_name, 'sell_strategy': sell_name,
+                        'stock_code': stock_code, 'stock_name': '—', 'allocation_pct': alloc_pct,
+                        'pair_capital': pair_capital, 'error': '未指定股票',
+                        'total_return_pct': None,
+                    })
+                    continue
+
+                buy_strat = strategy_manager.get_strategy(buy_name) if buy_name else None
+                sell_strat = strategy_manager.get_strategy(sell_name) if sell_name else None
+
+                if not buy_strat and not sell_strat:
+                    pair_results.append({
+                        'index': i, 'buy_strategy': buy_name, 'sell_strategy': sell_name,
+                        'stock_code': stock_code, 'stock_name': '—', 'allocation_pct': alloc_pct,
+                        'pair_capital': pair_capital, 'error': '策略不存在',
+                        'total_return_pct': None,
+                    })
+                    continue
+
+                if buy_strat and sell_strat:
+                    merged = merge_buy_sell_strategies(buy_strat, sell_strat)
+                elif buy_strat:
+                    merged = buy_strat
+                else:
+                    merged = sell_strat
+
+                # 查找股票名称
+                stock_obj = stock_manager.get_stock_by_code(stock_code)
+                stock_name = stock_obj.name if stock_obj else stock_code
+
+                try:
+                    # 准备 precomputed_df
+                    full_code = stock_obj.full_code if stock_obj else stock_code
+                    df = technical_indicators.calculate_all_indicators(full_code, start_date, end_date)
+                    if df is None or df.empty:
+                        raise ValueError('无法获取历史数据')
+
+                    if 'date' in df.columns:
+                        df['date'] = pd.to_datetime(df['date'])
+                    if 'boll_position' not in df.columns and 'boll_upper' in df.columns:
+                        import numpy as _np
+                        _rng = df['boll_upper'] - df['boll_lower']
+                        df['boll_position'] = (
+                            (df['close'] - df['boll_lower']) / _rng.replace(0, _np.nan)
+                        ).clip(0, 1).fillna(0.5)
+                    df = backtest_engine._merge_weekly_monthly(full_code, df)
+
+                    if idx_df is not None:
+                        try:
+                            for _n in [5, 10, 20, 60]:
+                                df[f'stock_ret_{_n}'] = df['close'].pct_change(_n) * 100
+                            df = pd.merge_asof(
+                                df.sort_values('date'), idx_df,
+                                on='date', direction='backward'
+                            )
+                            for _n in [5, 10, 20, 60]:
+                                df[f'rel_strength_{_n}'] = df[f'stock_ret_{_n}'] - df[f'idx_ret_{_n}']
+                        except Exception:
+                            for _n in [5, 10, 20, 60]:
+                                df[f'rel_strength_{_n}'] = 0.0
+                    else:
+                        for _n in [5, 10, 20, 60]:
+                            df[f'rel_strength_{_n}'] = 0.0
+
+                    # 日期过滤
+                    try:
+                        sd = pd.to_datetime(str(start_date), format='%Y%m%d', errors='coerce')
+                        ed = pd.to_datetime(str(end_date), format='%Y%m%d', errors='coerce')
+                        if pd.notna(sd):
+                            df = df[df['date'] >= sd]
+                        if pd.notna(ed):
+                            df = df[df['date'] <= ed]
+                        df = df.reset_index(drop=True)
+                    except Exception:
+                        pass
+
+                    result = backtest_engine.run_backtest(
+                        full_code, merged, start_date, end_date, pair_capital,
+                        precomputed_df=df
+                    )
+
+                    # 收集权益曲线供组合计算（equity_curve 是 DataFrame）
+                    ec_df = result.equity_curve
+                    if ec_df is not None and not ec_df.empty:
+                        ec_records = ec_df.to_dict(orient='records')
+                        ec_map = {}
+                        for rec in ec_records:
+                            d = rec.get('date')
+                            if d is not None:
+                                d_str = str(d)[:10]
+                                ec_map[d_str] = float(rec.get('equity', pair_capital))
+                        if ec_map:
+                            all_equity_series.append(ec_map)
+
+                    pair_results.append({
+                        'index': i,
+                        'buy_strategy': buy_name,
+                        'sell_strategy': sell_name,
+                        'stock_code': stock_code,
+                        'full_code': full_code,
+                        'stock_name': stock_name,
+                        'allocation_pct': _json_safe(alloc_pct, 1),
+                        'pair_capital': _json_safe(pair_capital, 0),
+                        'total_return_pct': _json_safe(result.total_return_pct, 2),
+                        'annual_return': _json_safe(result.annual_return, 2),
+                        'max_drawdown_pct': _json_safe(result.max_drawdown_pct, 2),
+                        'sharpe_ratio': _json_safe(result.sharpe_ratio, 4),
+                        'total_trades': result.total_trades,
+                        'win_rate': _json_safe(result.win_rate, 2),
+                        'profit_factor': _json_safe(result.profit_factor, 4),
+                        'final_equity': _json_safe(result.final_capital, 2),
+                    })
+                except Exception as e:
+                    logger.warning(f"多策略回测 {stock_code} 失败: {e}")
+                    import traceback as _tb
+                    logger.debug(_tb.format_exc())
+                    pair_results.append({
+                        'index': i, 'buy_strategy': buy_name, 'sell_strategy': sell_name,
+                        'stock_code': stock_code, 'stock_name': stock_name,
+                        'allocation_pct': alloc_pct, 'pair_capital': pair_capital,
+                        'error': str(e), 'total_return_pct': None,
+                    })
+
+            # ── 合并权益曲线 ──
+            combined_equity_curve = []
+            if all_equity_series:
+                all_dates = sorted(set().union(*[ec.keys() for ec in all_equity_series]))
+                # 对每个 series，用 forward-fill 填充缺失日期
+                filled = []
+                for ec_map in all_equity_series:
+                    arr = []
+                    last_val = None
+                    for d in all_dates:
+                        if d in ec_map:
+                            last_val = ec_map[d]
+                        arr.append(last_val)
+                    filled.append(arr)
+
+                for di, d in enumerate(all_dates):
+                    total_val = sum(
+                        (filled[si][di] or 0) for si in range(len(filled))
+                    )
+                    combined_equity_curve.append({'date': d, 'equity': round(total_val, 2)})
+
+            # ── 组合汇总指标 ──
+            valid_pairs = [p for p in pair_results if p.get('total_return_pct') is not None]
+            combined_return_pct = None
+            combined_annual = None
+            combined_max_dd = None
+            if combined_equity_curve:
+                import numpy as _np
+                equities = [c['equity'] for c in combined_equity_curve]
+                if equities and equities[0] and equities[0] > 0:
+                    combined_return_pct = round((equities[-1] / equities[0] - 1) * 100, 2)
+                    days_n = len(equities)
+                    years_n = days_n / 252
+                    if years_n > 0:
+                        combined_annual = round(((equities[-1] / equities[0]) ** (1 / years_n) - 1) * 100, 2)
+                    eq_arr = _np.array(equities, dtype=float)
+                    cummax = _np.maximum.accumulate(eq_arr)
+                    drawdowns = (eq_arr - cummax) / cummax
+                    combined_max_dd = round(float(drawdowns.min()) * 100, 2)
+
+            MULTI_BT_RESULTS[run_id] = {
+                'status': 'done',
+                'start_date': start_date,
+                'end_date': end_date,
+                'total_capital': total_capital,
+                'pair_results': pair_results,
+                'combined_equity_curve': combined_equity_curve,
+                'combined_return_pct': combined_return_pct,
+                'combined_annual': combined_annual,
+                'combined_max_dd': combined_max_dd,
+                'elapsed': round(_time.time() - t0, 1),
+            }
+            MULTI_BT_PROGRESS[run_id].update({
+                'status': 'done', 'done': len(pairs_input),
+                'elapsed': round(_time.time() - t0, 1),
+            })
+
+        thread = threading.Thread(target=_worker, daemon=True)
+        thread.start()
+        return jsonify({'run_id': run_id}), 202
+
+    except Exception as e:
+        logger.exception(f"api_multi_backtest_run error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/strategy/multi_backtest/progress')
+def api_multi_backtest_progress():
+    """SSE: 多策略回测进度"""
+    from flask import Response
+    run_id = request.args.get('run_id')
+    if not run_id:
+        return jsonify({'error': 'Missing run_id'}), 400
+
+    def gen():
+        import time as _time, json as _json
+        while True:
+            info = MULTI_BT_PROGRESS.get(run_id)
+            if info is None:
+                yield f"data: {_json.dumps({'status': 'not_found'})}\n\n"
+                break
+            try:
+                yield f"data: {_json.dumps(info)}\n\n"
+            except Exception:
+                yield "data: {\"status\":\"error\"}\n\n"
+            if info.get('status') in ('done', 'error'):
+                break
+            _time.sleep(1)
+
+    return Response(gen(), mimetype='text/event-stream')
+
+
+@app.route('/api/strategy/multi_backtest/result')
+def api_multi_backtest_result():
+    """获取多策略回测结果"""
+    run_id = request.args.get('run_id')
+    if not run_id:
+        return jsonify({'error': 'Missing run_id'}), 400
+    res = MULTI_BT_RESULTS.get(run_id)
+    if res is None:
+        prog = MULTI_BT_PROGRESS.get(run_id)
+        if prog:
+            return jsonify({'status': 'running', 'progress': prog}), 202
+        return jsonify({'error': 'run_id not found'}), 404
+    return jsonify(res)
+
+
 # ============== 启动函数 ==============
 
 def run_web_server(host=None, port=None, debug=None):
@@ -4849,7 +5754,23 @@ def run_web_server(host=None, port=None, debug=None):
             logger.info("调度器已在Web进程中自动启动")
     except Exception as e:
         logger.warning(f"自动启动调度器失败: {e}")
-    
+
+    # 启动时立即拉取一次实时数据（初始化快照），后续由全局更新循环按交易时间维护
+    import threading as _threading
+    def _initial_realtime_fetch():
+        global realtime_snapshot
+        try:
+            logger.info("启动时初始化实时数据...")
+            realtime_data_df = unified_data.get_realtime_data(adjust=True)
+            if not realtime_data_df.empty:
+                realtime_data = {row.get('code', ''): row for _, row in realtime_data_df.iterrows()}
+                realtime_snapshot.update(realtime_data)
+                unified_data.merge_realtime_data(realtime_data)
+                logger.info(f"初始实时数据已加载: {len(realtime_data)} 条")
+        except Exception as e:
+            logger.warning(f"初始实时数据加载失败: {e}")
+    _threading.Thread(target=_initial_realtime_fetch, daemon=True).start()
+
     app.run(host=host, port=port, debug=debug)
 
 

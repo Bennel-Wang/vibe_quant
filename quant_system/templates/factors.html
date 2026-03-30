@@ -168,11 +168,11 @@
                     <table class="table table-sm table-hover mb-0" id="opt-results-table">
                         <thead class="table-light">
                             <tr>
-                                <th>#</th><th>策略名称</th><th>总收益%</th><th>年化收益%</th>
+                                <th>#</th><th>买入策略</th><th>卖出策略</th><th>总收益%</th><th>年化收益%</th>
                                 <th>最大回撤%</th><th>夏普比率</th><th>交易次数</th><th>胜率%</th><th>盈亏比</th>
                             </tr>
                         </thead>
-                        <tbody><tr><td colspan="9" class="text-center text-muted py-3">点击"开始因子优化"运行</td></tr></tbody>
+                        <tbody><tr><td colspan="10" class="text-center text-muted py-3">点击"开始因子优化"运行</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -424,13 +424,16 @@ function runFactorOptimize() {
             // Show best strategy
             if (data.best_strategy) {
                 var b = data.best_strategy;
+                var pairName = b.buy_strategy_name
+                    ? (b.buy_strategy_name + ' + ' + b.sell_strategy_name)
+                    : (b.strategy_name || '');
                 var html = '<div class="row">';
                 html += '<div class="col-md-4 text-center">';
                 html += '<div class="fs-2 fw-bold text-success">' + (b.total_return_pct || 0) + '%</div>';
                 html += '<div class="text-muted">总收益率</div>';
                 html += '</div>';
                 html += '<div class="col-md-8">';
-                html += '<h5>' + b.strategy_name + '</h5>';
+                html += '<h5>' + pairName + '</h5>';
                 html += '<p class="text-muted small">' + (b.description || '') + '</p>';
                 html += '<div class="row">';
                 html += '<div class="col-4"><strong>年化:</strong> ' + (b.annual_return || 0) + '%</div>';
@@ -444,7 +447,7 @@ function runFactorOptimize() {
             // Render results table
             var tbody = $('#opt-results-table tbody');
             if (!data.results || data.results.length === 0) {
-                tbody.html('<tr><td colspan="9" class="text-center text-muted">无结果</td></tr>');
+                tbody.html('<tr><td colspan="10" class="text-center text-muted">无结果</td></tr>');
                 return;
             }
             var html = '';
@@ -452,7 +455,8 @@ function runFactorOptimize() {
                 var retCls = (r.total_return_pct || 0) > 0 ? 'positive' : (r.total_return_pct || 0) < 0 ? 'negative' : '';
                 html += '<tr' + (idx === 0 ? ' class="table-success"' : '') + '>';
                 html += '<td>' + (idx + 1) + '</td>';
-                html += '<td>' + r.strategy_name + '</td>';
+                html += '<td>' + (r.buy_strategy_name || r.strategy_name || '—') + '</td>';
+                html += '<td>' + (r.sell_strategy_name || '—') + '</td>';
                 html += '<td class="' + retCls + '">' + (r.total_return_pct != null ? r.total_return_pct + '%' : '<span class="text-danger">失败</span>') + '</td>';
                 html += '<td>' + (r.annual_return != null ? r.annual_return + '%' : '-') + '</td>';
                 html += '<td>' + (r.max_drawdown_pct != null ? r.max_drawdown_pct + '%' : '-') + '</td>';

@@ -45,15 +45,7 @@ stocks:
   industry: 白酒
   strategy: MACD策略
   buy_strategy: MACD策略
-  sell_strategy: MACD策略
-- name: 中国平安
-  code: '601318'
-  market: sh
-  type: stock
-  industry: 保险
-  strategy: RSI策略
-  buy_strategy: RSI策略
-  sell_strategy: RSI策略
+  sell_strategy: MACD死叉卖出
 - name: 比亚迪
   code: 002594
   market: sz
@@ -72,16 +64,6 @@ stocks:
   market: hk
   type: stock
   notes: 这个坑
-- name: 洋河股份
-  code: '002304'
-  market: sz
-  type: stock
-  industry: 白酒
-- name: 泸州老窖
-  code: 000568
-  market: sz
-  type: stock
-  industry: 白酒
 - name: 上海机场
   code: '600009'
   market: sh
@@ -92,6 +74,107 @@ stocks:
   market: sz
   type: stock
   industry: 家居用品
-  strategy: 中线2超跌
-  buy_strategy: 中线2超跌
-  sell_strategy: 中线超跌卖出
+  strategy: 布林带下轨买入
+  buy_strategy: 布林带下轨买入
+  sell_strategy: 布林带上轨卖出
+- name: 优必选
+  code: 09880
+  market: hk
+  type: stock
+- name: 快手-W
+  code: '01024'
+  market: hk
+  type: stock
+- name: 泡泡玛特
+  code: 09992
+  market: hk
+  type: stock
+- name: 特海国际
+  code: 09658
+  market: hk
+  type: stock
+- name: 阳光电源
+  code: '300274'
+  market: sz
+  type: stock
+  industry: 电气设备
+- name: 德赛西威
+  code: 002920
+  market: sz
+  type: stock
+  industry: 汽车配件
+- name: 万华化学
+  code: '600309'
+  market: sh
+  type: stock
+  industry: 化工原料
+- name: 波司登
+  code: 03998
+  market: hk
+  type: stock
+- name: 国盾量子
+  code: '688027'
+  market: sh
+  type: stock
+  industry: 通信设备
+- name: 沪电股份
+  code: '002463'
+  market: sz
+  type: stock
+  industry: 元器件
+- name: 英维克
+  code: 002837
+  market: sz
+  type: stock
+  industry: 专用机械
+- name: 长江电力
+  code: '600900'
+  market: sh
+  type: stock
+  industry: 水力发电
+- name: 华阳集团
+  code: 002906
+  market: sz
+  type: stock
+  industry: 汽车配件
+- name: 腾讯控股
+  code: '00700'
+  market: hk
+  type: stock
+- name: 拓普集团
+  code: '601689'
+  market: sh
+  type: stock
+  industry: 汽车配件
+- name: 中芯国际
+  code: '688981'
+  market: sh
+  type: stock
+  industry: 半导体
+- name: 北方华创
+  code: '002371'
+  market: sz
+  type: stock
+  industry: 半导体
+- name: 五粮液
+  code: 000858
+  market: sz
+  type: stock
+  industry: 白酒
+- name: 颐海国际
+  code: 01579
+  market: hk
+  type: stock
+- name: 小米集团-W
+  code: 01810
+  market: hk
+  type: stock
+- name: 华勤技术
+  code: '603296'
+  market: sh
+  type: stock
+  industry: 元器件
+- name: 海底捞
+  code: 06862
+  market: hk
+  type: stock
