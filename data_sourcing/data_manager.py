@@ -279,6 +279,119 @@ class DataManager:
 
         return df
 
+    def fetch_live_quotes(self, codes: list) -> list:
+        """直接从实时源获取最新行情，完全绕过本地 CSV 缓存。
+
+        适用于页面高频轮询场景。A 股批量调用新浪 API（单次请求），
+        港股调用 HKQuote。返回字段包含 Sina 报告的数据时间戳。
+
+        Args:
+            codes: 统一格式代码列表，如 ["000001.SZ", "600519.SH", "00700.HK"]
+
+        Returns:
+            list of dicts with keys:
+                code, name, now, open, prev_close, high, low,
+                volume (手), amount (元), pct_chg, change,
+                data_date (YYYY-MM-DD), data_time (HH:MM:SS)
+        """
+        import code_mapper as _cm
+
+        results = []
+        a_pairs = []   # [(unified_code, eq_code_with_prefix), ...]
+        hk_pairs = []  # [(unified_code, symbol), ...]
+
+        for code in codes:
+            market = _cm.get_market(code)
+            if market in ("A_STOCK", "A_INDEX"):
+                eq_code, _ = _cm.to_easyquotation(code)
+                if eq_code:
+                    a_pairs.append((code, eq_code))
+            elif market in ("HK_STOCK", "HK_INDEX"):
+                symbol, _ = _cm._split_code(code)
+                hk_pairs.append((code, symbol))
+
+        # ── A 股：批量新浪 API（单次 HTTP 请求拿所有代码）──────────────
+        if a_pairs:
+            eq_src = self._source_map.get("easyquotation")
+            if eq_src is None:
+                logger.warning("EasyquotationSource 未注册，跳过A股实时行情")
+            elif not eq_src._initialized and not eq_src.init():
+                logger.warning("EasyquotationSource 初始化失败，跳过A股实时行情")
+            else:
+                try:
+                    import easyquotation as _eq_lib
+                    quotation = _eq_lib.use("sina")
+                    eq_codes = [eq for _, eq in a_pairs]
+                    # prefix=True → 返回 key 为 "sh600519" 格式，方便匹配
+                    raw = quotation.real(eq_codes, prefix=True)
+                    for unified, eq_code in a_pairs:
+                        info = raw.get(eq_code)
+                        if not info:
+                            continue
+                        now_price = float(info.get("now", 0) or 0)
+                        if now_price <= 0:
+                            continue
+                        # Sina "close" = 昨收，"now" = 当前价
+                        prev_close = float(info.get("close", 0) or 0)
+                        change = round(now_price - prev_close, 4) if prev_close > 0 else None
+                        pct_chg = round((now_price - prev_close) / prev_close * 100, 4) if prev_close > 0 else None
+                        results.append({
+                            "code": unified,
+                            "name": info.get("name", ""),
+                            "now": now_price,
+                            "open": float(info.get("open", 0) or 0),
+                            "prev_close": prev_close,
+                            "high": float(info.get("high", 0) or 0),
+                            "low": float(info.get("low", 0) or 0),
+                            "volume": float(info.get("turnover", 0) or 0) / 100.0,
+                            "amount": float(info.get("volume", 0) or 0),
+                            "change": change,
+                            "pct_chg": pct_chg,
+                            "data_date": info.get("date", ""),   # e.g. "2024-01-10"
+                            "data_time": info.get("time", ""),   # e.g. "10:30:00"
+                        })
+                except Exception as e:
+                    logger.error(f"Sina批量实时行情失败: {e}", exc_info=True)
+
+        # ── 港股：FixedHKQuote ────────────────────────────────────────
+        if hk_pairs:
+            eq_src = self._source_map.get("easyquotation")
+            if eq_src and (eq_src._initialized or eq_src.init()):
+                try:
+                    from sources.fixed_hkquote import FixedHKQuote
+                    fixed_hk = FixedHKQuote()
+                    symbols = [sym for _, sym in hk_pairs]
+                    raw = fixed_hk.stocks(symbols)
+                    for unified, symbol in hk_pairs:
+                        info = (raw or {}).get(symbol)
+                        if not info:
+                            continue
+                        price = float(info.get("price", 0) or 0)
+                        if price <= 0:
+                            continue
+                        last_price = float(info.get("lastPrice", 0) or 0)
+                        pct_chg = float(info.get("dtd", 0) or 0)
+                        results.append({
+                            "code": unified,
+                            "name": info.get("name", ""),
+                            "now": price,
+                            "open": float(info.get("openPrice", 0) or 0),
+                            "prev_close": last_price,
+                            "high": float(info.get("high", 0) or 0),
+                            "low": float(info.get("low", 0) or 0),
+                            "volume": float(info.get("amount", 0) or 0) / 100.0,
+                            "amount": 0.0,
+                            "change": round(price - last_price, 4) if last_price > 0 else None,
+                            "pct_chg": pct_chg,
+                            "data_date": "",
+                            "data_time": info.get("time", ""),
+                        })
+                except Exception as e:
+                    logger.error(f"港股实时行情失败: {e}", exc_info=True)
+
+        logger.info(f"fetch_live_quotes: {len(results)}/{len(codes)} 成功")
+        return results
+
     def close_all(self):
         """关闭所有数据源"""
         for src in list(self._source_map.values()):

@@ -16,6 +16,9 @@
 - backtest: 回测引擎
 - risk_manager: 风控模块
 - notification: 消息通知
+- market_regime: 大盘环境检测
+- stock_classifier: 股票自动分类
+- strategy_matcher: 策略匹配引擎
 - web: Web可视化界面
 """
 

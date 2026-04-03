@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% block title %}大盘阶段判断及对应策略推荐 - 量化交易系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>AI日报 <small class="text-muted fs-6">Daily Report</small></h2>
+        <ul class="nav nav-tabs mt-3" id="report-tabs">
+            <li class="nav-item">
+                <a class="nav-link" href="/report">AI日报</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/report/market-analysis">大盘阶段判断及对应策略推荐</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <!-- Left panel: market regime card -->
+    <div class="col-md-4">
+        <div class="card mb-3" id="regime-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>📊 当前大盘阶段</strong>
+                <button class="btn btn-sm btn-outline-secondary" onclick="loadAll()">🔄 刷新</button>
+            </div>
+            <div class="card-body text-center" id="regime-body">
+                <div class="spinner-border text-primary my-3" role="status"></div>
+            </div>
+        </div>
+
+        <!-- Score breakdown card -->
+        <div class="card mb-3" id="score-card" style="display:none">
+            <div class="card-header"><strong>📈 评分细节</strong></div>
+            <div class="card-body p-2" id="score-body"></div>
+        </div>
+
+        <!-- Legend card -->
+        <div class="card">
+            <div class="card-header"><strong>📋 阶段说明</strong></div>
+            <div class="card-body p-2">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="badge bg-success me-2" style="width:80px">乐观</span>
+                    <small class="text-muted">大盘趋势向上，适合短线/成长股动量策略</small>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="badge bg-warning text-dark me-2" style="width:80px">混沌</span>
+                    <small class="text-muted">方向不明，适合震荡/中线策略</small>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="badge bg-danger me-2" style="width:80px">悲观</span>
+                    <small class="text-muted">趋势向下，以防御股为主，非防御股空仓</small>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-dark me-2" style="width:80px">极度悲观</span>
+                    <small class="text-muted">市场极弱，只适合长线价值布局</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right panel: stock strategy table -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>🏦 各股票适配策略推荐</strong>
+                <div>
+                    <span id="last-update-time" class="text-muted small me-3"></span>
+                    <button class="btn btn-sm btn-primary" onclick="sendAnalysis()" id="btn-send-analysis" disabled>
+                        📤 发送到微信
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm mb-0" id="stock-strategy-table">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width:80px">代码</th>
+                                <th style="width:100px">名称</th>
+                                <th style="width:80px">类型</th>
+                                <th style="width:100px">行业</th>
+                                <th>推荐策略</th>
+                                <th style="width:80px">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-strategy-tbody">
+                            <tr><td colspan="6" class="text-center text-muted py-4">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                正在分析大盘及股票数据...
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Send result area -->
+        <div id="send-result" class="mt-2"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var _analysisData = null;
+
+var REGIME_CONFIG = {
+    '乐观':   { badge: 'bg-success',         icon: '📈', score_range: '> 30' },
+    '混沌':   { badge: 'bg-warning text-dark', icon: '🌀', score_range: '-10 ~ 30' },
+    '悲观':   { badge: 'bg-danger',           icon: '📉', score_range: '-40 ~ -10' },
+    '极度悲观':{ badge: 'bg-dark',             icon: '🔻', score_range: '< -40' }
+};
+
+var CATEGORY_BADGES = {
+    '成长': 'bg-primary',
+    '防御': 'bg-success',
+    '周期': 'bg-warning text-dark',
+    '价值': 'bg-info text-dark'
+};
+
+function loadAll() {
+    loadRegime();
+    loadStockStrategies();
+}
+
+function loadRegime() {
+    $('#regime-body').html('<div class="spinner-border text-primary my-3" role="status"></div>');
+    $('#score-card').hide();
+
+    $.get('/api/market/regime', function(resp) {
+        if (!resp.success) {
+            $('#regime-body').html('<p class="text-danger">加载失败</p>');
+            return;
+        }
+        var d = resp.data;
+        var cfg = REGIME_CONFIG[d.regime_label] || { badge: 'bg-secondary', icon: '❓', score_range: '' };
+
+        var scoreVal = parseFloat(d.score) || 0;
+        var scoreCls = scoreVal >= 30 ? 'text-success' : scoreVal >= -10 ? 'text-warning' : scoreVal >= -40 ? 'text-danger' : 'text-dark';
+        $('#regime-body').html(
+            '<div class="mb-3">' +
+              '<span class="badge ' + cfg.badge + ' fs-4 px-3 py-2">' + cfg.icon + ' ' + d.regime_label + '</span>' +
+            '</div>' +
+            '<div class="display-6 fw-bold mb-1 ' + scoreCls + '">' + (scoreVal >= 0 ? '+' : '') + scoreVal.toFixed(1) + '</div>' +
+            '<div class="text-muted small mb-3">综合评分 (范围: -100 ~ +100，阈值: 极度悲观≤-40＜悲观≤-10＜混沌≤30＜乐观)</div>' +
+            '<p class="text-muted small mb-0">' + (d.detail || '') + '</p>'
+        );
+
+        // Score breakdown — use actual API fields (strings + floats)
+        function retBadge(val) {
+            var v = parseFloat(val) || 0;
+            var cls = v > 0 ? 'text-danger' : v < 0 ? 'text-success' : 'text-muted';
+            return '<span class="fw-bold small ' + cls + '">' + (v >= 0 ? '+' : '') + v.toFixed(2) + '%</span>';
+        }
+        function row(label, valueHtml, border) {
+            return '<div class="d-flex justify-content-between align-items-center py-1' + (border ? ' border-bottom' : '') + '">' +
+                '<span class="text-muted small">' + label + '</span>' + valueHtml + '</div>';
+        }
+        var MA_BADGE = { '多头排列': 'bg-danger', '空头排列': 'bg-success', '均线纠缠': 'bg-warning text-dark', '数据不足': 'bg-secondary' };
+        var RSI_BADGE = { '超买': 'bg-danger', '超卖': 'bg-success text-white', '中性': 'bg-secondary', '未知': 'bg-secondary' };
+        var maBadgeCls = MA_BADGE[d.ma_trend] || 'bg-secondary';
+        var rsiBadgeCls = RSI_BADGE[d.rsi_level] || 'bg-secondary';
+        var scoreRows =
+            row('分析日期', '<span class="fw-bold small">' + (d.date || '-') + '</span>', true) +
+            row('5日涨幅', retBadge(d.idx_ret_5), true) +
+            row('20日涨幅 (权重30%)', retBadge(d.idx_ret_20), true) +
+            row('60日涨幅 (权重20%)', retBadge(d.idx_ret_60), true) +
+            row('均线排列 (权重25%)', '<span class="badge ' + maBadgeCls + ' small">' + (d.ma_trend || '-') + '</span>', true) +
+            row('RSI状态 (权重15%)', '<span class="badge ' + rsiBadgeCls + ' small">' + (d.rsi_level || '-') + '</span>', false);
+        $('#score-body').html(scoreRows);
+        $('#score-card').show();
+    }).fail(function() {
+        $('#regime-body').html('<p class="text-danger">请求失败，请检查数据连接</p>');
+    });
+}
+
+function loadStockStrategies() {
+    var tbody = document.getElementById('stock-strategy-tbody');
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4"><div class="spinner-border spinner-border-sm me-2"></div>正在分析...</td></tr>';
+    $('#btn-send-analysis').prop('disabled', true);
+
+    $.get('/api/market/strategy-match', function(resp) {
+        if (!resp.success) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-danger text-center py-3">加载失败: ' + (resp.error || '') + '</td></tr>';
+            return;
+        }
+        _analysisData = resp.data;
+        var stocks = resp.data.stocks || [];
+        $('#last-update-time').text('更新时间: ' + new Date().toLocaleTimeString('zh-CN'));
+        $('#btn-send-analysis').prop('disabled', false);
+
+        tbody.innerHTML = '';
+        if (stocks.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">暂无股票数据</td></tr>';
+            return;
+        }
+
+        stocks.forEach(function(s) {
+            var catLabel = s.classification ? s.classification.category_label : '-';
+            var catBadge = CATEGORY_BADGES[catLabel] || 'bg-secondary';
+            var industry = s.classification ? (s.classification.industry || '-') : '-';
+
+            var stratHtml = '';
+            if (s.is_empty_position) {
+                stratHtml = '<span class="badge bg-secondary">空仓</span>' +
+                    '<small class="text-muted ms-2">当前大盘阶段不适合此股票类型</small>';
+            } else if (s.best_pair) {
+                stratHtml =
+                    '<div class="d-flex flex-wrap gap-1">' +
+                      '<div class="border border-success rounded px-2 py-1" style="background:rgba(40,167,69,.07)">' +
+                        '<span style="font-size:10px;color:#28a745;font-weight:600">🟢 买入</span><br>' +
+                        '<small>' + (s.best_pair.buy || '-') + '</small>' +
+                      '</div>' +
+                      '<div class="border border-danger rounded px-2 py-1" style="background:rgba(220,53,69,.07)">' +
+                        '<span style="font-size:10px;color:#dc3545;font-weight:600">🔴 卖出</span><br>' +
+                        '<small>' + (s.best_pair.sell || '-') + '</small>' +
+                      '</div>' +
+                    '</div>';
+            } else {
+                stratHtml = '<span class="text-muted">-</span>';
+            }
+
+            tbody.insertAdjacentHTML('beforeend',
+                '<tr>' +
+                  '<td><small class="text-muted">' + s.code + '</small></td>' +
+                  '<td><a href="/stock/' + (s.full_code || s.code) + '" class="text-decoration-none fw-semibold">' + s.name + '</a></td>' +
+                  '<td><span class="badge ' + catBadge + '">' + catLabel + '</span></td>' +
+                  '<td><small class="text-muted">' + industry + '</small></td>' +
+                  '<td>' + stratHtml + '</td>' +
+                  '<td>' +
+                    '<a href="/stock/' + (s.full_code || s.code) + '" class="btn btn-sm btn-outline-secondary">详情</a>' +
+                  '</td>' +
+                '</tr>'
+            );
+        });
+    }).fail(function() {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-danger text-center py-3">请求失败</td></tr>';
+    });
+}
+
+function sendAnalysis() {
+    if (!_analysisData) return;
+    var btn = document.getElementById('btn-send-analysis');
+    btn.disabled = true;
+    btn.textContent = '发送中...';
+
+    $.ajax({
+        url: '/api/market/strategy-match/send',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ data: _analysisData }),
+        success: function(resp) {
+            btn.disabled = false;
+            btn.textContent = '📤 发送到微信';
+            if (resp.success) {
+                $('#send-result').html('<div class="alert alert-success alert-dismissible fade show">✅ 大盘分析已发送到微信<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+            } else {
+                $('#send-result').html('<div class="alert alert-danger">发送失败: ' + (resp.error || '') + '</div>');
+            }
+        },
+        error: function() {
+            btn.disabled = false;
+            btn.textContent = '📤 发送到微信';
+            $('#send-result').html('<div class="alert alert-danger">请求失败</div>');
+        }
+    });
+}
+
+$(document).ready(function() {
+    loadAll();
+});
+</script>
+{% endblock %}

@@ -178,3 +178,8 @@ stocks:
   code: 06862
   market: hk
   type: stock
+- name: 首华燃气
+  code: '300483'
+  market: sz
+  type: stock
+  industry: 石油开采

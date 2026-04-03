@@ -1279,6 +1279,7 @@ def api_stock_chart(code):
 @app.route('/api/strategies')
 def api_strategies():
     """获取策略列表，返回内部 key 与显示名称"""
+    strategy_manager.reload_from_file()  # 热重载：自动同步磁盘上的策略变更
     strategies = []
     for key in strategy_manager.list_strategies():
         strat = strategy_manager.get_strategy(key)
@@ -1297,6 +1298,7 @@ def api_strategies():
 @app.route('/api/strategy/<name>')
 def api_strategy_detail(name):
     """获取策略详情（支持按 key 或 name 查找）"""
+    strategy_manager.reload_from_file()  # 热重载
     actual_key = name
     strategy = strategy_manager.strategies.get(name)
     if not strategy:
@@ -1348,6 +1350,7 @@ def api_run_strategy():
 def api_run_backtest():
     """运行回测（异步模式）：启动后台线程并返回 run_id；前端可通过 SSE 订阅进度并在完成后拉取结果。"""
     try:
+        strategy_manager.reload_from_file()  # 热重载，确保最新策略可用
         data = request.json
         code = data.get('code')
         buy_strategy_name = data.get('buy_strategy') or data.get('strategy')
@@ -2244,6 +2247,7 @@ def api_create_strategy():
             )
         
         # 保存到管理器
+        strategy.market_regime = data.get('market_regime', [])
         strategy_manager.add_strategy(name, strategy)
         
         # 保存策略到文件
@@ -2341,6 +2345,10 @@ def api_update_strategy(name):
                     reason=exc_data.get('reason', ''),
                     connector=exc_data.get('connector', 'OR')
                 ))
+
+        market_regime = data.get('market_regime')
+        if market_regime is not None:
+            strategy.market_regime = market_regime
         
         # 保存到文件
         save_strategies_to_file()
@@ -3228,30 +3236,41 @@ def api_data_realtime_global():
                 update_task_status['is_running'] = True
                 update_task_status['message'] = '全局实时更新已启动'
                 update_count = 0
+
+                def _do_fetch():
+                    """执行一次全量实时数据拉取并合并"""
+                    nonlocal update_count
+                    update_count += 1
+                    update_task_status['message'] = f'全局第 {update_count} 次实时更新...'
+                    try:
+                        realtime_data_df = unified_data.get_realtime_data(adjust=True)
+                        rt = {row.get('code', ''): row for _, row in realtime_data_df.iterrows()} if not realtime_data_df.empty else {}
+                    except Exception as e:
+                        logger.error(f"全局实时数据获取失败: {e}")
+                        rt = {}
+                    try:
+                        if rt:
+                            realtime_snapshot.update(rt)
+                            unified_data.merge_realtime_data(rt)
+                            update_task_status['message'] = f'全局第 {update_count} 次已合并 ({len(rt)} 只)'
+                    except Exception as e:
+                        logger.error(f"全局合并失败: {e}")
+                    update_task_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
                 try:
+                    # 立即做一次全量更新（无论是否在交易时间）
+                    _do_fetch()
+                    # 若非交易时间，完成初始更新后停止
+                    if not is_trading_time():
+                        update_task_status['message'] = '已完成全量更新，当前非交易时间，实时更新已停止'
+                        return
+                    # 交易时间：持续循环更新
                     while update_task_status['is_running'] and global_realtime_state['enabled']:
-                        # 非交易时间：休眠60秒后继续等待，不拉取数据
-                        if not is_trading_time():
-                            update_task_status['message'] = '非交易时间，暂停实时更新'
-                            time.sleep(60)
-                            continue
-                        update_count += 1
-                        update_task_status['message'] = f'全局第 {update_count} 次实时更新...'
-                        try:
-                            realtime_data_df = unified_data.get_realtime_data(adjust=True)
-                            realtime_data = {row.get('code', ''): row for _, row in realtime_data_df.iterrows()} if not realtime_data_df.empty else {}
-                        except Exception as e:
-                            logger.error(f"全局实时数据获取失败: {e}")
-                            realtime_data = {}
-                        try:
-                            if realtime_data:
-                                realtime_snapshot.update(realtime_data)
-                                unified_data.merge_realtime_data(realtime_data)
-                                update_task_status['message'] = f'全局第 {update_count} 次已合并'
-                        except Exception as e:
-                            logger.error(f"全局合并失败: {e}")
-                        update_task_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                         time.sleep(interval)
+                        if not is_trading_time():
+                            update_task_status['message'] = '已离开交易时间，实时更新已停止'
+                            break
+                        _do_fetch()
                     update_task_status['message'] = '全局实时更新已结束'
                 finally:
                     update_task_status['is_running'] = False
@@ -3321,6 +3340,8 @@ def api_data_realtime_latest():
             'volume': _sanitize(info.get('volume')),
             'amount': _sanitize(info.get('amount')),
             'notes': stock.notes if stock else '',
+            'data_time': info.get('data_time', ''),   # Sina-reported time HH:MM:SS
+            'data_date': info.get('data_date', ''),   # Sina-reported date YYYY-MM-DD
         }
 
     # 批量附加评分
@@ -4418,6 +4439,99 @@ def api_ai_daily_report_send():
         return jsonify({'error': str(e)}), 500
 
 
+# ============== 大盘分析 & 策略匹配 API ==============
+
+@app.route('/api/market/regime')
+def api_market_regime():
+    """获取当前大盘环境分析"""
+    try:
+        from .market_regime import market_regime_detector
+        date = request.args.get('date')
+        analysis = market_regime_detector.detect(date)
+        return jsonify({'success': True, 'data': analysis.to_dict()})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/market/stock-classification')
+def api_stock_classification():
+    """获取所有股票的自动分类"""
+    try:
+        from .stock_classifier import stock_classifier
+        results = stock_classifier.classify_all()
+        return jsonify({
+            'success': True,
+            'data': {code: c.to_dict() for code, c in results.items()}
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/market/strategy-match')
+def api_strategy_match():
+    """获取所有股票的策略匹配推荐"""
+    try:
+        from .strategy_matcher import strategy_matcher
+        date = request.args.get('date')
+        result = strategy_matcher.analyze_all_stocks(date)
+        return jsonify({'success': True, 'data': result})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/market/strategy-match/<code>')
+def api_strategy_match_stock(code):
+    """获取单只股票的策略匹配分析"""
+    try:
+        from .strategy_matcher import strategy_matcher
+        date = request.args.get('date')
+        result = strategy_matcher.analyze_stock(code, date)
+        return jsonify({'success': True, 'data': result})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/market/strategy-match/send', methods=['POST'])
+def api_market_strategy_match_send():
+    """将大盘阶段分析结果发送到微信通知"""
+    try:
+        data = request.json or {}
+        analysis = data.get('data', {})
+        market = analysis.get('market', {})
+        stocks = analysis.get('stocks', [])
+
+        regime_label = market.get('regime_label', '未知')
+        score = market.get('score', 0)
+        description = market.get('description', '')
+
+        date_str = datetime.now().strftime('%Y-%m-%d %H:%M')
+        content = f"## 🏦 大盘阶段判断及策略推荐 ({date_str})\n\n"
+        content += f"### 当前大盘阶段：{regime_label}（评分：{score:+.1f}）\n\n"
+        if description:
+            content += f"> {description}\n\n"
+
+        active = [s for s in stocks if not s.get('is_empty_position')]
+        empty = [s for s in stocks if s.get('is_empty_position')]
+
+        if active:
+            content += f"### ✅ 适配策略股票（{len(active)} 只）\n\n"
+            for s in active[:15]:
+                bp = s.get('best_pair', {}) or {}
+                cat = (s.get('classification') or {}).get('category_label', '')
+                content += f"**{s['name']}({s['code']})** [{cat}]\n"
+                content += f"  买入: {bp.get('buy', '-')} | 卖出: {bp.get('sell', '-')}\n\n"
+
+        if empty:
+            names = '、'.join(s['name'] for s in empty[:10])
+            content += f"### ⚠️ 建议空仓（{len(empty)} 只）\n{names}\n\n"
+
+        notification_manager.send_markdown_message(f"大盘阶段判断 {regime_label}", content)
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"发送大盘分析失败: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 # ============== 页面路由 ==============
 
 @app.route('/dashboard')
@@ -4474,6 +4588,12 @@ def page_groups():
 def page_report():
     """AI日报页面"""
     return render_template('report.html')
+
+
+@app.route('/report/market-analysis')
+def page_report_market_analysis():
+    """大盘阶段判断及对应策略推荐页面"""
+    return render_template('report_market_analysis.html')
 
 
 @app.route('/scheduler')
@@ -5747,9 +5867,11 @@ def run_web_server(host=None, port=None, debug=None):
     
     logger.info(f"启动Web服务器: http://{host}:{port}")
     
-    # 自动启动调度器（在web进程内）
+    # 自动启动调度器（仅在真正的 worker 进程中启动，防止 Werkzeug reloader 的 watcher 进程重复启动）
     try:
-        if not scheduler.is_running:
+        import os as _os
+        _is_reloader_watcher = debug and _os.environ.get('WERKZEUG_RUN_MAIN') != 'true'
+        if not _is_reloader_watcher and not scheduler.is_running:
             scheduler.start()
             logger.info("调度器已在Web进程中自动启动")
     except Exception as e:

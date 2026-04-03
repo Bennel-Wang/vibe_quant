@@ -250,6 +250,27 @@
                     <input type="number" class="form-control" id="new-max-position-ratio"
                            value="1.0" step="0.05" min="0.05" max="1.0" style="max-width:120px">
                 </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">适用大盘阶段 <span class="text-muted fw-normal small">（不勾选=全阶段适用）</span></label>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="new-regime-optimistic" value="optimistic">
+                            <label class="form-check-label" for="new-regime-optimistic">🟢 乐观</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="new-regime-chaotic" value="chaotic">
+                            <label class="form-check-label" for="new-regime-chaotic">🟡 混沌</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="new-regime-pessimistic" value="pessimistic">
+                            <label class="form-check-label" for="new-regime-pessimistic">🔴 悲观</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="new-regime-extremely_pessimistic" value="extremely_pessimistic">
+                            <label class="form-check-label" for="new-regime-extremely_pessimistic">⚫ 极度悲观</label>
+                        </div>
+                    </div>
+                </div>
                 <!-- 共用操作设置 -->
                 <div class="d-flex gap-4 mb-3 p-2 bg-light rounded border">
                     <div class="d-flex align-items-center gap-2">
@@ -325,6 +346,27 @@
                         <label class="form-label fw-bold">最大仓位上限 <span class="text-muted fw-normal small">（该策略触发时最多建仓的比例，0.1–1.0）</span></label>
                         <input type="number" class="form-control" id="edit-max-position-ratio"
                                value="1.0" step="0.05" min="0.05" max="1.0" style="max-width:120px">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">适用大盘阶段 <span class="text-muted fw-normal small">（不勾选=全阶段适用）</span></label>
+                        <div class="d-flex gap-3 flex-wrap">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="edit-regime-optimistic" value="optimistic">
+                                <label class="form-check-label" for="edit-regime-optimistic">🟢 乐观</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="edit-regime-chaotic" value="chaotic">
+                                <label class="form-check-label" for="edit-regime-chaotic">🟡 混沌</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="edit-regime-pessimistic" value="pessimistic">
+                                <label class="form-check-label" for="edit-regime-pessimistic">🔴 悲观</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="edit-regime-extremely_pessimistic" value="extremely_pessimistic">
+                                <label class="form-check-label" for="edit-regime-extremely_pessimistic">⚫ 极度悲观</label>
+                            </div>
+                        </div>
                     </div>
                     <!-- 共用操作设置 -->
                     <div class="d-flex gap-4 mb-3 p-2 bg-light rounded border">
@@ -461,8 +503,11 @@ function loadStrategies() {
 
             if (strategy.has_buy) { buyHtml += item; buySelectHtml += opt; }
             if (strategy.has_sell){ sellHtml += item; sellSelectHtml += opt; _sellStratsRun.push({key: key, name: displayName}); }
-            // 旧格式无 has_buy/has_sell 标记，放入买入框
-            if (!strategy.has_buy && !strategy.has_sell) { buyHtml += item; buySelectHtml += opt; }
+            // 旧格式无 has_buy/has_sell 标记，按名称中是否含"卖出"判断
+            if (!strategy.has_buy && !strategy.has_sell) {
+                if (displayName.includes('卖出')) { sellHtml += item; sellSelectHtml += opt; _sellStratsRun.push({key: key, name: displayName}); }
+                else { buyHtml += item; buySelectHtml += opt; }
+            }
         });
 
         $('#strategy-list-buy').html(buyHtml || '<p class="text-muted small px-2">暂无买入策略</p>');
@@ -956,7 +1001,12 @@ function createStrategy() {
         url: '/api/strategy/create',
         method: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({name: name, description: desc, max_position_ratio: parseFloat($('#new-max-position-ratio').val()) || 1.0, rules: rules, exclusion_rules: exclusion_rules}),
+        data: JSON.stringify({
+            name: name, description: desc,
+            max_position_ratio: parseFloat($('#new-max-position-ratio').val()) || 1.0,
+            market_regime: ['optimistic','chaotic','pessimistic','extremely_pessimistic'].filter(function(r){ return $('#new-regime-'+r).is(':checked'); }),
+            rules: rules, exclusion_rules: exclusion_rules
+        }),
         success: function(result) {
             createStrategyModal.hide();
             loadStrategies();
@@ -987,9 +1037,21 @@ function showStrategyDetail(name) {
         html += '<div class="p-2 border rounded bg-light" style="min-height:60px; white-space:pre-wrap;">' + descHtml + '</div>';
         html += '</div>';
         var maxPos = data.max_position_ratio != null ? data.max_position_ratio : 1.0;
-        html += '<div class="mb-3 d-flex align-items-center gap-2">';
+        html += '<div class="mb-3 d-flex align-items-center gap-2 flex-wrap">';
         html += '<span class="fw-bold">最大仓位上限：</span>';
         html += '<span class="badge bg-info text-dark fs-6">' + (maxPos * 100).toFixed(0) + '%</span>';
+        html += '</div>';
+        var regimeLabels = {optimistic:'🟢 乐观', chaotic:'🟡 混沌', pessimistic:'🔴 悲观', extremely_pessimistic:'⚫ 极度悲观'};
+        var regimeColors = {optimistic:'bg-success', chaotic:'bg-warning text-dark', pessimistic:'bg-danger', extremely_pessimistic:'bg-dark'};
+        html += '<div class="mb-3 d-flex align-items-center gap-2 flex-wrap">';
+        html += '<span class="fw-bold">适用大盘阶段：</span>';
+        if (data.market_regime && data.market_regime.length > 0) {
+            data.market_regime.forEach(function(r) {
+                html += '<span class="badge ' + (regimeColors[r]||'bg-secondary') + '">' + (regimeLabels[r]||r) + '</span>';
+            });
+        } else {
+            html += '<span class="text-muted small">全阶段适用</span>';
+        }
         html += '</div>';
         html += '<button class="btn btn-sm btn-primary" onclick="openEditStrategyModal()">编辑策略</button>';
         
@@ -1041,6 +1103,12 @@ function openEditStrategyModal() {
         $('#edit-strategy-name-visible').val(data.name || data.key || '');
         $('#edit-strategy-desc').val(data.description || '');
         $('#edit-max-position-ratio').val(data.max_position_ratio != null ? data.max_position_ratio : 1.0);
+
+        // 适用大盘阶段
+        var regimes = data.market_regime || [];
+        ['optimistic','chaotic','pessimistic','extremely_pessimistic'].forEach(function(r) {
+            $('#edit-regime-' + r).prop('checked', regimes.indexOf(r) !== -1);
+        });
         
         // 从第一条规则读取共用 action / position_ratio
         var firstRule = data.rules && data.rules[0];
@@ -1142,7 +1210,13 @@ function saveStrategyEdit() {
         url: '/api/strategy/' + name + '/update',
         method: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({name: $('#edit-strategy-name-visible').val().trim() || undefined, description: desc, max_position_ratio: parseFloat($('#edit-max-position-ratio').val()) || 1.0, rules: rules, exclusion_rules: exclusion_rules}),
+        data: JSON.stringify({
+            name: $('#edit-strategy-name-visible').val().trim() || undefined,
+            description: desc,
+            max_position_ratio: parseFloat($('#edit-max-position-ratio').val()) || 1.0,
+            market_regime: ['optimistic','chaotic','pessimistic','extremely_pessimistic'].filter(function(r){ return $('#edit-regime-'+r).is(':checked'); }),
+            rules: rules, exclusion_rules: exclusion_rules
+        }),
         success: function(result) {
             editStrategyModal.hide();
             loadStrategies();

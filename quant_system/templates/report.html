@@ -1,6 +1,20 @@
 {% extends "base.html" %}
 {% block title %}AI日报 - 量化交易系统{% endblock %}
 {% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>AI日报 <small class="text-muted fs-6">Daily Report</small></h2>
+        <ul class="nav nav-tabs mt-3" id="report-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="/report">AI日报</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/report/market-analysis">大盘阶段判断及对应策略推荐</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
 <div class="container-fluid mt-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4><i class="bi bi-newspaper"></i> 📊 AI每日总结与建议</h4>

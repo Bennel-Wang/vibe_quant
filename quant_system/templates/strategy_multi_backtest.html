@@ -225,8 +225,8 @@ function loadData() {
     $.get('/api/strategies', function(strategies) {
         _allStrategies = strategies;
         strategies.forEach(function(s) {
-            if (s.name && s.name.endsWith('买入')) _buyList.push(s);
-            else if (s.name && s.name.endsWith('卖出')) _sellList.push(s);
+            if (s.name && s.name.includes('买入')) _buyList.push(s);
+            else if (s.name && s.name.includes('卖出')) _sellList.push(s);
             else _otherList.push(s);
         });
         $.get('/api/stocks', function(stocks) {
@@ -253,9 +253,6 @@ function addDefaultRows() {
 function makeBuyOptions(selected) {
     var html = '<option value="">— 不指定 —</option>';
     _buyList.forEach(function(s) {
-        html += '<option value="' + esc(s.name) + '"' + (s.name === selected ? ' selected' : '') + '>' + esc(s.name) + '</option>';
-    });
-    _otherList.forEach(function(s) {
         html += '<option value="' + esc(s.name) + '"' + (s.name === selected ? ' selected' : '') + '>' + esc(s.name) + '</option>';
     });
     return html;

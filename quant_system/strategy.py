@@ -685,6 +685,7 @@ class QuantStrategy:
         self.rules: List[StrategyRule] = []
         self.exclusion_rules: List[StrategyRule] = []
         self.max_position_ratio: float = 1.0  # 该策略允许的最大仓位上限 (0-1)
+        self.market_regime: List[str] = []     # 适用的大盘阶段，空列表=全阶段适用
         self.parser = StrategyParser()
     
     def from_natural_language(self, description: str):
@@ -941,6 +942,7 @@ class QuantStrategy:
             'name': self.name,
             'description': self.description,
             'max_position_ratio': self.max_position_ratio,
+            'market_regime': self.market_regime,
             'rules': [asdict(r) for r in self.rules],
             'exclusion_rules': [asdict(r) for r in self.exclusion_rules],
         }
@@ -951,6 +953,7 @@ class QuantStrategy:
         strategy = cls(name=data.get('name', ''), description=data.get('description', ''))
         raw_max = data.get('max_position_ratio', 1.0)
         strategy.max_position_ratio = max(0.0, min(1.0, float(raw_max)))
+        strategy.market_regime = data.get('market_regime', [])
         for rule_data in data.get('rules', []):
             strategy.rules.append(StrategyRule(**rule_data))
         for exc_data in data.get('exclusion_rules', []):
@@ -1052,12 +1055,36 @@ class StrategyManager:
                 for key, strategy_data in data.items():
                     self.strategies[key] = QuantStrategy.from_dict(strategy_data)
                 loaded = bool(data)
+                self._strategies_file_mtime = os.path.getmtime(self._strategies_file)
                 logger.info(f"从文件加载了 {len(data)} 个策略")
             except Exception as e:
                 logger.error(f"加载策略文件失败: {e}")
         
         if not loaded:
             self._add_default_strategies()
+
+    def reload_from_file(self):
+        """重新从文件读取策略，合并到内存（热重载，无需重启服务）。
+        仅当文件修改时间变化时才执行，避免频繁IO。"""
+        if not os.path.exists(self._strategies_file):
+            return
+        try:
+            mtime = os.path.getmtime(self._strategies_file)
+            if mtime == getattr(self, '_strategies_file_mtime', None):
+                return  # 文件未变化，跳过
+            with open(self._strategies_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            for key, strategy_data in data.items():
+                self.strategies[key] = QuantStrategy.from_dict(strategy_data)
+            # 删除文件中已不存在的策略（同步清理）
+            file_keys = set(data.keys())
+            to_remove = [k for k in list(self.strategies.keys()) if k not in file_keys]
+            for k in to_remove:
+                del self.strategies[k]
+            self._strategies_file_mtime = mtime
+            logger.info(f"热重载策略文件: {len(data)} 个策略")
+        except Exception as e:
+            logger.error(f"热重载策略文件失败: {e}")
     
     def _add_default_strategies(self):
         """添加5个内置示例策略"""

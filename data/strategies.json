@@ -45,7 +45,7 @@
   },
   "RSI超卖反弹买入": {
     "name": "RSI超卖反弹买入",
-    "description": "日线RSI深度超卖后出现反弹信号时买入，适合短线波段操作",
+    "description": "[乐观市备选] avg_Sharpe=0.00. 适用: 大盘乐观+短线波段. 牛市中RSI难以深度超卖,触发较少. 仓位: 5-10%小仓位.",
     "max_position_ratio": 1.0,
     "rules": [
       {
@@ -75,7 +75,7 @@
   },
   "RSI超买卖出": {
     "name": "RSI超买卖出",
-    "description": "日线RSI进入超买区域时分批卖出，锁定短线利润",
+    "description": "配套RSI超卖反弹买入. 适用: 短线止盈.",
     "max_position_ratio": 1.0,
     "rules": [
       {
@@ -97,7 +97,7 @@
   },
   "MACD金叉买入": {
     "name": "MACD金叉买入",
-    "description": "MACD发生金叉且价格站上20日均线时买入，趋势跟踪策略",
+    "description": "[回测最优|乐观市] avg_Sharpe=1.83, avg_Ret=92.43%. 适用: 大盘乐观时, 成长股/科技股效果最佳(比亚迪Sharpe=2.79,宁德时代=2.33). 策略逻辑: MACD金叉+价格站上MA20. 仓位: 乐观市可用15-30%仓位.",
     "max_position_ratio": 1.0,
     "rules": [
       {
@@ -127,7 +127,7 @@
   },
   "MACD死叉卖出": {
     "name": "MACD死叉卖出",
-    "description": "MACD发生死叉时卖出，避免趋势反转损失",
+    "description": "配套MACD金叉买入. 适用: 大盘乐观时的止盈止损.",
     "max_position_ratio": 1.0,
     "rules": [
       {
@@ -149,7 +149,7 @@
   },
   "均线多头买入": {
     "name": "均线多头买入",
-    "description": "5日、20日、60日均线多头排列，价格回调到5日均线附近时买入",
+    "description": "[乐观市趋势] 适用: 大盘乐观, 均线多头排列追涨. 仓位: 10-20%.",
     "max_position_ratio": 1.0,
     "rules": [
       {
@@ -162,7 +162,7 @@
       {
         "condition": "ma_5 > ma_20 and close < ma_5 and close > ma_20",
         "action": "buy",
-        "position_ratio": 0.2,
+        "position_ratio": 0.25,
         "reason": "多头排列中价格回调至5日均线下方但在20日均线上，回调买入",
         "connector": "OR"
       }
@@ -179,7 +179,7 @@
   },
   "均线空头卖出": {
     "name": "均线空头卖出",
-    "description": "均线由多头转空头排列时减仓或清仓",
+    "description": "配套均线多头买入.",
     "max_position_ratio": 1.0,
     "rules": [
       {
@@ -201,7 +201,7 @@
   },
   "布林带下轨买入": {
     "name": "布林带下轨买入",
-    "description": "价格触及或跌破布林带下轨时买入，均值回归策略",
+    "description": "[混沌市均值回归] avg_Sharpe=0.19. 适用: 大盘混沌, 防御股效果好(长江电力Sharpe=1.24-1.82). 仓位: 10-20%.",
     "max_position_ratio": 1.0,
     "rules": [
       {
@@ -231,7 +231,7 @@
   },
   "布林带上轨卖出": {
     "name": "布林带上轨卖出",
-    "description": "价格触及或突破布林带上轨时卖出，锁定均值回归利润",
+    "description": "配套布林带下轨买入.",
     "max_position_ratio": 1.0,
     "rules": [
       {
@@ -253,7 +253,7 @@
   },
   "KDJ超卖买入": {
     "name": "KDJ超卖买入",
-    "description": "KDJ指标J值进入超卖区域并出现底背离时买入",
+    "description": "[混沌市] avg_Sharpe=0.21. 适用: 大盘混沌, 防御股(长江电力Sharpe=1.29-1.57). 仓位: 10-15%.",
     "max_position_ratio": 1.0,
     "rules": [
       {
@@ -275,7 +275,7 @@
   },
   "KDJ超买卖出": {
     "name": "KDJ超买卖出",
-    "description": "KDJ指标进入超买区域时减仓",
+    "description": "配套KDJ超卖买入.",
     "max_position_ratio": 1.0,
     "rules": [
       {
@@ -297,7 +297,7 @@
   },
   "低PE价值买入": {
     "name": "低PE价值买入",
-    "description": "市盈率处于历史低位且技术面企稳时买入，价值+技术双重验证",
+    "description": "[价值投资] 适用: 大盘乐观/混沌, PE历史低位+技术企稳. 仓位: 10-15%.",
     "max_position_ratio": 1.0,
     "rules": [
       {
@@ -327,7 +327,7 @@
   },
   "高PE高位卖出": {
     "name": "高PE高位卖出",
-    "description": "市盈率处于历史高位且技术面出现顶部信号时减仓",
+    "description": "配套低PE价值买入. PE历史高位+技术顶部信号.",
     "max_position_ratio": 1.0,
     "rules": [
       {
@@ -342,6 +342,583 @@
         "action": "sell",
         "position_ratio": 0.5,
         "reason": "PE极高且MACD转负，高估值顶部确认",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "短线突破买入": {
+    "name": "短线突破买入",
+    "description": "[乐观市] avg_Sharpe=0.74, avg_Ret=5.55%. 适用: 大盘乐观, 成长股放量突破. 仓位: 10-15%.",
+    "max_position_ratio": 0.1,
+    "rules": [
+      {
+        "condition": "volume_ratio > 2.0 and close > ma_20 and ma_5 > ma_20 and rsi_6 < 72 and overall_score > 0",
+        "action": "buy",
+        "position_ratio": 0.1,
+        "reason": "放量>2倍+站上20日线+均线多头排列+RSI未超买+大盘正面，强势二次突破确认",
+        "connector": "OR"
+      },
+      {
+        "condition": "boll_position > 0.7 and volume_ratio > 1.8 and close > ma_20 and rsi_6 < 75",
+        "action": "buy",
+        "position_ratio": 0.1,
+        "reason": "布林上半区>0.7+放量+20日线上方+RSI未超买，突破布林中上轨",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": [
+      {
+        "condition": "rsi_6 > 80",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "RSI超买，不追高",
+        "connector": "OR"
+      },
+      {
+        "condition": "overall_score < -30",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "大盘评分<-30，市场较弱，短线不入场",
+        "connector": "OR"
+      }
+    ]
+  },
+  "短线趋势卖出": {
+    "name": "短线趋势卖出",
+    "description": "配套短线突破买入. 适用: 乐观市跌破五日线止损.",
+    "max_position_ratio": 1.0,
+    "rules": [
+      {
+        "condition": "close < ma_5 and overall_score < 20",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "跌破五日线且大盘评分<20，趋势延续失败，止损",
+        "connector": "OR"
+      },
+      {
+        "condition": "rsi_6 > 82 and pct_chg < -0.5",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "RSI超买区且当日收跌0.5%以上，高位止盈",
+        "connector": "OR"
+      },
+      {
+        "condition": "volume_ratio > 3 and pct_chg < -3",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "大量(>3倍)暴跌>3%，主力出货信号，立即止损",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "中线1反身性买入": {
+    "name": "中线1反身性买入",
+    "description": "[乐观市中线] avg_Sharpe=0.62, avg_Ret=13.34%. 适用: 大盘乐观, 反身性增强效应. 策略逻辑: 股价持续强于大盘+基本面改善+情绪发酵. 仓位: 15-25%, 确定性>90%再入场.",
+    "max_position_ratio": 0.2,
+    "rules": [
+      {
+        "condition": "rel_strength_20 > 5 and rsi_6 < 70 and close > ma_20",
+        "action": "buy",
+        "position_ratio": 0.1,
+        "reason": "20日相对大盘超额收益>5%+RSI未过热+站上20日线，反身性P条件满足",
+        "connector": "OR"
+      },
+      {
+        "condition": "w_rsi6_pct100 < 65 and overall_score > 20 and w_ma_5 > w_ma_20 and close > ma_20",
+        "action": "buy",
+        "position_ratio": 0.1,
+        "reason": "周线未过热+大盘综合评分正面>20+周线多头排列+站上20日线，反身性三条件近似满足",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": [
+      {
+        "condition": "rsi_6 > 75",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "RSI已高位，不追高",
+        "connector": "OR"
+      },
+      {
+        "condition": "w_rsi6_pct100 > 80",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "周线RSI百分位已到高位，反身性增强空间有限",
+        "connector": "OR"
+      }
+    ]
+  },
+  "中线1反身性卖出": {
+    "name": "中线1反身性卖出",
+    "description": "配套中线1反身性买入. 三条件同时反向则卖出.",
+    "max_position_ratio": 1.0,
+    "rules": [
+      {
+        "condition": "rel_strength_5 < -3 and overall_score < 0",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "5日相对大盘明显弱+大盘评分转负，反身性P条件反向",
+        "connector": "OR"
+      },
+      {
+        "condition": "close < ma_20 and w_ma_5 < w_ma_20",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "跌破20日线且周线均线空头排列，趋势结构破坏",
+        "connector": "OR"
+      },
+      {
+        "condition": "rsi_6 > 85",
+        "action": "sell",
+        "position_ratio": 0.3,
+        "reason": "RSI极度超买，超涨止盈",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "中线2三重保护买入": {
+    "name": "中线2三重保护买入",
+    "description": "[混沌市] avg_Sharpe=0.12. 适用: 大盘混沌/震荡, 周期/价值股. 策略逻辑: 低估值+支撑有效+利空出尽. 仓位: 10-15%, 只做刚需行业龙头.",
+    "max_position_ratio": 0.2,
+    "rules": [
+      {
+        "condition": "w_rsi6_pct100 < 15 and rel_strength_5 > 0 and rsi_6 < 40",
+        "action": "buy",
+        "position_ratio": 0.05,
+        "reason": "周线RSI百分位极低(历史15%以下)+近期止跌强于大盘+日线未高，三重保护满足",
+        "connector": "OR"
+      },
+      {
+        "condition": "w_rsi6_pct100 < 20 and close > ma_20 * 0.97 and rsi_6 < 40",
+        "action": "buy",
+        "position_ratio": 0.05,
+        "reason": "周线极低(历史20%以下)+20日线支撑有效+日线超跌，支撑确认后加仓",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": [
+      {
+        "condition": "m_rsi6_pct100 < 3",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "月线RSI在极端历史低位(3%以下)，极端下跌趋势，等待更明确止跌信号",
+        "connector": "OR"
+      },
+      {
+        "condition": "overall_score < -50",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "大盘极度悲观，不逆势操作",
+        "connector": "OR"
+      }
+    ]
+  },
+  "中线2估值修复卖出": {
+    "name": "中线2估值修复卖出",
+    "description": "配套中线2三重保护买入. 估值回到合理位置即离场.",
+    "max_position_ratio": 1.0,
+    "rules": [
+      {
+        "condition": "w_rsi6_pct100 > 75",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "周线RSI百分位回到历史75分位，估值修复目标达到，止盈",
+        "connector": "OR"
+      },
+      {
+        "condition": "close < ma_20 * 0.97",
+        "action": "sell",
+        "position_ratio": 0.3,
+        "reason": "跌破20日支撑线3%以上，逻辑被破坏，止损",
+        "connector": "OR"
+      },
+      {
+        "condition": "m_rsi6_pct100 > 70 and rel_strength_5 < 0",
+        "action": "sell",
+        "position_ratio": 0.3,
+        "reason": "月线RSI回到中高位且股价已走弱，阶段顶部信号",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "长线4421极限买入": {
+    "name": "长线4421极限买入",
+    "description": "[极度悲观市] avg_Sharpe=0.04, avg_Ret=0.37%. 适用: 大盘极度悲观(贸易战/急跌), 追求赔率. 策略逻辑: 大盘4421信号+月线周线双低. 仓位: 20-30%(底部重仓), 目标3-4倍.",
+    "max_position_ratio": 0.6,
+    "rules": [
+      {
+        "condition": "m_rsi6_pct100 < 15 and w_rsi6_pct100 < 15 and idx_ret_20 < -5",
+        "action": "buy",
+        "position_ratio": 0.04,
+        "reason": "月线周线RSI双低(历史15%以下)+大盘近月跌幅>5%，4421大底信号初步触发",
+        "connector": "OR"
+      },
+      {
+        "condition": "m_rsi6_pct100 < 20 and pettm_pct10y < 20 and w_rsi_6 < 40",
+        "action": "buy",
+        "position_ratio": 0.04,
+        "reason": "月线极低+PE历史20%以下+周线RSI超跌，极值低估组合买点",
+        "connector": "OR"
+      },
+      {
+        "condition": "m_rsi6_pct100 < 25 and idx_ret_60 < -10 and overall_score < -20",
+        "action": "buy",
+        "position_ratio": 0.04,
+        "reason": "月线中低位+大盘60日跌幅>10%+大盘综合评分悲观，分批建仓信号",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": [
+      {
+        "condition": "pettm_pct10y > 50",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "PE估值超过历史50%分位，不是真正低估，不可重仓",
+        "connector": "OR"
+      },
+      {
+        "condition": "idx_ret_5 > 5",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "大盘短期反弹过快，等回调再建仓",
+        "connector": "OR"
+      }
+    ]
+  },
+  "长线泡沫卖出": {
+    "name": "长线泡沫卖出",
+    "description": "配套长线4421极限买入. 估值泡沫/不再成长/杀逻辑时清仓.",
+    "max_position_ratio": 1.0,
+    "rules": [
+      {
+        "condition": "m_rsi6_pct100 > 90 and w_rsi6_pct100 > 85",
+        "action": "sell",
+        "position_ratio": 0.3,
+        "reason": "月线周线RSI双高(历史90/85分位以上)，泡沫确认，分批减仓",
+        "connector": "OR"
+      },
+      {
+        "condition": "m_rsi6_pct100 > 85 and pettm_pct10y > 85 and rel_strength_5 < 0",
+        "action": "sell",
+        "position_ratio": 0.3,
+        "reason": "月线RSI高位+PE高估+近期走弱，三重顶部信号，继续减仓",
+        "connector": "OR"
+      },
+      {
+        "condition": "m_rsi6_pct100 > 95",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "月线RSI达历史极高(95分位以上)，泡沫严重，清仓",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "超级长线价值买入": {
+    "name": "超级长线价值买入",
+    "description": "[无视大盘] 适用: 任何大盘环境. 只买最好的生意(定价权+20年护城河+ROE>15%). 安全边际50%. 持有10-20年. 仓位: 20-30%.",
+    "max_position_ratio": 0.2,
+    "rules": [
+      {
+        "condition": "w_rsi6_pct100 < 20 and pettm_pct10y < 25 and overall_score > -60",
+        "action": "buy",
+        "position_ratio": 0.15,
+        "reason": "周线RSI历史极低(20%以下)+PE在历史25%以下+大盘未极度悲观，绝对价值底部，大仓位买入",
+        "connector": "OR"
+      },
+      {
+        "condition": "m_rsi6_pct100 < 25 and close > ma_20 * 0.97 and w_rsi6_pct100 < 30",
+        "action": "buy",
+        "position_ratio": 0.1,
+        "reason": "月线极低+日线企稳于20日线附近+周线低位，右侧阶段低点买入",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": [
+      {
+        "condition": "pe_ttm < 0",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "亏损企业不买，超级长线只买盈利质量高的公司",
+        "connector": "OR"
+      },
+      {
+        "condition": "m_rsi6_pct100 > 45",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "月线RSI超过历史45%分位，未到价值底部，等待更佳安全边际",
+        "connector": "OR"
+      }
+    ]
+  },
+  "超级长线卖出": {
+    "name": "超级长线卖出",
+    "description": "配套超级长线价值买入. PE超过历史极高+月线RSI持续95+才清仓.",
+    "max_position_ratio": 1.0,
+    "rules": [
+      {
+        "condition": "m_rsi6_pct100 > 90 and pettm_pct10y > 90",
+        "action": "sell",
+        "position_ratio": 0.3,
+        "reason": "月线RSI极高且PE极高(双90分位以上)，泡沫信号，减仓1/3",
+        "connector": "OR"
+      },
+      {
+        "condition": "m_rsi6_pct100 > 85 and w_rsi6_pct100 > 85 and rel_strength_20 < -5",
+        "action": "sell",
+        "position_ratio": 0.2,
+        "reason": "月线周线双高且20日相对大盘已走弱，泡沫顶部+趋势反转，继续减仓",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "成长股强势动量买入": {
+    "name": "成长股强势动量买入",
+    "description": "[全天候|回测优秀] avg_Sharpe=1.26, avg_Ret=28.71%. 适用: 无视大盘,成长型/科技股. 代表股: 比亚迪(Sharpe=2.35), 宁德时代(Sharpe=1.89). 策略逻辑: 相对强度+MACD+趋势. 仓位: 15-25%.",
+    "max_position_ratio": 0.45,
+    "rules": [
+      {
+        "condition": "rel_strength_10 > 2 and macd_histogram > 0 and rsi_6 > 32 and rsi_6 < 62 and close > ma_20 and volume_ratio > 1.3",
+        "action": "buy",
+        "position_ratio": 0.22,
+        "reason": "CH1主力通道：10日跑赢大盘2%以上+MACD金叉确认+RSI中性区(32-62)+站20日均线+量比>1.3放量，高置信度建仓22%",
+        "connector": "OR"
+      },
+      {
+        "condition": "w_rsi6_pct100 < 30 and rsi_6 > 25 and rsi_6 < 50 and close > ma_60 * 0.95 and volume_ratio > 1.2",
+        "action": "buy",
+        "position_ratio": 0.12,
+        "reason": "CH2超跌恢复：周线RSI处于历史30%分位以下（超跌）+日线RSI在25-50回升区间+未破60日线5%+放量1.2倍，抄底12%",
+        "connector": "OR"
+      },
+      {
+        "condition": "rel_strength_20 > 5 and close > ma_20 and macd_histogram > 0 and rsi_6 < 65",
+        "action": "buy",
+        "position_ratio": 0.06,
+        "reason": "CH3趋势延续：20日跑赢大盘超5%+站20线+MACD正区+RSI未超买，小仓位追加6%",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": [
+      {
+        "condition": "rsi_6 > 72",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "RSI>72短期过热，不追高",
+        "connector": "OR"
+      },
+      {
+        "condition": "overall_score < -55",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "大盘综合评分<-55，系统性恐慌禁止买入",
+        "connector": "OR"
+      },
+      {
+        "condition": "rel_strength_10 < -5",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "10日跑输大盘5%以上，弱势股不做",
+        "connector": "OR"
+      }
+    ]
+  },
+  "成长股强势动量卖出": {
+    "name": "成长股强势动量卖出",
+    "description": "配套成长股强势动量买入. 延迟止盈(周线RSI>80)+硬止损(破MA20-4%).",
+    "max_position_ratio": 1.0,
+    "rules": [
+      {
+        "condition": "w_rsi6_pct100 > 80 and rsi_6 > 70",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "延迟止盈：周线RSI达80%分位+日线RSI>70，卖出50%锁定利润，保留剩余仓位继续跑",
+        "connector": "OR"
+      },
+      {
+        "condition": "w_rsi6_pct100 > 88",
+        "action": "sell",
+        "position_ratio": 0.6,
+        "reason": "极高位止盈：周线RSI达88%历史极高位，大幅减仓60%防顶部逆转",
+        "connector": "OR"
+      },
+      {
+        "condition": "close < ma_20 * 0.96",
+        "action": "sell",
+        "position_ratio": 1.0,
+        "reason": "硬止损：跌破20日均线4%，全部清仓保护本金",
+        "connector": "OR"
+      },
+      {
+        "condition": "macd < macd_signal and close < ma_20",
+        "action": "sell",
+        "position_ratio": 0.6,
+        "reason": "趋势反转：MACD死叉+跌破20日线，减仓60%",
+        "connector": "OR"
+      },
+      {
+        "condition": "rel_strength_5 < -8",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "急速走弱：5日内跑输大盘8%以上，减仓50%防继续下跌",
+        "connector": "OR"
+      },
+      {
+        "condition": "rsi_6 > 85 and pct_chg < -0.5",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "超买转跌：RSI>85极超买区当日下跌，止盈50%",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "防御股熊市超跌买入": {
+    "name": "防御股熊市超跌买入",
+    "description": "[悲观市唯一] avg_Sharpe=-0.45, 回撤远小于大盘. 适用: 大盘悲观时仅限防御型股票(公用事业/消费). 代表股: 长江电力(Sharpe=0.79,WR=91%). 仓位: 5-10%小仓位快进快出. 非防御股应空仓.",
+    "max_position_ratio": 0.3,
+    "rules": [
+      {
+        "condition": "idx_ret_20 < -3 and rsi_6 < 25 and boll_position < 0.15 and volume_ratio > 1.5",
+        "action": "buy",
+        "position_ratio": 0.15,
+        "reason": "CH1恐慌底部：大盘20日跌超3%+RSI极超卖(<25)+布林极下轨(<15%)+放量1.5倍=恐慌性抛售底部，买入15%",
+        "connector": "OR"
+      },
+      {
+        "condition": "idx_ret_10 < -2 and w_rsi6_pct100 < 15 and rsi_6 < 32 and rsi_6 > 18",
+        "action": "buy",
+        "position_ratio": 0.1,
+        "reason": "CH2周线超跌：大盘10日跌超2%+周线RSI位于历史15%分位以下+日线RSI开始回升(18-32区间)，加仓10%",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": [
+      {
+        "condition": "idx_ret_20 > 2",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "大盘20日涨超2%，非熊市环境不适用此策略",
+        "connector": "OR"
+      },
+      {
+        "condition": "close < ma_60 * 0.85",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "跌破60日线15%，趋势完全破坏不接刀",
+        "connector": "OR"
+      }
+    ]
+  },
+  "防御股熊市超跌卖出": {
+    "name": "防御股熊市超跌卖出",
+    "description": "配套防御股熊市超跌买入. 反弹至布林中轨即止盈.",
+    "max_position_ratio": 1.0,
+    "rules": [
+      {
+        "condition": "rsi_6 > 58 and boll_position > 0.5",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "快速止盈：RSI回升至58以上+价格回到布林中轨，减仓50%锁定反弹收益",
+        "connector": "OR"
+      },
+      {
+        "condition": "w_rsi6_pct100 > 60",
+        "action": "sell",
+        "position_ratio": 0.6,
+        "reason": "反弹完成：周线RSI回到60%分位以上（中高位），减仓60%，反弹行情基本结束",
+        "connector": "OR"
+      },
+      {
+        "condition": "close < ma_60 * 0.92",
+        "action": "sell",
+        "position_ratio": 1.0,
+        "reason": "硬止损：跌破60日均线8%，全部清仓防止深度套牢",
+        "connector": "OR"
+      },
+      {
+        "condition": "rsi_6 > 70",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "过热止盈：RSI达70不贪，减仓50%",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": []
+  },
+  "震荡市RSI波段买入": {
+    "name": "震荡市RSI波段买入",
+    "description": "[回测最优|混沌市] avg_Sharpe=0.24, 长江电力Sharpe=1.22-1.82. 适用: 大盘震荡/混沌, 防御型/周期型股票(万华化学/长江电力/索菲亚). 策略逻辑: RSI<28+布林下轨触发买入. 仓位: 10-15%.",
+    "max_position_ratio": 0.25,
+    "rules": [
+      {
+        "condition": "abs(idx_ret_20) < 5 and rsi_6 < 28 and boll_position < 0.30 and volume_ratio > 1.0",
+        "action": "buy",
+        "position_ratio": 0.12,
+        "reason": "CH1超卖买入：大盘20日涨跌<5%(横盘确认)+RSI极超卖(<28)+布林下轨区(<30%)+有成交量，建仓12%",
+        "connector": "OR"
+      },
+      {
+        "condition": "abs(idx_ret_20) < 5 and rsi_6 < 35 and rsi_6 > 20 and w_rsi6_pct100 < 25 and close > ma_60 * 0.95",
+        "action": "buy",
+        "position_ratio": 0.08,
+        "reason": "CH2周线底部：横盘+RSI低区(20-35)+周线位于历史25%分位以下+未破60日线5%，加仓8%",
+        "connector": "OR"
+      }
+    ],
+    "exclusion_rules": [
+      {
+        "condition": "rsi_6 > 55",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "RSI>55不在超卖区，不符合区间交易逻辑",
+        "connector": "OR"
+      },
+      {
+        "condition": "close < ma_60 * 0.90",
+        "action": "hold",
+        "position_ratio": 0,
+        "reason": "跌破60日线10%，已非横盘而是趋势下跌，此策略不适用",
+        "connector": "OR"
+      }
+    ]
+  },
+  "震荡市RSI波段卖出": {
+    "name": "震荡市RSI波段卖出",
+    "description": "配套震荡市RSI波段买入. RSI>65+布林中上轨止盈.",
+    "max_position_ratio": 1.0,
+    "rules": [
+      {
+        "condition": "rsi_6 > 65 and boll_position > 0.60",
+        "action": "sell",
+        "position_ratio": 0.6,
+        "reason": "区间止盈：RSI回到65以上+布林带上方60%位置，减仓60%兑现波段收益",
+        "connector": "OR"
+      },
+      {
+        "condition": "rsi_6 > 72",
+        "action": "sell",
+        "position_ratio": 0.5,
+        "reason": "超买止盈：RSI进入超买区(>72)，减仓50%不贪",
+        "connector": "OR"
+      },
+      {
+        "condition": "w_rsi6_pct100 > 68",
+        "action": "sell",
+        "position_ratio": 0.4,
+        "reason": "周线高位：周线RSI达68%分位以上，减仓40%",
+        "connector": "OR"
+      },
+      {
+        "condition": "close < ma_20 * 0.96",
+        "action": "sell",
+        "position_ratio": 1.0,
+        "reason": "硬止损：跌破20日均线4%，全部清仓",
         "connector": "OR"
       }
     ],

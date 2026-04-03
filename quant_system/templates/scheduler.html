@@ -194,6 +194,8 @@
                 <label class="btn btn-outline-success btn-sm" for="type-ai_report">🤖 AI日报</label>
                 <input type="checkbox" class="btn-check" id="type-strategy_alert" autocomplete="off">
                 <label class="btn btn-outline-warning btn-sm" for="type-strategy_alert">📡 策略提醒</label>
+                <input type="checkbox" class="btn-check" id="type-market_strategy_analysis" autocomplete="off">
+                <label class="btn btn-outline-primary btn-sm" for="type-market_strategy_analysis">🏦 大盘阶段判断</label>
             </div>
         </div>
         <div class="col-md-2 d-flex flex-column gap-2">
@@ -239,7 +241,7 @@ function loadTasks() {
         tbody.empty();
         window._schedulerTasks = tasks || {};
 
-        var typeMap = { 'data_update': ['📊 数据更新', 'bg-primary'], 'ai_report': ['🤖 AI日报', 'bg-success'], 'strategy_alert': ['📡 策略提醒', 'bg-warning text-dark'] };
+        var typeMap = { 'data_update': ['📊 数据更新', 'bg-primary'], 'ai_report': ['🤖 AI日报', 'bg-success'], 'strategy_alert': ['📡 策略提醒', 'bg-warning text-dark'], 'market_strategy_analysis': ['🏦 大盘阶段判断', 'bg-secondary'] };
 
         function renderRow(key, t, isCustom) {
             // Status badge
@@ -404,6 +406,7 @@ $(function() {
             if ($('#custom-type-data_update').is(':checked')) types.push('data_update');
             if ($('#custom-type-ai_report').is(':checked')) types.push('ai_report');
             if ($('#custom-type-strategy_alert').is(':checked')) types.push('strategy_alert');
+            if ($('#custom-type-market_strategy_analysis').is(':checked')) types.push('market_strategy_analysis');
             var enabled = $('#custom-task-enabled').is(':checked');
             var skip = $('#custom-task-skip').is(':checked');
             if (!name || !time || types.length === 0) { showToast('请输入名称/时间并选择至少一个类型', 'warning'); return; }
@@ -459,6 +462,7 @@ function addUnifiedTask() {
     if ($('#type-data_update').is(':checked')) types.push('data_update');
     if ($('#type-ai_report').is(':checked')) types.push('ai_report');
     if ($('#type-strategy_alert').is(':checked')) types.push('strategy_alert');
+    if ($('#type-market_strategy_analysis').is(':checked')) types.push('market_strategy_analysis');
     var skip = $('#new-skip-nontrading').is(':checked');
     if (!time || !name || types.length === 0) { showToast('请输入名称/时间并选择至少一个类型', 'warning'); return; }
     $.ajax({
@@ -473,6 +477,7 @@ function addUnifiedTask() {
                 $('#type-data_update').prop('checked', true);
                 $('#type-ai_report').prop('checked', false);
                 $('#type-strategy_alert').prop('checked', false);
+                $('#type-market_strategy_analysis').prop('checked', false);
                 $('#new-skip-nontrading').prop('checked', true);
                 showToast('已添加任务', 'success');
                 loadTasks();
@@ -512,6 +517,7 @@ function editCustomTask(id) {
     $('#custom-type-data_update').prop('checked', currentTypes.indexOf('data_update') !== -1);
     $('#custom-type-ai_report').prop('checked', currentTypes.indexOf('ai_report') !== -1);
     $('#custom-type-strategy_alert').prop('checked', currentTypes.indexOf('strategy_alert') !== -1);
+    $('#custom-type-market_strategy_analysis').prop('checked', currentTypes.indexOf('market_strategy_analysis') !== -1);
     $('#custom-task-enabled').prop('checked', !!(t && t.enabled));
     $('#custom-task-skip').prop('checked', !!(t && (t.skip_non_trading_day !== undefined ? t.skip_non_trading_day : true)));
     if (typeof customTaskModal !== 'undefined' && customTaskModal) {
@@ -665,7 +671,9 @@ function testNotification(channel) {
               <input type="checkbox" class="btn-check" id="custom-type-ai_report" autocomplete="off">
               <label class="btn btn-outline-primary btn-sm me-1" for="custom-type-ai_report">AI日报</label>
               <input type="checkbox" class="btn-check" id="custom-type-strategy_alert" autocomplete="off">
-              <label class="btn btn-outline-primary btn-sm" for="custom-type-strategy_alert">策略提醒</label>
+              <label class="btn btn-outline-primary btn-sm me-1" for="custom-type-strategy_alert">策略提醒</label>
+              <input type="checkbox" class="btn-check" id="custom-type-market_strategy_analysis" autocomplete="off">
+              <label class="btn btn-outline-primary btn-sm me-1" for="custom-type-market_strategy_analysis">大盘阶段判断</label>
             </div>
           </div>
           <div class="form-check mb-2">

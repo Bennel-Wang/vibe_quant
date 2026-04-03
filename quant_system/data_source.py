@@ -268,7 +268,11 @@ class UnifiedDataSource:
         return self._adapt_columns(df)
 
     def get_realtime_data(self, codes: Optional[list] = None, adjust: bool = True) -> pd.DataFrame:
-        """获取实时/最新数据（通过 data_sourcing 获取近期数据取最后一条）"""
+        """获取实时行情 — 直接调用新浪/HKQuote API，绕过本地 CSV 缓存。
+
+        通过 DataManager.fetch_live_quotes() 批量拉取，确保每次轮询都获取
+        到最新价格而非 CSV 中的历史数据。失败时回退至 CSV 最后一行。
+        """
         dm = self._ensure_dm()
         if dm is None:
             return pd.DataFrame()
@@ -281,8 +285,35 @@ class UnifiedDataSource:
 
         # 跳过板块代码（无数据源支持）
         codes = [c for c in codes if not is_sector_code(c.split('.')[0])]
+        if not codes:
+            return pd.DataFrame()
 
-        # 取最近7天以覆盖周末/假期
+        # ── 优先：直接调用实时 API，完全绕过 CSV 缓存 ──────────────────
+        try:
+            live_quotes = dm.fetch_live_quotes(codes)
+        except Exception as e:
+            logger.warning(f"fetch_live_quotes 异常，回退到 CSV: {e}")
+            live_quotes = []
+
+        if live_quotes:
+            rows = []
+            for q in live_quotes:
+                row = dict(q)
+                # 字段别名兼容 web_app 消费者
+                row['price'] = q['now']
+                row['lastPrice'] = q.get('prev_close', 0)
+                # 清理 NaN
+                row = {k: (None if isinstance(v, float) and math.isnan(v) else v)
+                       for k, v in row.items()}
+                rows.append(row)
+            return pd.DataFrame(rows)
+
+        # ── 回退：从本地 CSV 取最后一条（非实时，仅备用）───────────────
+        logger.warning("fetch_live_quotes 无结果，回退到 CSV 历史数据（价格可能不是最新）")
+        return self._fallback_realtime_from_csv(codes, dm)
+
+    def _fallback_realtime_from_csv(self, codes: list, dm) -> pd.DataFrame:
+        """回退：从本地 CSV 最后一行获取近似价格（非实时）"""
         from datetime import timedelta
         end_d = datetime.now()
         start_d = end_d - timedelta(days=7)
@@ -294,21 +325,17 @@ class UnifiedDataSource:
             try:
                 df = dm.fetch(uc, start_date, end_date, freq="day")
                 if df is not None and not df.empty:
-                    # 过滤非交易日
                     df = self._filter_trading_days(df, uc)
                     if df.empty:
                         continue
-
                     last = df.iloc[-1].to_dict()
-                    # 使用统一后缀格式（如 000001.SH）作为代码标识
                     last['code'] = uc
-                    # 映射字段以兼容 web_app 消费者（期望 now/price/volume）
                     last['now'] = last.get('close')
                     last['price'] = last.get('close')
+                    last['data_time'] = ''
+                    last['data_date'] = ''
                     if 'vol' in last:
                         last['volume'] = last['vol']
-
-                    # 用前一交易日收盘价作为 prev_close，使涨跌额/涨跌幅正确计算
                     if len(df) >= 2:
                         prev_close = df.iloc[-2]['close']
                         last['lastPrice'] = prev_close
@@ -321,23 +348,61 @@ class UnifiedDataSource:
                                     last['pct_chg'] = round((c - p) / p * 100, 4)
                             except (ValueError, TypeError):
                                 pass
-
-                    # 清理 NaN 值为 None（避免 JSON 序列化 NaN 导致前端显示异常）
                     last = {k: (None if isinstance(v, float) and math.isnan(v) else v)
                             for k, v in last.items()}
                     rows.append(last)
             except Exception as e:
-                logger.debug(f"实时数据获取失败 {uc}: {e}")
-            # 反爬虫：每次请求间短暂延迟
+                logger.debug(f"CSV回退获取失败 {uc}: {e}")
             if idx < len(codes) - 1:
                 import time as _time
-                _time.sleep(0.5)
-
+                _time.sleep(0.2)
         return pd.DataFrame(rows) if rows else pd.DataFrame()
 
     def merge_realtime_data(self, live_data):
-        """兼容旧接口 — data_sourcing 已在 fetch 中自动合并实时数据"""
-        logger.debug("merge_realtime_data: data_sourcing 已自动处理实时数据合并")
+        """将实时快照持久化到本地CSV（更新/追加今日行情行，确保今日数据可查）"""
+        if not live_data:
+            return True
+        today = datetime.now().strftime('%Y%m%d')
+        try:
+            from data_sourcing.storage import load_existing_data, get_csv_path
+        except ImportError:
+            logger.warning("data_sourcing.storage 不可用，跳过实时数据合并")
+            return False
+
+        updated = 0
+        for code_key, info in live_data.items():
+            try:
+                price = float(info.get('price', 0) or info.get('close', 0) or 0)
+                if price <= 0:
+                    continue
+                unified = self._resolve_unified_code(code_key)
+                new_row = {
+                    'trade_date': today,
+                    'open': float(info.get('open', price) or price),
+                    'high': float(info.get('high', price) or price),
+                    'low': float(info.get('low', price) or price),
+                    'close': price,
+                    'vol': float(info.get('volume', 0) or 0),
+                    'amount': float(info.get('amount', 0) or 0),
+                }
+                csv_path = get_csv_path(unified, 'day')
+                df = load_existing_data(unified, 'day')
+                if df.empty:
+                    df = pd.DataFrame([new_row])
+                else:
+                    mask = df['trade_date'].astype(str) == today
+                    if mask.any():
+                        for col, val in new_row.items():
+                            if col in df.columns:
+                                df.loc[mask, col] = val
+                    else:
+                        new_df = pd.DataFrame([new_row])
+                        df = pd.concat([df, new_df], ignore_index=True)
+                df.to_csv(csv_path, index=False)
+                updated += 1
+            except Exception as e:
+                logger.debug(f"merge_realtime_data 持久化失败 {code_key}: {e}")
+        logger.debug(f"merge_realtime_data: 已更新 {updated} 只股票的今日数据")
         return True
 
     def update_all_data(self, refresh: bool = False):

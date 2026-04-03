@@ -135,14 +135,30 @@ class EmailNotifier:
 
 class NotificationManager:
     """通知管理器 - 支持微信(PushPlus)和邮件(SMTP)"""
-    
+
+    # 同类通知 4 小时内只发一次，防当天多次重复推送
+    _DEDUP_WINDOW = 4 * 3600
+
     def __init__(self):
         self.notifier = PushPlusNotifier()
         self.email_notifier = EmailNotifier()
         self.wechat_enabled = bool(config.get_pushplus_token())
         self.email_enabled = self.email_notifier.is_configured
         self.enabled = self.wechat_enabled or self.email_enabled
-    
+        self._last_sent: Dict[str, float] = {}  # dedup: title前缀 -> 上次发送时间戳
+        self._dedup_lock = __import__('threading').Lock()
+
+    def _is_duplicate(self, title: str) -> bool:
+        """同标题前缀 4 小时内只发一次，返回 True 表示应跳过（线程安全）"""
+        import time
+        key = title[:20]
+        now = time.time()
+        with self._dedup_lock:
+            if now - self._last_sent.get(key, 0) < self._DEDUP_WINDOW:
+                return True
+            self._last_sent[key] = now
+            return False
+
     def _send(self, title: str, content: str, channels: List[str] = None):
         """统一发送到所有启用的渠道"""
         channels = channels or ['wechat', 'email']
@@ -152,9 +168,12 @@ class NotificationManager:
         if 'email' in channels and self.email_enabled:
             results['email'] = self.email_notifier.send_email(title, content)
         return results
-    
+
     def send_markdown_message(self, title: str, content: str, channels: List[str] = None):
-        """兼容旧接口：发送 Markdown 消息（公开方法，委托给 _send）"""
+        """发送 Markdown 消息，同标题 2 小时内自动去重"""
+        if self._is_duplicate(title):
+            logger.info(f"通知去重，跳过重复发送: {title[:40]}")
+            return {'dedup': True}
         return self._send(title, content, channels)
 
     def get_config_status(self) -> Dict:

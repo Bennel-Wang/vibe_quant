@@ -83,6 +83,18 @@
       ],
       "enabled": true,
       "skip_non_trading_day": false
+    },
+    {
+      "id": "c068f56b",
+      "time": "14:45",
+      "name": "每日大盘策略分析推荐",
+      "content": "自动检测大盘环境，分类股票类型，匹配最优策略并发送通知",
+      "types": [
+        "data_update",
+        "market_strategy_analysis"
+      ],
+      "enabled": true,
+      "skip_non_trading_day": true
     }
   ]
 }

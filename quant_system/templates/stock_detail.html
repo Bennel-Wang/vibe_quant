@@ -95,6 +95,16 @@
             </div>
         </div>
     </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="metric-value" id="data-update-time" style="font-size:1em">--:--:--</div>
+                <div class="metric-label">
+                    行情时间 <span id="rt-indicator" class="badge bg-secondary ms-1" style="font-size:0.65em">离线</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- 综合评分详情面板 -->
@@ -236,7 +246,7 @@
 {% block extra_js %}
 <script>
 var stockCode = '{{ code }}';
-var updateModal, realtimeInterval, rtPollInterval;
+var updateModal, realtimeInterval, rtPollInterval, intradayAutoRefresh;
 var _prevStockPrice = null;
 
 $(document).ready(function() {
@@ -276,10 +286,20 @@ function startRtPoll() {
     if (rtPollInterval) return;
     fetchStockRealtime();
     rtPollInterval = setInterval(fetchStockRealtime, 5000);
+    // Auto-refresh intraday chart every 15s when tab is active
+    if (!intradayAutoRefresh) {
+        intradayAutoRefresh = setInterval(function() {
+            if ($('#intraday-pane').hasClass('active')) {
+                loadIntradayChart();
+            }
+        }, 15000);
+    }
 }
 
 function stopRtPoll() {
     if (rtPollInterval) { clearInterval(rtPollInterval); rtPollInterval = null; }
+    if (intradayAutoRefresh) { clearInterval(intradayAutoRefresh); intradayAutoRefresh = null; }
+    $('#rt-indicator').removeClass('bg-success bg-warning').addClass('bg-secondary').text('离线');
 }
 
 function _updatePriceChange(pctVal) {
@@ -298,6 +318,24 @@ function fetchStockRealtime() {
         Object.keys(data).forEach(function(k) {
             if (data[k].code === stockCode || k === stockCode) found = data[k];
         });
+
+        // 显示数据时间：优先用新浪报告的 data_time（真实行情时间），否则用本地轮询时间
+        var timeStr;
+        if (found && found.data_time && found.data_time.length >= 5) {
+            // 新浪返回 "HH:MM:SS"，可能附带日期前缀，取后8位
+            var t = found.data_time;
+            timeStr = t.length > 8 ? t.slice(-8) : t;
+            var dateLabel = (found.data_date && found.data_date !== '') ? (found.data_date.replace(/^(\d{4})-(\d{2})-(\d{2})$/, '$2-$3') + ' ') : '';
+            $('#data-update-time').text(dateLabel + timeStr);
+        } else {
+            var now = new Date();
+            timeStr = now.getHours().toString().padStart(2,'0') + ':' +
+                      now.getMinutes().toString().padStart(2,'0') + ':' +
+                      now.getSeconds().toString().padStart(2,'0');
+            $('#data-update-time').text(timeStr);
+        }
+        $('#rt-indicator').removeClass('bg-secondary bg-warning').addClass('bg-success').text('实时');
+
         if (!found) return;
 
         var price = found.price;
@@ -320,6 +358,8 @@ function fetchStockRealtime() {
         if (found.pct_chg != null) {
             _updatePriceChange(parseFloat(found.pct_chg));
         }
+    }).fail(function() {
+        $('#rt-indicator').removeClass('bg-success').addClass('bg-warning').text('失败');
     });
 }
 
@@ -893,46 +933,85 @@ function loadIntradayChart() {
         }
 
         // Show current stats
-        var color = (data.change_pct || 0) >= 0 ? '#ef5350' : '#26a69a';
+        var changeColor = (data.change_pct || 0) >= 0 ? '#ef5350' : '#26a69a';
         var sign = (data.change_pct || 0) >= 0 ? '+' : '';
         var statsHtml = '<div class="row text-center mb-2">' +
-            '<div class="col-3"><div class="small text-muted">开盘</div><div>' + (data.open || '--') + '</div></div>' +
-            '<div class="col-3"><div class="small text-muted">现价</div><div class="fw-bold" style="color:' + color + '">' + (data.current_price || '--') + '</div></div>' +
-            '<div class="col-3"><div class="small text-muted">涨跌幅</div><div style="color:' + color + '">' + sign + ((data.change_pct || 0).toFixed(2)) + '%</div></div>' +
-            '<div class="col-3"><div class="small text-muted">高/低</div><div>' + (data.high || '--') + '/' + (data.low || '--') + '</div></div>' +
+            '<div class="col-3"><div class="small text-muted">开盘</div><div>' + (data.open ? parseFloat(data.open).toFixed(2) : '--') + '</div></div>' +
+            '<div class="col-3"><div class="small text-muted">现价</div><div class="fw-bold" style="color:' + changeColor + '">' + (data.current_price ? parseFloat(data.current_price).toFixed(2) : '--') + '</div></div>' +
+            '<div class="col-3"><div class="small text-muted">涨跌幅</div><div style="color:' + changeColor + '">' + sign + ((data.change_pct || 0).toFixed(2)) + '%</div></div>' +
+            '<div class="col-3"><div class="small text-muted">高/低</div><div>' + (data.high ? parseFloat(data.high).toFixed(2) : '--') + '/' + (data.low ? parseFloat(data.low).toFixed(2) : '--') + '</div></div>' +
             '</div>';
         $('#intraday-info').html(statsHtml);
 
         var snapshots = data.snapshots || [];
         if (snapshots.length > 0) {
-            // Draw intraday price/average line chart
-            var times = snapshots.map(s => s.time);
-            var prices = snapshots.map(s => s.price);
-            var avgPrices = snapshots.map(s => s.avg_price);
+            var times = snapshots.map(function(s) { return s.time; });
+            var prices = snapshots.map(function(s) { return parseFloat(s.price); });
+            var avgPrices = snapshots.map(function(s) { return parseFloat(s.avg_price); });
+
+            // Use open price as baseline; fall back to first data point
+            var openPrice = parseFloat(data.open) || prices[0];
+            var lastPrice = prices[prices.length - 1];
+            var lineColor = lastPrice >= openPrice ? '#ef5350' : '#26a69a';
+            var fillColor = lastPrice >= openPrice ? 'rgba(239,83,80,0.15)' : 'rgba(38,166,154,0.15)';
+
+            // Invisible baseline trace at open price — fill: 'tonexty' fills between this and the price line
+            // This avoids fill: 'tozeroy' which would compress the y-axis to include y=0
+            var baselineTrace = {
+                x: times,
+                y: times.map(function() { return openPrice; }),
+                type: 'scatter',
+                mode: 'lines',
+                name: '开盘基准',
+                line: {color: 'rgba(150,150,150,0.6)', width: 1, dash: 'dot'},
+                showlegend: true,
+                hoverinfo: 'skip',
+            };
 
             var priceTrace = {
                 x: times, y: prices,
                 name: '分时价格',
                 type: 'scatter', mode: 'lines',
-                line: {color: color, width: 1.5},
-                fill: 'tozeroy',
-                fillcolor: color === '#ef5350' ? 'rgba(239,83,80,0.1)' : 'rgba(38,166,154,0.1)',
-            };
-            var avgTrace = {
-                x: times, y: avgPrices,
-                name: '日内均价',
-                type: 'scatter', mode: 'lines',
-                line: {color: '#ff9800', width: 1, dash: 'dash'},
+                line: {color: lineColor, width: 1.5},
+                fill: 'tonexty',
+                fillcolor: fillColor,
             };
 
-            Plotly.newPlot('intraday-chart', [priceTrace, avgTrace], {
-                height: 350,
-                margin: {t: 10, b: 40, l: 60, r: 10},
-                xaxis: {title: '时间', type: 'category'},
-                yaxis: {title: '价格'},
+            var avgTrace = {
+                x: times, y: avgPrices,
+                name: '均价',
+                type: 'scatter', mode: 'lines',
+                line: {color: '#ff9800', width: 1.2, dash: 'dash'},
+            };
+
+            // Compute y-axis range with padding — must NOT include 0
+            var allVals = prices.concat(avgPrices, [openPrice]).filter(function(v) { return !isNaN(v) && v > 0; });
+            var minP = Math.min.apply(null, allVals);
+            var maxP = Math.max.apply(null, allVals);
+            var pad = Math.max((maxP - minP) * 0.15, minP * 0.003);
+
+            Plotly.newPlot('intraday-chart', [baselineTrace, priceTrace, avgTrace], {
+                height: 380,
+                margin: {t: 10, b: 40, l: 70, r: 15},
+                xaxis: {
+                    type: 'category',
+                    nticks: 10,
+                    tickangle: -30,
+                    showgrid: true,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                },
+                yaxis: {
+                    title: '价格',
+                    range: [minP - pad, maxP + pad],
+                    showgrid: true,
+                    gridcolor: 'rgba(128,128,128,0.2)',
+                },
                 showlegend: true,
-                legend: {x: 0, y: 1}
-            });
+                legend: {x: 0.01, y: 0.99, bgcolor: 'rgba(255,255,255,0.08)', borderwidth: 0},
+                hovermode: 'x unified',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                paper_bgcolor: 'rgba(0,0,0,0)',
+            }, {responsive: true});
         } else {
             // No snapshots - show a message with guide to enable realtime
             $('#intraday-chart').html(
@@ -948,7 +1027,17 @@ function loadIntradayChart() {
     });
 }
 
-$('#intraday-tab').on('shown.bs.tab', loadIntradayChart);
+$('#intraday-tab').on('shown.bs.tab', function() {
+    loadIntradayChart();
+    // If realtime polling is active, ensure intraday auto-refresh is running
+    if (rtPollInterval && !intradayAutoRefresh) {
+        intradayAutoRefresh = setInterval(function() {
+            if ($('#intraday-pane').hasClass('active')) {
+                loadIntradayChart();
+            }
+        }, 15000);
+    }
+});
 
 function loadChipDistribution() {
     $.get('/api/stock/' + stockCode + '/chip_distribution', function(data) {

@@ -24,6 +24,9 @@ from .indicators import technical_indicators, indicator_analyzer
 from .feature_extractor import feature_extractor
 from .strategy import ai_decision_maker, strategy_manager
 from .notification import notification_manager
+from .strategy_matcher import strategy_matcher
+from .market_regime import market_regime_detector
+from .stock_classifier import stock_classifier
 
 logger = logging.getLogger(__name__)
 
@@ -61,13 +64,15 @@ class TradingScheduler:
         self.custom_task_types = {
             'data_update': '数据更新',
             'ai_report': '生成AI日报并发送',
-            'strategy_alert': '策略触发提醒'
+            'strategy_alert': '策略触发提醒',
+            'market_strategy_analysis': '大盘阶段判断及对应策略推荐'
         }
         # 映射到实际方法（在实例化后，方法可用）
         self._custom_type_to_func = {
             'data_update': self.update_all,
             'ai_report': self.send_daily_report,
-            'strategy_alert': self.run_strategy_backtest_alert
+            'strategy_alert': self.run_strategy_backtest_alert,
+            'market_strategy_analysis': self.run_market_strategy_analysis
         }
     
     # 内建任务默认调度配置（hour/minute/enabled 必须完整）
@@ -320,7 +325,7 @@ class TradingScheduler:
             body += "\n".join(lines) if lines else "- 暂无数据"
             body += f"\n\n---\n*数据更新、指标计算、新闻抓取已完成*"
 
-            notification_manager.notifier.send_markdown_message(
+            notification_manager.send_markdown_message(
                 f"📊 收盘总结 ({now})", body
             )
             logger.info("每日总结通知已发送")
@@ -405,6 +410,21 @@ class TradingScheduler:
             return
         logger.info("开始生成AI日报")
         try:
+            # 先拉取最新实时行情，确保报告价格是收盘/最新价，而非历史缓存中的开盘价
+            realtime_prices: dict = {}
+            try:
+                live_df = unified_data.get_realtime_data()
+                if live_df is not None and not live_df.empty:
+                    for _, row in live_df.iterrows():
+                        raw_code = str(row.get('code', ''))
+                        bare = raw_code.split('.')[0]
+                        price = float(row.get('close', row.get('price', 0)) or 0)
+                        if price > 0:
+                            realtime_prices[bare] = price
+                    logger.info(f"实时行情已加载: {len(realtime_prices)} 只股票")
+            except Exception as e:
+                logger.warning(f"实时行情获取失败，将使用历史数据价格: {e}")
+
             stocks = stock_manager.get_stocks()
             report_items = []
 
@@ -419,7 +439,9 @@ class TradingScheduler:
                     latest = df_ind.iloc[-1]
                     prev = df_ind.iloc[-2] if len(df_ind) >= 2 else latest
 
-                    close = float(latest.get('close', 0) or 0)
+                    # 优先使用实时价格，避免开盘价缓存导致价格滞后
+                    hist_close = float(latest.get('close', 0) or 0)
+                    close = realtime_prices.get(stock.code, hist_close) or hist_close
                     prev_close = float(prev.get('close', 0) or close)
                     chg_pct = (close - prev_close) / prev_close * 100 if prev_close > 0 else 0
                     rsi6 = float(latest.get('rsi_6', 50) or 50)
@@ -560,6 +582,71 @@ class TradingScheduler:
         content += "\n\n".join(lines)
         notification_manager.send_markdown_message(f"策略提醒 {date_str}", content)
         logger.info("策略回测提醒已发送")
+
+    def run_market_strategy_analysis(self, force: bool = False):
+        """大盘环境分析+股票分类+策略匹配推荐，发送每日通知"""
+        if not force and not self.is_trading_day():
+            logger.info("跳过大盘策略分析：今天不是交易日")
+            return
+        logger.info("开始执行大盘策略分析任务")
+        try:
+            result = strategy_matcher.analyze_all_stocks()
+            market = result['market']
+            stocks_data = result['stocks']
+
+            date_str = datetime.now(BEIJING_TZ).strftime('%Y-%m-%d')
+            regime_emoji = market.get('regime_emoji', '❓')
+            regime_label = market.get('regime_label', '未知')
+            score = market.get('score', 0)
+            detail = market.get('detail', '')
+
+            content = f"## {regime_emoji} 大盘策略分析 ({date_str})\n\n"
+            content += f"### 大盘环境: {regime_label} (评分: {score})\n"
+            content += f"{detail}\n\n"
+
+            # 按类型分组
+            groups = {'成长型': [], '防御型': [], '周期价值型': []}
+            empty_positions = []
+            for s in stocks_data:
+                cat_label = s['classification'].get('category_label', '未知')
+                if s.get('is_empty_position'):
+                    empty_positions.append(s)
+                elif cat_label in groups:
+                    groups[cat_label].append(s)
+                else:
+                    groups.setdefault(cat_label, []).append(s)
+
+            if empty_positions:
+                content += f"### ⛔ 建议空仓 ({len(empty_positions)}只)\n"
+                for s in empty_positions:
+                    content += f"- {s['name']}({s['code']}) [{s['classification'].get('category_label','')}]\n"
+                content += "\n"
+
+            for cat_name, cat_stocks in groups.items():
+                if not cat_stocks:
+                    continue
+                content += f"### {cat_name} ({len(cat_stocks)}只)\n\n"
+                for s in cat_stocks:
+                    bp = s.get('best_pair')
+                    if bp:
+                        content += (
+                            f"- **{s['name']}({s['code']})** → "
+                            f"买入:{bp['buy']} / 卖出:{bp['sell']}\n"
+                            f"  理由: {bp['reason']}\n"
+                        )
+                    else:
+                        content += f"- {s['name']}({s['code']}) → 暂无推荐\n"
+                content += "\n"
+
+            content += f"\n---\n*生成时间: {datetime.now(BEIJING_TZ).strftime('%Y-%m-%d %H:%M')}*"
+
+            notification_manager.send_markdown_message(
+                f"{regime_emoji} 大盘策略分析 {date_str} | {regime_label}", content
+            )
+            logger.info(f"大盘策略分析通知已发送: {regime_label}(score={score})")
+
+        except Exception as e:
+            logger.error(f"大盘策略分析失败: {e}", exc_info=True)
 
     # ------ 策略回测辅助方法 ------
 
@@ -882,6 +969,8 @@ class TradingScheduler:
         self.task_status.setdefault(f"custom_{task_id}", {})
         self.task_status[f"custom_{task_id}"].update({'running': True, 'start_time': datetime.now(BEIJING_TZ).strftime('%Y-%m-%d %H:%M:%S'), 'last_result': '运行中...', 'last_success': None})
         types = task.get('types', ['data_update']) or ['data_update']
+        # 确保 data_update 永远最先执行，其余顺序不变
+        types = sorted(types, key=lambda t: (0 if t == 'data_update' else 1, types.index(t)))
         results = []
         for ttype in types:
             func = self._custom_type_to_func.get(ttype)
@@ -1059,7 +1148,6 @@ class TradingScheduler:
         if not self.is_running:
             return []
 
-        trading_day = self.is_trading_day()
         custom_tasks_map = {f"custom_task_{t.get('id')}": t for t in self.get_custom_tasks()}
 
         next_times = []
@@ -1068,9 +1156,9 @@ class TradingScheduler:
             if not next_run:
                 continue
 
-            # 自定义任务：非交易日且设置了跳过，则推算到下一个交易日
+            # 自定义任务：如果下次执行时间本身落在周末，且配置了跳过非交易日，则推算到下一个工作日
             task_cfg = custom_tasks_map.get(job.id)
-            if task_cfg and not trading_day and task_cfg.get('skip_non_trading_day', True):
+            if task_cfg and task_cfg.get('skip_non_trading_day', True):
                 next_run = self._next_trading_day_run_time(next_run)
 
             next_times.append(next_run.strftime('%Y-%m-%d %H:%M:%S'))
