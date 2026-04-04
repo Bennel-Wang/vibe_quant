@@ -40,6 +40,11 @@ BACKTEST_RESULTS: Dict[str, Dict] = {}
 ADAPT_PROGRESS: Dict[str, Dict] = {}
 ADAPT_RESULTS: Dict[str, Dict] = {}
 
+# 最佳因子（批量股票最优策略）进度与结果存储
+BEST_PROGRESS: Dict[str, Dict] = {}
+BEST_RESULTS: Dict[str, Dict] = {}
+BEST_CANCELLED: Dict[str, bool] = {}  # run_id -> cancelled flag
+
 # Intraday snapshot storage: code -> list of {time, price, volume, avg_price}
 INTRADAY_SNAPSHOTS: Dict[str, list] = {}
 
@@ -4229,15 +4234,25 @@ def api_strategy_alerts_assign():
     try:
         data = request.get_json(force=True)
         code = data.get('code', '')
-        buy_strategy_name = data.get('buy_strategy') or data.get('strategy', '')
+        buy_strategy_name  = data.get('buy_strategy') or data.get('strategy', '')
         sell_strategy_name = data.get('sell_strategy', '')
+        strategy_display   = data.get('strategy_display', '')   # optional human-readable label
         stock = stock_manager.get_stock_by_code(code)
         if stock is None:
-            return jsonify({'success': False, 'error': '股票不存在'}), 404
-        stock.buy_strategy = buy_strategy_name
+            # Fallback: try bare code (strip exchange suffix)
+            bare = code.split('.')[0] if '.' in code else code
+            stock = next((s for s in stock_manager.get_all_stocks() if s.code == bare), None)
+        if stock is None:
+            return jsonify({'success': False, 'error': f'股票不存在: {code}'}), 404
+        stock.buy_strategy  = buy_strategy_name
         stock.sell_strategy = sell_strategy_name
-        # 向后兼容：strategy字段存买入策略
-        stock.strategy = buy_strategy_name
+        # strategy field: use explicit display name, else combine buy+sell, else just buy
+        if strategy_display:
+            stock.strategy = strategy_display
+        elif sell_strategy_name:
+            stock.strategy = f"{buy_strategy_name} + {sell_strategy_name}"
+        else:
+            stock.strategy = buy_strategy_name
         stock_manager.save()
         return jsonify({'success': True})
     except Exception as e:
@@ -5138,13 +5153,17 @@ def api_factors_optimize():
                     code, merged, start_date, end_date, initial_capital,
                     precomputed_df=precomputed_df
                 )
+                _eff = _get_effective_position_ratio(merged)
+                _ar  = _json_safe(result.annual_return, 2)
                 results.append({
                     'strategy_key': pair_key,
                     'buy_strategy_name': buy_name,
                     'sell_strategy_name': sell_name,
                     'description': merged.description,
                     'total_return_pct': _json_safe(result.total_return_pct, 2),
-                    'annual_return': _json_safe(result.annual_return, 2),
+                    'annual_return': _ar,
+                    'adj_annual_return': _json_safe(_ar / _eff if _eff > 0 else _ar, 2),
+                    'effective_pos_pct': round(_eff * 100),
                     'max_drawdown_pct': _json_safe(result.max_drawdown_pct, 2),
                     'sharpe_ratio': _json_safe(result.sharpe_ratio, 4),
                     'total_trades': result.total_trades,
@@ -5271,6 +5290,463 @@ def _generate_factor_strategies():
     return strategies
 
 
+# ============== 最佳因子（批量股票最优策略筛选）==============
+
+def _get_effective_position_ratio(strategy) -> float:
+    """返回策略的有效仓位比例（用于将总资金收益换算为仓位收益）"""
+    buy_rules = [r for r in strategy.rules if r.action == 'buy']
+    per_trade = max((r.position_ratio for r in buy_rules), default=1.0)
+    max_pos = strategy.max_position_ratio
+    if max_pos < 1.0:
+        return min(max_pos, per_trade)
+    return per_trade
+
+
+@app.route('/api/factors/best', methods=['POST'])
+def api_factors_best():
+    """最佳因子：对批量股票遍历所有策略，通过5年回测综合评分找出最适合的策略"""
+    try:
+        data = request.json or {}
+        codes = data.get('codes', [])
+        initial_capital = float(data.get('initial_capital', 1000000))
+
+        # 准入门槛（支持用户自定义）
+        th_min_win_rate    = float(data.get('min_win_rate',    50))
+        th_max_drawdown    = float(data.get('max_drawdown',    40))
+        th_min_annual      = float(data.get('min_annual',       6))
+        th_min_trades      = int(data.get('min_trades',         3))
+
+        # 回测周期（支持用户自定义，默认近5年）
+        _raw_start = data.get('start_date', '')
+        _raw_end   = data.get('end_date',   '')
+        if _raw_start:
+            # HTML date input returns "YYYY-MM-DD"
+            start_date = _raw_start.replace('-', '')
+        else:
+            start_date = (datetime.now() - timedelta(days=5 * 365)).strftime('%Y%m%d')
+        if _raw_end:
+            end_date = _raw_end.replace('-', '')
+        else:
+            end_date = datetime.now().strftime('%Y%m%d')
+
+        import threading, uuid, time as _time
+        run_id = str(uuid.uuid4())
+        BEST_CANCELLED[run_id] = False
+        BEST_PROGRESS[run_id] = {
+            'status': 'running', 'done': 0, 'total': 0,
+            'current_stock': '', 'elapsed': 0,
+            'partial_results': [], 'partial_unfit': [],
+            'start_date': start_date, 'end_date': end_date,
+        }
+
+        def _score_strategy(adj_annual, win_rate, max_drawdown_pct):
+            """综合评分 0~100（基于仓位调整后年化收益），不达门槛返回 None.
+            max_drawdown_pct 可能为负值（回测引擎存为负数），统一取绝对值比较。"""
+            abs_dd = abs(max_drawdown_pct) if max_drawdown_pct is not None else 0
+            if (win_rate < th_min_win_rate
+                    or abs_dd > th_max_drawdown
+                    or adj_annual < th_min_annual):
+                return None
+            annual_score   = max(0.0, min(1.0, (adj_annual - th_min_annual) / max(1, 50 - th_min_annual))) * 100
+            win_score      = max(0.0, min(1.0, (win_rate - 50) / 50)) * 100
+            drawdown_score = max(0.0, min(1.0, (th_max_drawdown - abs_dd) / max(1, th_max_drawdown))) * 100
+            return round(annual_score * 0.4 + win_score * 0.3 + drawdown_score * 0.3, 2)
+
+        def _position_advice(strategy, max_drawdown_pct, other_strat=None):
+            buy_rules = [r for r in strategy.rules if r.action == 'buy']
+            per_trade_ratio = buy_rules[0].position_ratio if buy_rules else 0.2
+            if other_strat:
+                other_buy = [r for r in other_strat.rules if r.action == 'buy']
+                if other_buy:
+                    per_trade_ratio = min(per_trade_ratio, other_buy[0].position_ratio)
+            per_trade_pct = max(5, round(per_trade_ratio * 100))
+            max_pos_pct = strategy.max_position_ratio * 100
+            if max_pos_pct >= 100:
+                max_pos_pct = 60
+            add_count    = max(1, int(max_pos_pct / per_trade_pct))
+            dd_step      = round(max_drawdown_pct / add_count, 1) if add_count > 0 else max_drawdown_pct
+            steps = [
+                {
+                    'step':              i + 1,
+                    'trigger_drawdown':  round(dd_step * (i + 1), 1),
+                    'add_position_pct':  per_trade_pct,
+                    'total_position_pct': per_trade_pct * (i + 1),
+                }
+                for i in range(add_count)
+            ]
+            return {
+                'per_trade_pct':   per_trade_pct,
+                'max_position_pct': per_trade_pct * add_count,
+                'add_count':       add_count,
+                'drawdown_step':   dd_step,
+                'steps':           steps,
+                'summary': (
+                    f'初始建仓 {per_trade_pct}%，每下跌 {dd_step}% 加仓一次，'
+                    f'每次加 {per_trade_pct}%，最多加 {add_count} 次，满仓 {per_trade_pct * add_count}%'
+                ),
+            }
+
+        def _worker():
+            import math as _math
+            t0 = _time.time()
+
+            def _js(val, nd=2):
+                if isinstance(val, float) and (_math.isinf(val) or _math.isnan(val)):
+                    return 0
+                return round(val, nd) if val is not None else None
+
+            # Pre-load benchmark index once
+            _BENCHMARK = '000001.SH'
+            try:
+                idx_raw = unified_data.get_historical_data(_BENCHMARK, start_date, end_date)
+                if idx_raw is not None and not idx_raw.empty:
+                    idx_df = idx_raw.copy()
+                    idx_df['date'] = pd.to_datetime(idx_df['date'])
+                    idx_df = idx_df.sort_values('date').reset_index(drop=True)
+                    for _n in [5, 10, 20, 60]:
+                        idx_df[f'idx_ret_{_n}'] = idx_df['close'].pct_change(_n) * 100
+                    idx_df['idx_pct_chg'] = idx_df['close'].pct_change() * 100
+                    idx_cols = ['date', 'idx_pct_chg'] + [f'idx_ret_{_n}' for _n in [5, 10, 20, 60]]
+                    idx_df = idx_df[idx_cols]
+                else:
+                    idx_df = None
+            except Exception:
+                idx_df = None
+
+            # Determine target stocks
+            all_stocks = [s for s in stock_manager.get_all_stocks()
+                          if s.type not in ('index', 'sector')]
+            if codes:
+                target_codes = set(str(c).strip() for c in codes)
+                stocks = [s for s in all_stocks
+                          if s.code in target_codes or s.full_code in target_codes]
+            else:
+                stocks = all_stocks
+
+            BEST_PROGRESS[run_id]['total'] = len(stocks)
+
+            from .strategy import merge_buy_sell_strategies, QuantStrategy as _QS
+
+            # Build strategy collection — test ALL user strategies + buy/sell named pairs
+            strategy_manager.reload_from_file()
+            strategies_to_test = {}   # key -> (strat, buy_name, sell_name)
+            user_buy_named, user_sell_named = [], []
+            for key in strategy_manager.list_strategies():
+                strat = strategy_manager.get_strategy(key)
+                if not strat or not strat.rules:
+                    continue
+                strategies_to_test[key] = (strat, strat.name, '')
+                if strat.name.endswith('买入'):
+                    user_buy_named.append((key, strat))
+                elif strat.name.endswith('卖出'):
+                    user_sell_named.append((key, strat))
+
+            # Add merged buy+sell named pairs as additional combined strategies
+            for i in range(max(len(user_buy_named), len(user_sell_named))):
+                buy_item  = user_buy_named[i]  if i < len(user_buy_named)  else None
+                sell_item = user_sell_named[i] if i < len(user_sell_named) else None
+                if buy_item and sell_item:
+                    bk, bs = buy_item
+                    sk, ss = sell_item
+                    merged   = merge_buy_sell_strategies(bs, ss)
+                    pair_key = f"{bk}+{sk}"
+                    if pair_key not in strategies_to_test:
+                        strategies_to_test[pair_key] = (merged, bs.name, ss.name)
+
+            stock_results = []
+            unfit_stocks  = []
+
+            for i, stock in enumerate(stocks):
+                # ── 取消检查 ──
+                if BEST_CANCELLED.get(run_id):
+                    BEST_PROGRESS[run_id].update({
+                        'status': 'cancelled',
+                        'elapsed': round(_time.time() - t0, 1),
+                    })
+                    return
+
+                code_full = stock.full_code
+                BEST_PROGRESS[run_id].update({
+                    'done': i,
+                    'current_stock': f"{stock.name}({stock.code})",
+                    'elapsed': round(_time.time() - t0, 1),
+                })
+                try:
+                    df = technical_indicators.calculate_all_indicators(code_full, start_date, end_date)
+                    if df is None or df.empty:
+                        entry = {'code': stock.code, 'name': stock.name, 'reason': '数据不足'}
+                        unfit_stocks.append(entry)
+                        BEST_PROGRESS[run_id]['partial_unfit'].append(entry)
+                        continue
+                    if 'date' in df.columns:
+                        df['date'] = pd.to_datetime(df['date'])
+                    import numpy as _np
+                    if 'boll_position' not in df.columns and 'boll_upper' in df.columns:
+                        _rng = df['boll_upper'] - df['boll_lower']
+                        df['boll_position'] = (
+                            (df['close'] - df['boll_lower']) / _rng.replace(0, _np.nan)
+                        ).clip(0, 1).fillna(0.5)
+                    df = backtest_engine._merge_weekly_monthly(code_full, df)
+                    if idx_df is not None:
+                        try:
+                            for _n in [5, 10, 20, 60]:
+                                df[f'stock_ret_{_n}'] = df['close'].pct_change(_n) * 100
+                            df = pd.merge_asof(
+                                df.sort_values('date'), idx_df,
+                                on='date', direction='backward'
+                            )
+                            for _n in [5, 10, 20, 60]:
+                                df[f'rel_strength_{_n}'] = (
+                                    df[f'stock_ret_{_n}'] - df[f'idx_ret_{_n}']
+                                )
+                        except Exception:
+                            for _n in [5, 10, 20, 60]:
+                                df[f'rel_strength_{_n}'] = 0.0
+                    else:
+                        for _n in [5, 10, 20, 60]:
+                            df[f'rel_strength_{_n}'] = 0.0
+                    try:
+                        sd = pd.to_datetime(str(start_date), format='%Y%m%d', errors='coerce')
+                        ed = pd.to_datetime(str(end_date), format='%Y%m%d', errors='coerce')
+                        if pd.notna(sd):
+                            df = df[df['date'] >= sd]
+                        if pd.notna(ed):
+                            df = df[df['date'] <= ed]
+                        df = df.reset_index(drop=True)
+                    except Exception:
+                        pass
+
+                    # ── 回测所有策略，计算仓位调整年化 ──
+                    raw_results = []
+
+                    def _add_raw(key, strat, buy_name, sell_name, result, is_cross=False, cross_other=None):
+                        effective_ratio = _get_effective_position_ratio(strat)
+                        ar  = _js(result.annual_return)
+                        adj = _js(ar / effective_ratio if effective_ratio > 0 else ar)
+                        raw_results.append({
+                            'strategy_key':         key,
+                            'strategy_name':        strat.name,
+                            'buy_name':             buy_name,
+                            'sell_name':            sell_name,
+                            'annual_return':        ar,
+                            'adj_annual_return':    adj,
+                            'effective_pos_pct':    round(effective_ratio * 100),
+                            'win_rate':             _js(result.win_rate),
+                            'max_drawdown_pct':     _js(result.max_drawdown_pct),
+                            'total_return_pct':     _js(result.total_return_pct),
+                            'sharpe_ratio':         _js(result.sharpe_ratio, 4),
+                            'total_trades':         result.total_trades,
+                            'profit_factor':        _js(result.profit_factor, 4),
+                            '_strat':               strat,
+                            '_is_cross':            is_cross,
+                            '_cross_other':         cross_other,
+                        })
+
+                    for skey, (strat, buy_name, sell_name) in strategies_to_test.items():
+                        try:
+                            r = backtest_engine.run_backtest(
+                                code_full, strat, start_date, end_date, initial_capital,
+                                precomputed_df=df
+                            )
+                            if r.total_trades >= th_min_trades:
+                                _add_raw(skey, strat, buy_name, sell_name, r)
+                        except Exception:
+                            pass
+
+                    # ── 门槛过滤 + 评分（基于仓位调整年化）──
+                    qualified = []
+                    for entry in raw_results:
+                        score = _score_strategy(
+                            entry.get('adj_annual_return') or 0,
+                            entry.get('win_rate') or 0,
+                            entry.get('max_drawdown_pct') or 0,
+                        )
+                        if score is not None:
+                            entry['composite_score'] = score
+                            qualified.append(entry)
+
+                    # ── 跨策略混搭优化 ──
+                    if len(qualified) >= 2:
+                        qualified.sort(key=lambda x: x['composite_score'], reverse=True)
+                        top1, top2 = qualified[0], qualified[1]
+                        if top1['composite_score'] - top2['composite_score'] <= 15:
+                            s1, s2 = top1['_strat'], top2['_strat']
+                            buy1  = [r for r in s1.rules if r.action == 'buy']
+                            sell1 = [r for r in s1.rules if r.action == 'sell']
+                            buy2  = [r for r in s2.rules if r.action == 'buy']
+                            sell2 = [r for r in s2.rules if r.action == 'sell']
+                            # For each cross pair, extract just the constituent buy/sell strategy names:
+                            # - buy side: use buy_name if it's a named buy strategy, else strategy_name
+                            # - sell side: use sell_name if it's a named sell strategy, else strategy_name
+                            def _buy_n(entry):
+                                n = (entry.get('buy_name') or '').strip()
+                                return n if n else entry.get('strategy_name', '')
+                            def _sell_n(entry):
+                                n = (entry.get('sell_name') or '').strip()
+                                return n if n else entry.get('strategy_name', '')
+                            # cross_candidates: (combined_strat, buy_source_entry, sell_source_entry)
+                            cross_candidates = []
+                            if buy1 and sell2:
+                                b_name = _buy_n(top1)
+                                s_name = _sell_n(top2)
+                                ca = _QS(
+                                    name=f"混搭：{b_name}买×{s_name}卖",
+                                    description=f"混搭: {b_name}的买入规则 + {s_name}的卖出规则",
+                                )
+                                ca.rules.extend(buy1)
+                                ca.rules.extend(sell2)
+                                ca.max_position_ratio = s1.max_position_ratio
+                                cross_candidates.append((ca, b_name, s_name))
+                            if buy2 and sell1:
+                                b_name = _buy_n(top2)
+                                s_name = _sell_n(top1)
+                                cb = _QS(
+                                    name=f"混搭：{b_name}买×{s_name}卖",
+                                    description=f"混搭: {b_name}的买入规则 + {s_name}的卖出规则",
+                                )
+                                cb.rules.extend(buy2)
+                                cb.rules.extend(sell1)
+                                cb.max_position_ratio = s2.max_position_ratio
+                                cross_candidates.append((cb, b_name, s_name))
+                            for cstrat, buy_n_str, sell_n_str in cross_candidates:
+                                try:
+                                    r = backtest_engine.run_backtest(
+                                        code_full, cstrat, start_date, end_date, initial_capital,
+                                        precomputed_df=df
+                                    )
+                                    if r.total_trades >= th_min_trades:
+                                        _add_raw(
+                                            f'cross_{cstrat.name}', cstrat,
+                                            buy_n_str,   # pure buy strategy name
+                                            sell_n_str,  # pure sell strategy name
+                                            r, is_cross=True,
+                                        )
+                                        # re-score the just-added entry
+                                        last = raw_results[-1]
+                                        score = _score_strategy(
+                                            last.get('adj_annual_return') or 0,
+                                            last.get('win_rate') or 0,
+                                            last.get('max_drawdown_pct') or 0,
+                                        )
+                                        if score is not None:
+                                            last['composite_score'] = score
+                                            qualified.append(last)
+                                except Exception:
+                                    pass
+
+                    if not qualified:
+                        def _clean_raw(e):
+                            return {k: v for k, v in e.items() if not k.startswith('_')}
+                        sorted_raw = sorted(raw_results, key=lambda x: x.get('adj_annual_return') or -999, reverse=True)
+                        entry = {
+                            'code':        stock.code,
+                            'name':        stock.name,
+                            'reason':      '所有策略均不达准入标准' if raw_results else '无可用策略或交易次数不足',
+                            'raw_results': [_clean_raw(r) for r in sorted_raw],
+                        }
+                        unfit_stocks.append(entry)
+                        BEST_PROGRESS[run_id]['partial_unfit'].append(entry)
+                        continue
+
+                    qualified.sort(key=lambda x: x['composite_score'], reverse=True)
+                    best = qualified[0]
+                    best_strat_obj  = best.get('_strat')
+                    pos_advice      = None
+                    if best_strat_obj:
+                        pos_advice = _position_advice(
+                            best_strat_obj,
+                            best['max_drawdown_pct'] or 10,
+                            other_strat=best.get('_cross_other') if best.get('_is_cross') else None,
+                        )
+
+                    def _clean(e):
+                        return {k: v for k, v in e.items() if not k.startswith('_')}
+
+                    stock_entry = {
+                        'code':          stock.code,
+                        'full_code':     code_full,
+                        'name':          stock.name,
+                        'best_strategy': _clean(best),
+                        'all_qualified': [_clean(r) for r in qualified],
+                        'position_advice': pos_advice,
+                    }
+                    stock_results.append(stock_entry)
+                    # 实时更新进度中的部分结果
+                    BEST_PROGRESS[run_id]['partial_results'].append(stock_entry)
+
+                except Exception as e:
+                    logger.debug(f"最佳因子处理失败 {code_full}: {e}")
+                    entry = {
+                        'code': stock.code, 'name': stock.name,
+                        'reason': f'处理失败: {str(e)[:80]}',
+                    }
+                    unfit_stocks.append(entry)
+                    BEST_PROGRESS[run_id]['partial_unfit'].append(entry)
+
+            BEST_RESULTS[run_id] = {
+                'status': 'done',
+                'start_date':    start_date,
+                'end_date':      end_date,
+                'stock_results': stock_results,
+                'unfit_stocks':  unfit_stocks,
+                'elapsed':       round(_time.time() - t0, 1),
+            }
+            BEST_PROGRESS[run_id].update({
+                'status':  'done',
+                'done':    len(stocks),
+                'elapsed': round(_time.time() - t0, 1),
+            })
+
+        thread = threading.Thread(target=_worker, daemon=True)
+        thread.start()
+        return jsonify({'run_id': run_id, 'start_date': start_date, 'end_date': end_date}), 202
+
+    except Exception as e:
+        logger.exception(f"api_factors_best error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/factors/best/cancel', methods=['POST'])
+def api_factors_best_cancel():
+    """取消正在运行的最佳因子任务"""
+    run_id = (request.json or {}).get('run_id') or request.args.get('run_id')
+    if not run_id:
+        return jsonify({'error': 'Missing run_id'}), 400
+    if run_id not in BEST_PROGRESS:
+        return jsonify({'error': 'run_id not found'}), 404
+    BEST_CANCELLED[run_id] = True
+    BEST_PROGRESS[run_id]['status'] = 'cancelling'
+    return jsonify({'success': True})
+
+
+@app.route('/api/factors/best/progress')
+def api_factors_best_progress():
+    """轮询最佳因子任务进度（含实时部分结果）"""
+    run_id = request.args.get('run_id')
+    if not run_id:
+        return jsonify({'error': 'Missing run_id'}), 400
+    info = BEST_PROGRESS.get(run_id)
+    if info is None:
+        return jsonify({'status': 'not_found'}), 404
+    return jsonify(info)
+
+
+@app.route('/api/factors/best/result')
+def api_factors_best_result():
+    """获取最佳因子任务最终结果"""
+    run_id = request.args.get('run_id')
+    if not run_id:
+        return jsonify({'error': 'Missing run_id'}), 400
+    res = BEST_RESULTS.get(run_id)
+    if res is None:
+        prog = BEST_PROGRESS.get(run_id)
+        if prog:
+            return jsonify({'status': 'running', 'progress': prog}), 202
+        return jsonify({'error': 'run_id not found'}), 404
+    return jsonify(res)
+
+
+# ============== 数据源配置API ==============
 # ============== 数据源配置API ==============
 
 @app.route('/api/config/data_source')
