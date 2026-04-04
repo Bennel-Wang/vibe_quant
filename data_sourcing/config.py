@@ -8,14 +8,15 @@ from pathlib import Path
 
 # === 项目路径 ===
 PROJECT_ROOT = Path(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = PROJECT_ROOT / "data"
-LOG_DIR = PROJECT_ROOT / "logs"
-DATA_DIR.mkdir(exist_ok=True)
-LOG_DIR.mkdir(exist_ok=True)
+_REPO_ROOT = PROJECT_ROOT.parent  # 统一使用仓库根目录管理数据和日志
+DATA_DIR = _REPO_ROOT / "data" / "history"
+LOG_DIR = _REPO_ROOT / "logs"
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # === 读取主项目 config.yaml ===
 _main_config = {}
-_config_path = PROJECT_ROOT.parent / "config.yaml"
+_config_path = _REPO_ROOT / "config.yaml"
 if _config_path.exists():
     try:
         import yaml

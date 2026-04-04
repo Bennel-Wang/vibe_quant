@@ -1,0 +1,1423 @@
+2026-03-21 15:26:52 [source.baostock] ERROR: Baostock 登录失败: 客户端版本不匹配，请使用'pip install baostock --upgrade'更新至下列版本00.8.90|00.9.00
+2026-03-21 15:26:52 [source.baostock] ERROR: Baostock 登录失败: 客户端版本不匹配，请使用'pip install baostock --upgrade'更新至下列版本00.8.90|00.9.00
+2026-03-21 15:26:52 [source.baostock] ERROR: Baostock 登录失败: 客户端版本不匹配，请使用'pip install baostock --upgrade'更新至下列版本00.8.90|00.9.00
+2026-03-21 15:26:53 [source.baostock] ERROR: Baostock 登录失败: 客户端版本不匹配，请使用'pip install baostock --upgrade'更新至下列版本00.8.90|00.9.00
+2026-03-21 15:32:13 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 15:32:13 [source.baostock] INFO: Baostock 获取成功: 000001.SH, 38 条
+2026-03-21 15:32:14 [source.baostock] INFO: Baostock 获取成功: 399006.SZ, 38 条
+2026-03-21 15:32:14 [source.baostock] INFO: Baostock 获取成功: 000001.SZ, 38 条
+2026-03-21 15:32:14 [source.baostock] INFO: Baostock 已登出
+2026-03-21 15:33:58 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 15:33:58 [source.baostock] WARNING: Baostock 无数据: 000001.SZ (20260321-20260321)
+2026-03-21 15:33:58 [source.baostock] INFO: Baostock 已登出
+2026-03-21 15:46:45 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 15:46:46 [source.baostock] INFO: Baostock 获取成功: 000001.SH, 38 条
+2026-03-21 15:46:46 [source.baostock] INFO: Baostock 获取成功: 399006.SZ, 38 条
+2026-03-21 15:46:46 [source.baostock] INFO: Baostock 获取成功: 000001.SZ, 38 条
+2026-03-21 15:46:46 [source.baostock] INFO: Baostock 已登出
+2026-03-21 16:02:19 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 16:02:19 [source.baostock] INFO: Baostock 获取成功: 000001.SH, 38 条
+2026-03-21 16:02:19 [source.baostock] INFO: Baostock 获取成功: 399006.SZ, 38 条
+2026-03-21 16:02:20 [source.baostock] INFO: Baostock 获取成功: 000001.SZ, 38 条
+2026-03-21 16:02:20 [source.baostock] INFO: Baostock 已登出
+2026-03-21 16:29:47 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 16:29:47 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260321-20260321)
+2026-03-21 16:29:48 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260321-20260321)
+2026-03-21 16:31:58 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 16:31:59 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260321-20260321)
+2026-03-21 16:31:59 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260321-20260321)
+2026-03-21 16:32:00 [source.baostock] WARNING: Baostock 无数据: 600036.SH (20260321-20260321)
+2026-03-21 16:32:00 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260321-20260321)
+2026-03-21 16:32:00 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260321-20260321)
+2026-03-21 16:32:01 [source.baostock] WARNING: Baostock 无数据: 000858.SZ (20260321-20260321)
+2026-03-21 16:32:02 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260321-20260321)
+2026-03-21 16:32:02 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260321-20260321)
+2026-03-21 16:32:02 [source.baostock] WARNING: Baostock 无数据: 600523.SH (20260321-20260321)
+2026-03-21 16:32:03 [source.baostock] WARNING: Baostock 无数据: 600500.SH (20260321-20260321)
+2026-03-21 16:32:03 [source.baostock] WARNING: Baostock 无数据: 600531.SH (20260321-20260321)
+2026-03-21 16:32:03 [source.baostock] WARNING: Baostock 无数据: 600980.SH (20260321-20260321)
+2026-03-21 16:32:03 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260321-20260321)
+2026-03-21 16:32:03 [source.baostock] WARNING: Baostock 无数据: 801010.SH (20260321-20260321)
+2026-03-21 16:33:49 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 16:33:49 [source.baostock] WARNING: Baostock 无数据: 801010.SH (20260321-20260321)
+2026-03-21 16:34:20 [source.baostock] WARNING: Baostock 无数据: 801020.SH (20260321-20260321)
+2026-03-21 16:34:50 [source.baostock] WARNING: Baostock 无数据: 801110.SH (20260321-20260321)
+2026-03-21 16:36:39 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 16:36:39 [source.baostock] WARNING: Baostock 无数据: 801010.SH (20260321-20260321)
+2026-03-21 16:46:22 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 16:46:22 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260321-20260321)
+2026-03-21 16:46:22 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260321-20260321)
+2026-03-21 16:46:22 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260321-20260321)
+2026-03-21 17:03:19 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 17:03:19 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260321-20260321)
+2026-03-21 17:03:19 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260321-20260321)
+2026-03-21 17:03:20 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260321-20260321)
+2026-03-21 17:03:20 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260321-20260321)
+2026-03-21 17:03:21 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260321-20260321)
+2026-03-21 17:03:26 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260321-20260321)
+2026-03-21 17:03:27 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260321-20260321)
+2026-03-21 17:03:28 [source.baostock] WARNING: Baostock 无数据: 600036.SH (20260321-20260321)
+2026-03-21 17:03:28 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260321-20260321)
+2026-03-21 17:03:28 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260321-20260321)
+2026-03-21 17:03:29 [source.baostock] WARNING: Baostock 无数据: 000858.SZ (20260321-20260321)
+2026-03-21 17:03:29 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260321-20260321)
+2026-03-21 17:03:29 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260321-20260321)
+2026-03-21 17:03:30 [source.baostock] WARNING: Baostock 无数据: 600523.SH (20260321-20260321)
+2026-03-21 17:03:30 [source.baostock] WARNING: Baostock 无数据: 600500.SH (20260321-20260321)
+2026-03-21 17:03:30 [source.baostock] WARNING: Baostock 无数据: 600531.SH (20260321-20260321)
+2026-03-21 17:03:31 [source.baostock] WARNING: Baostock 无数据: 600980.SH (20260321-20260321)
+2026-03-21 17:03:31 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260321-20260321)
+2026-03-21 17:19:30 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 17:19:30 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260321-20260321)
+2026-03-21 17:19:30 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 17:19:30 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260321-20260321)
+2026-03-21 17:19:30 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 17:19:30 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260321-20260321)
+2026-03-21 17:19:31 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 17:19:31 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260321-20260321)
+2026-03-21 17:19:35 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260321-20260321)
+2026-03-21 17:19:35 [source.baostock] WARNING: Baostock 无数据: 600036.SH (20260321-20260321)
+2026-03-21 17:19:35 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260321-20260321)
+2026-03-21 17:19:36 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260321-20260321)
+2026-03-21 17:19:36 [source.baostock] WARNING: Baostock 无数据: 000858.SZ (20260321-20260321)
+2026-03-21 17:19:37 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260321-20260321)
+2026-03-21 17:19:37 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260321-20260321)
+2026-03-21 17:19:37 [source.baostock] WARNING: Baostock 无数据: 600523.SH (20260321-20260321)
+2026-03-21 17:19:37 [source.baostock] WARNING: Baostock 无数据: 600500.SH (20260321-20260321)
+2026-03-21 17:19:37 [source.baostock] WARNING: Baostock 无数据: 600531.SH (20260321-20260321)
+2026-03-21 17:19:38 [source.baostock] WARNING: Baostock 无数据: 600980.SH (20260321-20260321)
+2026-03-21 17:19:38 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260321-20260321)
+2026-03-21 17:19:38 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260321-20260321)
+2026-03-21 17:19:38 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260321-20260321)
+2026-03-21 17:19:39 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260321-20260321)
+2026-03-21 17:19:39 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260321-20260321)
+2026-03-21 17:19:40 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260321-20260321)
+2026-03-21 17:21:16 [source.baostock] WARNING: Baostock 无数据: 600501.SH (20260321-20260321)
+2026-03-21 19:49:58 [source.baostock] INFO: Baostock 初始化成功
+2026-03-21 19:49:59 [source.baostock] WARNING: Baostock 无数据: 000001.SZ (20260321-20260321)
+2026-03-22 08:08:33 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 08:08:33 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260322-20260322)
+2026-03-22 08:08:35 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260322-20260322)
+2026-03-22 08:08:36 [source.baostock] WARNING: Baostock 无数据: 600036.SH (20260322-20260322)
+2026-03-22 08:08:37 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260322-20260322)
+2026-03-22 08:08:38 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260322-20260322)
+2026-03-22 08:08:39 [source.baostock] WARNING: Baostock 无数据: 000858.SZ (20260322-20260322)
+2026-03-22 08:08:40 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260322-20260322)
+2026-03-22 08:08:40 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260322-20260322)
+2026-03-22 08:08:42 [source.baostock] WARNING: Baostock 无数据: 600523.SH (20260322-20260322)
+2026-03-22 08:08:43 [source.baostock] WARNING: Baostock 无数据: 600500.SH (20260322-20260322)
+2026-03-22 08:08:43 [source.baostock] WARNING: Baostock 无数据: 600531.SH (20260322-20260322)
+2026-03-22 08:08:44 [source.baostock] WARNING: Baostock 无数据: 600980.SH (20260322-20260322)
+2026-03-22 08:08:45 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260322-20260322)
+2026-03-22 08:08:46 [source.baostock] WARNING: Baostock 无数据: 600501.SH (20260322-20260322)
+2026-03-22 08:08:47 [source.baostock] WARNING: Baostock 无数据: 000001.SZ (20260322-20260322)
+2026-03-22 08:08:47 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260322-20260322)
+2026-03-22 08:08:49 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260322-20260322)
+2026-03-22 08:08:50 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260322-20260322)
+2026-03-22 08:08:51 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260322-20260322)
+2026-03-22 08:08:52 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260322-20260322)
+2026-03-22 09:30:50 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 09:30:50 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260321-20260322)
+2026-03-22 09:30:51 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260321-20260322)
+2026-03-22 09:30:52 [source.baostock] WARNING: Baostock 无数据: 600036.SH (20260321-20260322)
+2026-03-22 09:30:53 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260321-20260322)
+2026-03-22 09:30:54 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260321-20260322)
+2026-03-22 09:30:56 [source.baostock] WARNING: Baostock 无数据: 000858.SZ (20260321-20260322)
+2026-03-22 09:30:57 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260321-20260322)
+2026-03-22 09:30:57 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260321-20260322)
+2026-03-22 09:30:59 [source.baostock] WARNING: Baostock 无数据: 600523.SH (20260321-20260322)
+2026-03-22 09:30:59 [source.baostock] WARNING: Baostock 无数据: 600500.SH (20260321-20260322)
+2026-03-22 09:31:00 [source.baostock] WARNING: Baostock 无数据: 600531.SH (20260321-20260322)
+2026-03-22 09:31:01 [source.baostock] WARNING: Baostock 无数据: 600980.SH (20260321-20260322)
+2026-03-22 09:31:02 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260321-20260322)
+2026-03-22 09:31:03 [source.baostock] WARNING: Baostock 无数据: 600501.SH (20260321-20260322)
+2026-03-22 09:31:04 [source.baostock] WARNING: Baostock 无数据: 000001.SZ (20260321-20260322)
+2026-03-22 09:31:08 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260321-20260322)
+2026-03-22 09:31:11 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260321-20260322)
+2026-03-22 09:31:12 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260321-20260322)
+2026-03-22 09:31:13 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260321-20260322)
+2026-03-22 09:31:15 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260321-20260322)
+2026-03-22 09:39:15 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 09:39:15 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260321-20260322)
+2026-03-22 10:13:29 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 10:13:29 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260321-20260322)
+2026-03-22 10:23:39 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 10:23:39 [source.baostock] WARNING: Baostock 无数据: 000001.SZ (20260321-20260322)
+2026-03-22 10:23:40 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260321-20260322)
+2026-03-22 10:23:49 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260321-20260322)
+2026-03-22 10:23:50 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260321-20260322)
+2026-03-22 10:23:50 [source.baostock] WARNING: Baostock 无数据: 600036.SH (20260321-20260322)
+2026-03-22 10:23:51 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260321-20260322)
+2026-03-22 10:23:52 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260321-20260322)
+2026-03-22 10:23:54 [source.baostock] WARNING: Baostock 无数据: 000858.SZ (20260321-20260322)
+2026-03-22 10:23:55 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260321-20260322)
+2026-03-22 10:23:56 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260321-20260322)
+2026-03-22 10:23:57 [source.baostock] WARNING: Baostock 无数据: 600523.SH (20260321-20260322)
+2026-03-22 10:23:58 [source.baostock] WARNING: Baostock 无数据: 600500.SH (20260321-20260322)
+2026-03-22 10:23:58 [source.baostock] WARNING: Baostock 无数据: 600531.SH (20260321-20260322)
+2026-03-22 10:23:59 [source.baostock] WARNING: Baostock 无数据: 600980.SH (20260321-20260322)
+2026-03-22 10:24:00 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260321-20260322)
+2026-03-22 10:24:00 [source.baostock] WARNING: Baostock 无数据: 600501.SH (20260321-20260322)
+2026-03-22 10:24:02 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260321-20260322)
+2026-03-22 10:24:03 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260321-20260322)
+2026-03-22 10:24:04 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260321-20260322)
+2026-03-22 10:24:04 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260321-20260322)
+2026-03-22 10:24:37 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260321-20260322)
+2026-03-22 10:39:49 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 10:39:50 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260321-20260322)
+2026-03-22 10:40:11 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260321-20260322)
+2026-03-22 10:40:11 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260321-20260322)
+2026-03-22 10:50:12 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 10:50:15 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260321-20260322)
+2026-03-22 10:50:18 [source.baostock] WARNING: Baostock 无数据: 600036.SH (20260321-20260322)
+2026-03-22 10:50:19 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260321-20260322)
+2026-03-22 11:18:36 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 11:18:36 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260321-20260322)
+2026-03-22 11:18:40 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260321-20260322)
+2026-03-22 11:18:42 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260321-20260322)
+2026-03-22 11:18:44 [source.baostock] WARNING: Baostock 无数据: 000858.SZ (20260321-20260322)
+2026-03-22 11:18:45 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260321-20260322)
+2026-03-22 11:18:46 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260321-20260322)
+2026-03-22 11:18:50 [source.baostock] WARNING: Baostock 无数据: 600523.SH (20260321-20260322)
+2026-03-22 11:18:52 [source.baostock] WARNING: Baostock 无数据: 600500.SH (20260321-20260322)
+2026-03-22 11:18:53 [source.baostock] WARNING: Baostock 无数据: 600531.SH (20260321-20260322)
+2026-03-22 11:18:53 [source.baostock] WARNING: Baostock 无数据: 600980.SH (20260321-20260322)
+2026-03-22 11:18:54 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260321-20260322)
+2026-03-22 11:18:55 [source.baostock] WARNING: Baostock 无数据: 600501.SH (20260321-20260322)
+2026-03-22 11:18:57 [source.baostock] WARNING: Baostock 无数据: 000001.SZ (20260321-20260322)
+2026-03-22 11:19:01 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260321-20260322)
+2026-03-22 11:19:02 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260321-20260322)
+2026-03-22 11:19:03 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260321-20260322)
+2026-03-22 11:19:04 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260321-20260322)
+2026-03-22 11:22:19 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 11:22:20 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260321-20260322)
+2026-03-22 11:22:50 [source.baostock] WARNING: Baostock 无数据: 000010.SZ (20260321-20260322)
+2026-03-22 11:22:50 [source.baostock] WARNING: Baostock 无数据: 000010.SZ (20260321-20260322)
+2026-03-22 11:22:50 [source.baostock] WARNING: Baostock 无数据: 000010.SZ (20260321-20260322)
+2026-03-22 11:36:47 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 11:36:47 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260321-20260322)
+2026-03-22 11:37:35 [source.baostock] WARNING: Baostock 无数据: 600523.SH (20260321-20260322)
+2026-03-22 14:23:37 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 14:23:41 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 4632 条
+2026-03-22 14:23:44 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3575 条
+2026-03-22 14:23:47 [source.baostock] INFO: Baostock 获取成功: 300750.SZ, 1886 条
+2026-03-22 19:51:17 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 19:51:18 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260321-20260322)
+2026-03-22 19:51:26 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260321-20260322)
+2026-03-22 19:51:30 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260321-20260322)
+2026-03-22 19:53:27 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260321-20260322)
+2026-03-22 19:53:27 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260321-20260322)
+2026-03-22 19:53:37 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260321-20260322)
+2026-03-22 19:53:37 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260321-20260322)
+2026-03-22 19:54:26 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260321-20260322)
+2026-03-22 19:54:42 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260321-20260322)
+2026-03-22 19:54:48 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260321-20260322)
+2026-03-22 19:55:13 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260321-20260322)
+2026-03-22 19:55:23 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260321-20260322)
+2026-03-22 19:55:30 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260321-20260322)
+2026-03-22 20:00:53 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 20:00:54 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260321-20260322)
+2026-03-22 20:00:57 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260321-20260322)
+2026-03-22 20:04:58 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 4632 条
+2026-03-22 20:05:02 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3575 条
+2026-03-22 20:05:05 [source.baostock] INFO: Baostock 获取成功: 300750.SZ, 1886 条
+2026-03-22 20:05:13 [source.baostock] INFO: Baostock 获取成功: 002304.SZ, 3975 条
+2026-03-22 20:06:24 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260321-20260322)
+2026-03-22 20:07:17 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260321-20260322)
+2026-03-22 20:25:28 [source.baostock] INFO: Baostock 初始化成功
+2026-03-22 20:25:28 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260321-20260322)
+2026-03-22 20:25:30 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260321-20260322)
+2026-03-22 20:25:30 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260321-20260322)
+2026-03-22 20:25:31 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260321-20260322)
+2026-03-22 20:25:33 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260321-20260322)
+2026-03-22 20:25:34 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260321-20260322)
+2026-03-22 20:25:35 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260321-20260322)
+2026-03-22 20:25:36 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260321-20260322)
+2026-03-22 20:25:37 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260321-20260322)
+2026-03-22 20:25:37 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260321-20260322)
+2026-03-22 20:25:38 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260321-20260322)
+2026-03-22 20:25:39 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260321-20260322)
+2026-03-22 20:36:36 [source.baostock] ERROR: Baostock 查询错误 000568.SZ: 网络接收错误。
+2026-03-22 20:36:36 [source.baostock] ERROR: Baostock 查询错误 000568.SZ: 网络接收错误。
+2026-03-22 20:36:36 [source.baostock] ERROR: Baostock 查询错误 000568.SZ: 网络接收错误。
+2026-03-22 20:37:20 [source.baostock] ERROR: Baostock 查询错误 600009.SH: 网络接收错误。
+2026-03-22 20:37:23 [source.baostock] ERROR: Baostock 查询错误 000001.SH: 网络接收错误。
+2026-03-22 20:37:34 [source.baostock] ERROR: Baostock 查询错误 000001.SH: 网络接收错误。
+2026-03-22 20:38:14 [source.baostock] ERROR: Baostock 查询错误 600519.SH: 网络接收错误。
+2026-03-22 20:38:38 [source.baostock] ERROR: Baostock 查询错误 399001.SZ: 网络接收错误。
+2026-03-22 20:38:57 [source.baostock] ERROR: Baostock 查询错误 000688.SH: 网络接收错误。
+2026-03-22 20:39:43 [source.baostock] ERROR: Baostock 查询错误 000001.SH: 网络接收错误。
+2026-03-22 20:39:58 [source.baostock] ERROR: Baostock 查询错误 000001.SH: 网络接收错误。
+2026-03-23 22:36:58 [source.baostock] INFO: Baostock 初始化成功
+2026-03-23 22:37:05 [source.baostock] INFO: Baostock 获取成功: 399006.SZ, 3837 条
+2026-03-23 22:40:48 [source.baostock] INFO: Baostock 初始化成功
+2026-03-23 22:41:20 [source.baostock] INFO: Baostock 获取成功: 000300.SH, 5151 条
+2026-03-23 23:16:55 [source.baostock] INFO: Baostock 初始化成功
+2026-03-23 23:16:55 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20030101-20260323)
+2026-03-23 23:19:09 [source.baostock] INFO: Baostock 获取成功: 399006.SZ, 3837 条
+2026-03-23 23:20:20 [source.baostock] ERROR: Baostock 查询错误 399006.SZ: 网络接收错误。
+2026-03-23 23:20:26 [source.baostock] ERROR: Baostock 查询错误 399006.SZ: 网络接收错误。
+2026-03-23 23:52:52 [source.baostock] INFO: Baostock 初始化成功
+2026-03-23 23:52:52 [source.baostock] INFO: Baostock 获取成功: 600519.SH, 6 条
+2026-03-23 23:53:00 [source.baostock] ERROR: Baostock 查询错误 600519.SH: 网络接收错误。
+2026-03-23 23:53:05 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-23 23:53:06 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-23 23:53:13 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-23 23:53:26 [source.baostock] ERROR: Baostock 查询错误 600519.SH: 网络接收错误。
+2026-03-23 23:53:43 [source.baostock] ERROR: Baostock 查询错误 600519.SH: 网络接收错误。
+2026-03-23 23:54:00 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-23 23:54:01 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-23 23:54:19 [source.baostock] ERROR: Baostock 查询错误 600519.SH: 网络接收错误。
+2026-03-23 23:54:37 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-23 23:54:46 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-23 23:54:55 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-23 23:54:58 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-23 23:55:14 [source.baostock] ERROR: Baostock 查询错误 600519.SH: 网络接收错误。
+2026-03-23 23:55:19 [source.baostock] ERROR: Baostock 查询错误 600519.SH: 网络接收错误。
+2026-03-23 23:55:23 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-23 23:55:32 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-23 23:55:35 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-23 23:55:38 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-23 23:55:49 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-23 23:55:51 [source.baostock] ERROR: Baostock 查询错误 000568.SZ: 网络接收错误。
+2026-03-23 23:55:54 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-23 23:56:02 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-23 23:56:13 [source.baostock] ERROR: Baostock 查询错误 000568.SZ: 网络接收错误。
+2026-03-23 23:56:21 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-23 23:56:24 [source.baostock] ERROR: Baostock 查询错误 600009.SH: 网络接收错误。
+2026-03-23 23:56:43 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-23 23:56:56 [source.baostock] ERROR: Baostock 查询错误 000568.SZ: 网络接收错误。
+2026-03-24 00:00:01 [source.baostock] INFO: Baostock 初始化成功
+2026-03-24 00:00:01 [source.baostock] INFO: Baostock 初始化成功
+2026-03-24 00:00:01 [source.baostock] INFO: Baostock 初始化成功
+2026-03-24 00:00:01 [source.baostock] INFO: Baostock 初始化成功
+2026-03-24 00:00:01 [source.baostock] INFO: Baostock 初始化成功
+2026-03-24 00:00:01 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260324-20260324)
+2026-03-24 00:00:01 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260324-20260324)
+2026-03-24 00:00:01 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260324-20260324)
+2026-03-24 00:00:01 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260324-20260324)
+2026-03-24 00:00:01 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260324-20260324)
+2026-03-24 00:00:02 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260324-20260324)
+2026-03-24 00:00:02 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260324-20260324)
+2026-03-24 00:00:02 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260324-20260324)
+2026-03-24 00:00:04 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260324-20260324)
+2026-03-24 00:00:04 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260324-20260324)
+2026-03-24 00:00:10 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260324-20260324)
+2026-03-24 00:00:10 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260324-20260324)
+2026-03-24 00:00:10 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260324-20260324)
+2026-03-24 00:00:10 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260324-20260324)
+2026-03-24 00:00:10 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260324-20260324)
+2026-03-24 00:00:11 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260324-20260324)
+2026-03-24 00:00:11 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260324-20260324)
+2026-03-24 00:00:12 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260324-20260324)
+2026-03-24 00:00:12 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260324-20260324)
+2026-03-24 00:00:12 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260324-20260324)
+2026-03-24 00:00:13 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260324-20260324)
+2026-03-24 00:00:13 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260324-20260324)
+2026-03-24 00:00:14 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260324-20260324)
+2026-03-24 00:00:14 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260324-20260324)
+2026-03-24 00:00:14 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260324-20260324)
+2026-03-24 00:00:14 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260324-20260324)
+2026-03-24 00:00:15 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260324-20260324)
+2026-03-24 00:00:15 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260324-20260324)
+2026-03-24 00:00:16 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260324-20260324)
+2026-03-24 00:00:16 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260324-20260324)
+2026-03-24 00:00:16 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260324-20260324)
+2026-03-24 00:00:16 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260324-20260324)
+2026-03-24 00:00:17 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260324-20260324)
+2026-03-24 00:00:17 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260324-20260324)
+2026-03-24 00:02:37 [source.baostock] ERROR: Baostock 查询错误 399006.SZ: 网络接收错误。
+2026-03-24 00:02:45 [source.baostock] ERROR: Baostock 查询错误 000688.SH: 网络接收错误。
+2026-03-24 00:07:14 [source.baostock] INFO: Baostock 初始化成功
+2026-03-24 00:07:15 [source.baostock] INFO: Baostock 获取成功: 600519.SH, 5 条
+2026-03-24 00:07:15 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 5 条
+2026-03-24 00:07:21 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-24 00:07:22 [source.baostock] ERROR: Baostock 查询错误 600519.SH: 网络接收错误。
+2026-03-24 00:07:26 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-24 00:07:35 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-24 00:07:37 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-24 00:08:45 [source.baostock] INFO: Baostock 初始化成功
+2026-03-24 00:08:49 [source.baostock] ERROR: Baostock 查询错误 600519.SH: 网络接收错误。
+2026-03-24 00:08:53 [source.baostock] ERROR: Baostock 查询错误 600519.SH: 网络接收错误。
+2026-03-24 20:53:07 [source.baostock] INFO: Baostock 初始化成功
+2026-03-24 20:53:14 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 4634 条
+2026-03-24 20:57:06 [source.baostock] INFO: Baostock 初始化成功
+2026-03-24 20:57:07 [source.baostock] INFO: Baostock 获取成功: 000001.SH, 37 条
+2026-03-24 20:57:07 [source.baostock] INFO: Baostock 获取成功: 399006.SZ, 37 条
+2026-03-24 20:57:08 [source.baostock] INFO: Baostock 获取成功: 000001.SZ, 37 条
+2026-03-24 20:57:09 [source.baostock] INFO: Baostock 已登出
+2026-03-25 20:34:50 [source.baostock] INFO: Baostock 初始化成功
+2026-03-25 20:34:53 [source.baostock] INFO: Baostock 获取成功: 000001.SZ, 242 条
+2026-03-25 20:36:55 [source.baostock] INFO: Baostock 初始化成功
+2026-03-25 20:36:58 [source.baostock] INFO: Baostock 获取成功: 300750.SZ, 1889 条
+2026-03-25 20:40:52 [source.baostock] INFO: Baostock 初始化成功
+2026-03-25 20:41:33 [source.baostock] INFO: Baostock 获取成功: 002304.SZ, 3978 条
+2026-03-25 20:44:57 [source.baostock] INFO: Baostock 初始化成功
+2026-03-25 20:45:17 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3578 条
+2026-03-25 20:48:56 [source.baostock] INFO: Baostock 初始化成功
+2026-03-25 20:49:21 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3578 条
+2026-03-25 21:37:49 [source.baostock] INFO: Baostock 初始化成功
+2026-03-25 21:37:59 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 4635 条
+2026-03-25 21:38:21 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3578 条
+2026-03-25 21:40:03 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3578 条
+2026-03-25 21:40:13 [source.baostock] INFO: Baostock 获取成功: 300750.SZ, 1889 条
+2026-03-25 21:40:26 [source.baostock] INFO: Baostock 获取成功: 002304.SZ, 3978 条
+2026-03-25 21:41:51 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3578 条
+2026-03-25 21:41:58 [source.baostock] INFO: Baostock 获取成功: 300750.SZ, 1889 条
+2026-03-25 21:46:12 [source.baostock] INFO: Baostock 初始化成功
+2026-03-25 21:46:23 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 4635 条
+2026-03-25 21:54:13 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-25 21:54:15 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-25 21:54:17 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-25 21:55:59 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-25 21:59:19 [source.baostock] INFO: Baostock 初始化成功
+2026-03-25 21:59:22 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 4635 条
+2026-03-25 22:02:30 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 4635 条
+2026-03-25 22:07:05 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 4635 条
+2026-03-25 22:07:17 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3578 条
+2026-03-25 22:07:21 [source.baostock] INFO: Baostock 获取成功: 300750.SZ, 1889 条
+2026-03-25 22:24:14 [source.baostock] INFO: Baostock 初始化成功
+2026-03-25 22:24:26 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 4635 条
+2026-03-25 22:48:23 [source.baostock] INFO: Baostock 初始化成功
+2026-03-25 22:48:41 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3578 条
+2026-03-25 22:57:35 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-25 22:59:00 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-25 22:59:02 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-25 23:08:25 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-25 23:09:51 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-25 23:11:00 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-25 23:11:00 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-25 23:11:01 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-25 23:11:02 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-25 23:12:15 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-25 23:12:16 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-25 23:12:16 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-25 23:12:18 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-25 23:13:24 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-25 23:13:25 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-26 19:04:53 [source.baostock] INFO: Baostock 初始化成功
+2026-03-26 19:27:43 [source.baostock] ERROR: Baostock 登录失败: 网络接收错误。
+2026-03-26 19:27:47 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 10:30:31 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 10:30:31 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260328-20260328)
+2026-03-28 10:30:33 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 10:30:35 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260328-20260328)
+2026-03-28 10:30:38 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 10:30:41 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260328-20260328)
+2026-03-28 10:30:43 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260328-20260328)
+2026-03-28 10:30:45 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260328-20260328)
+2026-03-28 10:30:47 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260328-20260328)
+2026-03-28 10:30:48 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260328-20260328)
+2026-03-28 10:30:56 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260328-20260328)
+2026-03-28 10:30:58 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260328-20260328)
+2026-03-28 10:30:59 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260328-20260328)
+2026-03-28 10:31:01 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260328-20260328)
+2026-03-28 10:40:52 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 10:40:52 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 11:23:54 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 11:23:54 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260328-20260328)
+2026-03-28 11:23:55 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260328-20260328)
+2026-03-28 11:23:57 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260328-20260328)
+2026-03-28 11:24:01 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260328-20260328)
+2026-03-28 11:24:03 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260328-20260328)
+2026-03-28 11:24:03 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260328-20260328)
+2026-03-28 11:24:12 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260328-20260328)
+2026-03-28 11:24:16 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260328-20260328)
+2026-03-28 11:24:17 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 11:24:19 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 11:24:21 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260328-20260328)
+2026-03-28 11:24:22 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260328-20260328)
+2026-03-28 11:24:23 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260328-20260328)
+2026-03-28 11:44:33 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 11:44:33 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260328-20260328)
+2026-03-28 11:44:37 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260328-20260328)
+2026-03-28 11:44:38 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 11:49:07 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 11:49:07 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260328-20260328)
+2026-03-28 11:49:08 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260328-20260328)
+2026-03-28 11:49:11 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260328-20260328)
+2026-03-28 11:49:14 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260328-20260328)
+2026-03-28 11:49:16 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 11:49:16 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 11:49:17 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260328-20260328)
+2026-03-28 11:49:17 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260328-20260328)
+2026-03-28 11:49:18 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260328-20260328)
+2026-03-28 11:49:19 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260328-20260328)
+2026-03-28 11:49:19 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260328-20260328)
+2026-03-28 11:49:20 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260328-20260328)
+2026-03-28 11:50:39 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 11:50:39 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260328-20260328)
+2026-03-28 11:50:44 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260328-20260328)
+2026-03-28 11:50:45 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260328-20260328)
+2026-03-28 11:50:47 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260328-20260328)
+2026-03-28 11:50:47 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260328-20260328)
+2026-03-28 11:50:51 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 11:50:52 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260328-20260328)
+2026-03-28 11:50:56 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260328-20260328)
+2026-03-28 11:50:59 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260328-20260328)
+2026-03-28 11:51:00 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260328-20260328)
+2026-03-28 11:51:02 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260328-20260328)
+2026-03-28 11:51:03 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260328-20260328)
+2026-03-28 11:51:17 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 11:57:05 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 11:57:05 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260328-20260328)
+2026-03-28 11:57:05 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260328-20260328)
+2026-03-28 11:57:09 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260328-20260328)
+2026-03-28 11:57:11 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 11:57:15 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 11:57:15 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260328-20260328)
+2026-03-28 11:57:15 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260328-20260328)
+2026-03-28 11:57:16 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260328-20260328)
+2026-03-28 11:57:18 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260328-20260328)
+2026-03-28 11:57:20 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260328-20260328)
+2026-03-28 11:57:27 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260328-20260328)
+2026-03-28 11:57:31 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260328-20260328)
+2026-03-28 11:57:33 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260328-20260328)
+2026-03-28 11:57:48 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 11:58:04 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260328-20260328)
+2026-03-28 13:26:42 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 13:26:42 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260328-20260328)
+2026-03-28 13:26:43 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 13:26:43 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260328-20260328)
+2026-03-28 13:26:43 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260328-20260328)
+2026-03-28 13:26:43 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260328-20260328)
+2026-03-28 13:26:49 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 13:26:49 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 13:26:51 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 13:30:20 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 13:30:20 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260328-20260328)
+2026-03-28 13:30:21 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260328-20260328)
+2026-03-28 13:30:29 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 13:30:33 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 13:30:34 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260328-20260328)
+2026-03-28 13:30:34 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260328-20260328)
+2026-03-28 13:30:34 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260328-20260328)
+2026-03-28 13:30:35 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260328-20260328)
+2026-03-28 13:30:35 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260328-20260328)
+2026-03-28 13:30:41 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260328-20260328)
+2026-03-28 13:30:42 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260328-20260328)
+2026-03-28 13:30:45 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260328-20260328)
+2026-03-28 13:30:48 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260328-20260328)
+2026-03-28 13:31:18 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 15:33:52 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 15:33:52 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260328-20260328)
+2026-03-28 15:33:56 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 15:33:59 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 15:33:59 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260328-20260328)
+2026-03-28 15:34:08 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260328-20260328)
+2026-03-28 15:34:09 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260328-20260328)
+2026-03-28 15:34:12 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260328-20260328)
+2026-03-28 15:34:14 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260328-20260328)
+2026-03-28 15:34:16 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260328-20260328)
+2026-03-28 15:34:19 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260328-20260328)
+2026-03-28 15:34:20 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260328-20260328)
+2026-03-28 15:34:21 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260328-20260328)
+2026-03-28 15:34:22 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260328-20260328)
+2026-03-28 16:04:37 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-28 16:04:38 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-28 16:04:38 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-28 16:14:43 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 16:14:43 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 16:20:17 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 16:20:17 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 16:20:20 [source.baostock] ERROR: Baostock 查询错误 600519.SH: 网络接收错误。
+2026-03-28 16:20:24 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-28 16:20:28 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-28 16:20:30 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-28 16:20:34 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-28 16:20:40 [source.baostock] ERROR: Baostock 查询错误 000568.SZ: 网络接收错误。
+2026-03-28 16:20:42 [source.baostock] ERROR: Baostock 查询错误 600009.SH: 网络接收错误。
+2026-03-28 16:21:33 [source.baostock] INFO: Baostock 获取成功: 600519.SH, 5 条
+2026-03-28 16:21:35 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 16:21:36 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 16:21:37 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260328-20260328)
+2026-03-28 16:21:38 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260328-20260328)
+2026-03-28 16:21:39 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260328-20260328)
+2026-03-28 16:21:41 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260328-20260328)
+2026-03-28 16:21:42 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260328-20260328)
+2026-03-28 16:21:43 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260328-20260328)
+2026-03-28 16:21:45 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260328-20260328)
+2026-03-28 16:21:46 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260328-20260328)
+2026-03-28 16:21:48 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260328-20260328)
+2026-03-28 16:22:29 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260328-20260328)
+2026-03-28 16:22:43 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 16:23:22 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-28 16:28:14 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 16:28:16 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-28 16:28:17 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-28 16:28:21 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-28 17:57:52 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 17:57:52 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260328-20260328)
+2026-03-28 17:57:53 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260328-20260328)
+2026-03-28 17:57:55 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260328-20260328)
+2026-03-28 17:59:48 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 17:59:49 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260328-20260328)
+2026-03-28 17:59:52 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260328-20260328)
+2026-03-28 20:15:00 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 20:15:00 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 20:15:01 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260328-20260328)
+2026-03-28 20:15:06 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260328-20260328)
+2026-03-28 20:15:08 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260328-20260328)
+2026-03-28 20:15:10 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260328-20260328)
+2026-03-28 20:15:12 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260328-20260328)
+2026-03-28 20:15:14 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260328-20260328)
+2026-03-28 20:15:26 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 20:16:12 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260328-20260328)
+2026-03-28 20:16:12 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260328-20260328)
+2026-03-28 20:46:35 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 20:46:53 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 4637 条
+2026-03-28 20:48:35 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 20:48:39 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 4637 条
+2026-03-28 20:48:42 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3580 条
+2026-03-28 20:48:45 [source.baostock] INFO: Baostock 获取成功: 300750.SZ, 1891 条
+2026-03-28 20:48:49 [source.baostock] INFO: Baostock 获取成功: 002304.SZ, 3980 条
+2026-03-28 21:30:28 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 21:30:28 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260328-20260328)
+2026-03-28 22:08:40 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 22:08:40 [source.baostock] WARNING: Baostock 无数据: 000568.SH (20030101-20260328)
+2026-03-28 22:09:40 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 22:09:40 [source.baostock] WARNING: Baostock 无数据: 000001.SZ (20260328-20260328)
+2026-03-28 22:09:44 [source.baostock] WARNING: Baostock 无数据: 600036.SH (20260328-20260328)
+2026-03-28 22:09:47 [source.baostock] WARNING: Baostock 无数据: 000858.SZ (20260328-20260328)
+2026-03-28 23:19:37 [source.baostock] INFO: Baostock 初始化成功
+2026-03-28 23:19:37 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260328-20260328)
+2026-03-28 23:19:37 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260328-20260328)
+2026-03-28 23:19:43 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260328-20260328)
+2026-03-28 23:19:45 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260328-20260328)
+2026-03-28 23:19:46 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260328-20260328)
+2026-03-28 23:19:46 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260328-20260328)
+2026-03-28 23:19:47 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260328-20260328)
+2026-03-28 23:19:47 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260328-20260328)
+2026-03-28 23:19:53 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260328-20260328)
+2026-03-28 23:19:57 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260328-20260328)
+2026-03-28 23:19:59 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260328-20260328)
+2026-03-28 23:20:01 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260328-20260328)
+2026-03-28 23:20:03 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260328-20260328)
+2026-03-28 23:20:13 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260328-20260328)
+2026-03-29 09:37:09 [source.baostock] INFO: Baostock 初始化成功
+2026-03-29 09:37:09 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260329-20260329)
+2026-03-29 09:37:10 [source.baostock] INFO: Baostock 初始化成功
+2026-03-29 09:37:10 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260329-20260329)
+2026-03-29 09:37:11 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260329-20260329)
+2026-03-29 09:37:11 [source.baostock] WARNING: Baostock 无数据: 601318.SH (20260329-20260329)
+2026-03-29 09:37:12 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260329-20260329)
+2026-03-29 09:37:13 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260329-20260329)
+2026-03-29 09:37:13 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260329-20260329)
+2026-03-29 09:37:14 [source.baostock] WARNING: Baostock 无数据: 002304.SZ (20260329-20260329)
+2026-03-29 09:37:16 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260329-20260329)
+2026-03-29 09:37:16 [source.baostock] WARNING: Baostock 无数据: 000568.SZ (20260329-20260329)
+2026-03-29 09:37:18 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260329-20260329)
+2026-03-29 09:37:18 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260329-20260329)
+2026-03-29 09:37:19 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260329-20260329)
+2026-03-29 09:37:20 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260329-20260329)
+2026-03-29 09:37:20 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260329-20260329)
+2026-03-29 09:37:20 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260329-20260329)
+2026-03-29 09:37:21 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260329-20260329)
+2026-03-29 09:45:17 [source.baostock] INFO: Baostock 初始化成功
+2026-03-29 09:45:21 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 4637 条
+2026-03-29 09:45:23 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3580 条
+2026-03-29 09:45:26 [source.baostock] INFO: Baostock 获取成功: 300750.SZ, 1891 条
+2026-03-29 09:45:30 [source.baostock] INFO: Baostock 获取成功: 002304.SZ, 3980 条
+2026-03-29 20:13:16 [source.baostock] INFO: Baostock 初始化成功
+2026-03-29 20:13:19 [source.baostock] INFO: Baostock 获取成功: 601318.SH, 4637 条
+2026-03-29 20:13:30 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3580 条
+2026-03-29 20:15:10 [source.baostock] INFO: Baostock 获取成功: 002572.SZ, 3635 条
+2026-03-29 21:16:50 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-29 21:24:33 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-29 21:24:35 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-29 21:24:38 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-29 22:40:58 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-29 22:41:00 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-29 22:41:01 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-29 22:41:03 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 18:30:39 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-30 18:30:42 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 18:30:45 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 18:30:46 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 18:30:51 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 18:32:38 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-30 18:32:39 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 18:32:41 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 18:32:43 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 18:32:49 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 18:34:38 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-30 18:34:41 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 18:34:45 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 18:34:49 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 18:34:56 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 18:36:37 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-30 18:36:41 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 18:36:44 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 18:36:46 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 18:36:49 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 18:38:57 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 18:46:55 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 18:48:58 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 18:50:43 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 18:50:47 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 18:50:52 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 18:50:58 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 18:52:38 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-30 18:52:42 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 18:52:43 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 18:52:45 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 18:52:50 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 18:54:37 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-30 18:54:39 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-30 18:54:41 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 18:54:42 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 18:54:46 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 18:54:53 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 18:56:37 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-30 18:56:40 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 18:56:42 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 18:56:47 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 18:56:55 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 18:58:47 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 18:58:51 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 18:58:54 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 19:02:41 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 19:02:44 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 19:02:48 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 19:02:54 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 19:02:56 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 19:04:37 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-30 19:04:40 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-30 19:04:41 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 19:04:43 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 19:04:43 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 19:04:46 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 19:04:48 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 19:04:53 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 19:06:44 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 19:06:47 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 19:06:52 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 19:06:56 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 19:08:48 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 19:08:55 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 19:10:36 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-30 19:10:38 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 19:10:41 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 19:10:45 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 19:10:50 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 19:12:37 [source.baostock] ERROR: Baostock 查询错误 601318.SH: 网络接收错误。
+2026-03-30 19:12:40 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 19:12:43 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 19:12:47 [source.baostock] ERROR: Baostock 查询错误 002304.SZ: 网络接收错误。
+2026-03-30 19:12:54 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-03-30 21:03:29 [source.baostock] INFO: Baostock 初始化成功
+2026-03-30 21:03:41 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3581 条
+2026-03-30 21:04:43 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:05:24 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:05:40 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:05:56 [source.baostock] WARNING: Baostock 无数据: 002463.SH (20030101-20260330)
+2026-03-30 21:06:11 [source.baostock] WARNING: Baostock 无数据: 002463.SH (20260323-20260330)
+2026-03-30 21:06:27 [source.baostock] WARNING: Baostock 无数据: 002837.SH (20030101-20260330)
+2026-03-30 21:06:43 [source.baostock] WARNING: Baostock 无数据: 002837.SH (20260323-20260330)
+2026-03-30 21:07:40 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:08:25 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:08:40 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:08:59 [source.baostock] WARNING: Baostock 无数据: 002463.SH (20030101-20260330)
+2026-03-30 21:09:30 [source.baostock] WARNING: Baostock 无数据: 002837.SH (20030101-20260330)
+2026-03-30 21:09:40 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:10:22 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20260323-20260330)
+2026-03-30 21:11:15 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:11:32 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:11:53 [source.baostock] ERROR: Baostock 查询错误 01579.SZ: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:12:05 [source.baostock] WARNING: Baostock 无数据: 002463.SH (20030101-20260330)
+2026-03-30 21:12:24 [source.baostock] ERROR: Baostock 查询错误 06862.SZ: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:12:37 [source.baostock] WARNING: Baostock 无数据: 002837.SH (20030101-20260330)
+2026-03-30 21:12:52 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20030101-20260330)
+2026-03-30 21:12:52 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20240330-20260330)
+2026-03-30 21:12:52 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20030101-20260330)
+2026-03-30 21:12:53 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20030101-20260330)
+2026-03-30 21:13:17 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:13:24 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20030101-20260330)
+2026-03-30 21:13:42 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20240330-20260330)
+2026-03-30 21:13:55 [source.baostock] ERROR: Baostock 查询错误 01579.SZ: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:13:56 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20030101-20260330)
+2026-03-30 21:14:26 [source.baostock] ERROR: Baostock 查询错误 06862.SZ: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:14:30 [source.baostock] ERROR: Baostock 查询错误 01579.SZ: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:15:00 [source.baostock] ERROR: Baostock 查询错误 06862.SZ: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:15:01 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20030101-20260330)
+2026-03-30 21:15:01 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20030101-20260330)
+2026-03-30 21:15:01 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20030101-20260330)
+2026-03-30 21:15:18 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:15:47 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20030101-20260330)
+2026-03-30 21:15:53 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20210331-20260330)
+2026-03-30 21:15:56 [source.baostock] ERROR: Baostock 查询错误 01579.SZ: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:16:20 [source.baostock] INFO: Baostock 初始化成功
+2026-03-30 21:16:20 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:16:21 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:16:54 [source.baostock] WARNING: Baostock 无数据: 002463.SH (20030101-20260330)
+2026-03-30 21:16:59 [source.baostock] ERROR: Baostock 查询错误 01579.SZ: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:17:26 [source.baostock] WARNING: Baostock 无数据: 002837.SH (20030101-20260330)
+2026-03-30 21:17:30 [source.baostock] ERROR: Baostock 查询错误 06862.SZ: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:18:07 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20030101-20260330)
+2026-03-30 21:18:39 [source.baostock] ERROR: Baostock 查询错误 01579.SZ: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:19:10 [source.baostock] ERROR: Baostock 查询错误 06862.SZ: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:21:01 [source.baostock] ERROR: Baostock 查询错误 03998.SH: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:21:34 [source.baostock] WARNING: Baostock 无数据: 002463.SH (20030101-20260330)
+2026-03-30 21:22:06 [source.baostock] WARNING: Baostock 无数据: 002837.SH (20030101-20260330)
+2026-03-30 21:22:46 [source.baostock] WARNING: Baostock 无数据: 002371.SH (20030101-20260330)
+2026-03-30 21:23:18 [source.baostock] ERROR: Baostock 查询错误 01579.SZ: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:23:48 [source.baostock] ERROR: Baostock 查询错误 06862.SZ: 股票代码应为9位，请检查。格式示例：sh.600000。
+2026-03-30 21:37:16 [source.baostock] INFO: Baostock 初始化成功
+2026-03-30 21:37:16 [source.baostock] WARNING: Baostock 无数据: 603296.SH (20220101-20220430)
+2026-03-30 21:39:52 [source.baostock] WARNING: Baostock 无数据: 603296.SH (20220101-20220430)
+2026-03-30 21:40:28 [source.baostock] WARNING: Baostock 无数据: 603296.SH (20220101-20220430)
+2026-03-30 21:40:54 [source.baostock] WARNING: Baostock 无数据: 603296.SH (20220101-20220430)
+2026-03-30 21:41:22 [source.baostock] WARNING: Baostock 无数据: 603296.SH (20220101-20220430)
+2026-03-30 21:43:05 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3581 条
+2026-03-30 21:43:09 [source.baostock] INFO: Baostock 获取成功: 300750.SZ, 1892 条
+2026-03-30 21:43:17 [source.baostock] INFO: Baostock 获取成功: 002572.SZ, 3636 条
+2026-03-30 21:43:37 [source.baostock] INFO: Baostock 获取成功: 300274.SZ, 3498 条
+2026-03-30 21:43:49 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-03-30 21:44:17 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 21:44:26 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-03-30 21:44:30 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-03-30 21:44:36 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-03-30 21:44:39 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-03-30 21:44:44 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-30 21:45:10 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-03-30 21:45:15 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-03-30 21:45:30 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-03-30 21:45:36 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-03-30 21:46:49 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 21:47:13 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-03-30 21:47:16 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-03-30 21:56:05 [source.baostock] INFO: Baostock 初始化成功
+2026-03-30 21:56:05 [source.baostock] WARNING: Baostock 无数据: 603296.SH (20220101-20220430)
+2026-03-30 22:57:06 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-03-30 22:57:07 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-03-30 22:57:09 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-03-30 22:58:15 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-03-30 22:58:16 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-03-31 22:21:54 [source.baostock] INFO: Baostock 初始化成功
+2026-03-31 22:22:00 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3582 条
+2026-03-31 22:22:05 [source.baostock] INFO: Baostock 获取成功: 300750.SZ, 1893 条
+2026-03-31 22:22:18 [source.baostock] INFO: Baostock 获取成功: 002572.SZ, 3637 条
+2026-03-31 22:22:44 [source.baostock] INFO: Baostock 获取成功: 603296.SH, 639 条
+2026-03-31 22:22:57 [source.baostock] INFO: Baostock 获取成功: 300483.SZ, 2612 条
+2026-03-31 22:24:29 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3582 条
+2026-03-31 22:26:29 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3582 条
+2026-03-31 22:27:37 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-03-31 22:30:15 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-01 09:30:28 [source.baostock] ERROR: Baostock 查询错误 600519.SH: 网络接收错误。
+2026-04-01 09:30:28 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-01 09:30:28 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 09:30:32 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 09:30:34 [source.baostock] ERROR: Baostock 查询错误 600009.SH: 网络接收错误。
+2026-04-01 09:30:36 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 09:30:36 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 09:30:41 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-01 09:30:43 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-01 09:30:43 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-01 09:30:44 [source.baostock] ERROR: Baostock 查询错误 600309.SH: 网络接收错误。
+2026-04-01 09:30:46 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-01 09:30:51 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-01 09:30:53 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-01 09:30:55 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-01 09:30:56 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-01 09:30:59 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-01 09:31:02 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-01 09:31:04 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-01 09:31:06 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-01 09:31:08 [source.baostock] ERROR: Baostock 查询错误 000858.SZ: 网络接收错误。
+2026-04-01 09:31:16 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-01 09:31:17 [source.baostock] ERROR: Baostock 查询错误 000001.SH: 网络接收错误。
+2026-04-01 09:31:19 [source.baostock] ERROR: Baostock 查询错误 399001.SZ: 网络接收错误。
+2026-04-01 09:31:21 [source.baostock] ERROR: Baostock 查询错误 399006.SZ: 网络接收错误。
+2026-04-01 09:31:22 [source.baostock] ERROR: Baostock 查询错误 000300.SH: 网络接收错误。
+2026-04-01 09:31:24 [source.baostock] ERROR: Baostock 查询错误 000688.SH: 网络接收错误。
+2026-04-01 09:51:29 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-01 14:15:33 [source.baostock] INFO: Baostock 初始化成功
+2026-04-01 14:15:38 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3582 条
+2026-04-01 14:21:28 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 14:21:32 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 14:21:34 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 14:21:34 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-01 14:21:37 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-01 14:22:10 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-01 14:22:13 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-01 14:22:13 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-01 14:22:15 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-01 14:22:15 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-01 14:22:16 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-01 14:22:17 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-01 14:22:39 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-01 14:25:31 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 14:25:33 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 14:25:36 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 14:36:32 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 14:36:34 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 14:36:36 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 14:36:40 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-01 14:38:32 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 14:38:33 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 14:38:37 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 14:38:41 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-01 14:40:22 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-01 14:40:23 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-01 14:40:24 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-01 14:40:25 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-01 14:40:27 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-01 14:40:29 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-01 14:40:32 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-01 14:40:32 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 14:40:33 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-01 14:40:35 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 14:40:39 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-01 14:40:39 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 14:40:42 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-01 14:41:28 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-01 14:41:38 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-01 14:42:27 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-01 14:42:32 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-01 14:44:33 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 14:44:34 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 14:44:38 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 14:44:42 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-01 15:27:47 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 15:27:49 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 15:27:53 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 15:27:56 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-01 15:27:56 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-01 15:27:57 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-01 15:28:00 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-01 15:28:03 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-01 15:28:05 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-01 15:28:41 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-01 15:28:41 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-01 15:29:47 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 15:29:48 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 15:29:49 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 15:29:52 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-01 15:29:53 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-01 15:29:54 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-01 15:29:55 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-01 15:29:55 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-01 15:29:56 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-01 15:29:57 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-01 15:29:58 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-01 15:29:59 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-01 15:30:00 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-01 15:30:02 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-01 15:30:03 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-01 15:31:42 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-01 15:31:43 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-01 15:31:44 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-01 15:31:45 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-01 15:31:46 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-01 15:31:46 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-01 15:31:47 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-01 15:31:48 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-01 15:31:49 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-01 15:31:50 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-01 15:31:52 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-01 15:31:53 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-01 15:33:03 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 15:33:05 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 16:02:02 [source.baostock] INFO: Baostock 初始化成功
+2026-04-01 16:02:05 [source.baostock] INFO: Baostock 获取成功: 002906.SZ, 2054 条
+2026-04-01 16:03:19 [source.baostock] INFO: Baostock 获取成功: 601689.SH, 2682 条
+2026-04-01 16:05:58 [source.baostock] INFO: Baostock 获取成功: 002906.SZ, 2054 条
+2026-04-01 16:06:07 [source.baostock] INFO: Baostock 获取成功: 601689.SH, 2682 条
+2026-04-01 16:06:11 [source.baostock] INFO: Baostock 获取成功: 688981.SH, 1383 条
+2026-04-01 16:06:38 [source.baostock] INFO: Baostock 获取成功: 002371.SZ, 3896 条
+2026-04-01 16:09:00 [source.baostock] INFO: Baostock 获取成功: 002906.SZ, 2054 条
+2026-04-01 16:09:03 [source.baostock] INFO: Baostock 获取成功: 601689.SH, 2682 条
+2026-04-01 16:09:06 [source.baostock] INFO: Baostock 获取成功: 688981.SH, 1383 条
+2026-04-01 16:09:15 [source.baostock] INFO: Baostock 获取成功: 002371.SZ, 3896 条
+2026-04-01 16:11:01 [source.baostock] INFO: Baostock 获取成功: 002906.SZ, 2054 条
+2026-04-01 16:11:09 [source.baostock] INFO: Baostock 获取成功: 601689.SH, 2682 条
+2026-04-01 16:11:12 [source.baostock] INFO: Baostock 获取成功: 688981.SH, 1383 条
+2026-04-01 16:11:22 [source.baostock] INFO: Baostock 获取成功: 002371.SZ, 3896 条
+2026-04-01 16:14:01 [source.baostock] INFO: Baostock 获取成功: 601689.SH, 2682 条
+2026-04-01 16:14:06 [source.baostock] INFO: Baostock 获取成功: 688981.SH, 1383 条
+2026-04-01 16:14:12 [source.baostock] INFO: Baostock 获取成功: 002371.SZ, 3896 条
+2026-04-01 16:14:17 [source.baostock] INFO: Baostock 获取成功: 603296.SH, 639 条
+2026-04-01 16:15:55 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3790 条
+2026-04-01 16:15:59 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2244 条
+2026-04-01 16:16:21 [source.baostock] INFO: Baostock 获取成功: 600900.SH, 5432 条
+2026-04-01 16:19:02 [source.baostock] INFO: Baostock 获取成功: 688027.SH, 1388 条
+2026-04-01 16:19:12 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3790 条
+2026-04-01 16:19:24 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2244 条
+2026-04-01 16:22:01 [source.baostock] INFO: Baostock 获取成功: 300274.SZ, 3499 条
+2026-04-01 16:22:05 [source.baostock] INFO: Baostock 获取成功: 002920.SZ, 2002 条
+2026-04-01 16:22:08 [source.baostock] INFO: Baostock 获取成功: 688027.SH, 1388 条
+2026-04-01 16:22:14 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3790 条
+2026-04-01 16:22:20 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2244 条
+2026-04-01 16:24:49 [source.baostock] INFO: Baostock 获取成功: 002920.SZ, 2002 条
+2026-04-01 16:24:53 [source.baostock] INFO: Baostock 获取成功: 688027.SH, 1388 条
+2026-04-01 16:25:01 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3790 条
+2026-04-01 16:25:08 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2244 条
+2026-04-01 16:25:15 [source.baostock] INFO: Baostock 获取成功: 600900.SH, 5432 条
+2026-04-01 16:25:26 [source.baostock] INFO: Baostock 获取成功: 002906.SZ, 2054 条
+2026-04-01 16:27:52 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3790 条
+2026-04-01 16:27:59 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2244 条
+2026-04-01 16:28:08 [source.baostock] INFO: Baostock 获取成功: 600900.SH, 5432 条
+2026-04-01 16:28:11 [source.baostock] INFO: Baostock 获取成功: 002906.SZ, 2054 条
+2026-04-01 16:28:15 [source.baostock] INFO: Baostock 获取成功: 601689.SH, 2682 条
+2026-04-01 16:28:18 [source.baostock] INFO: Baostock 获取成功: 688981.SH, 1383 条
+2026-04-01 16:30:56 [source.baostock] INFO: Baostock 获取成功: 688027.SH, 1388 条
+2026-04-01 16:31:30 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3790 条
+2026-04-01 16:31:58 [source.baostock] INFO: Baostock 获取成功: 603296.SH, 639 条
+2026-04-01 16:32:06 [source.baostock] INFO: Baostock 获取成功: 300483.SZ, 2612 条
+2026-04-01 16:33:47 [source.baostock] INFO: Baostock 获取成功: 688027.SH, 1388 条
+2026-04-01 16:34:05 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3790 条
+2026-04-01 16:34:12 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2244 条
+2026-04-01 16:34:30 [source.baostock] INFO: Baostock 获取成功: 600900.SH, 5432 条
+2026-04-01 16:37:03 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3790 条
+2026-04-01 16:37:12 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2244 条
+2026-04-01 16:37:18 [source.baostock] INFO: Baostock 获取成功: 600900.SH, 5432 条
+2026-04-01 16:40:46 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3790 条
+2026-04-01 16:41:43 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2244 条
+2026-04-01 16:41:52 [source.baostock] INFO: Baostock 获取成功: 601689.SH, 2682 条
+2026-04-01 16:41:54 [source.baostock] INFO: Baostock 获取成功: 688981.SH, 1383 条
+2026-04-01 16:42:05 [source.baostock] INFO: Baostock 获取成功: 002371.SZ, 3896 条
+2026-04-01 16:42:09 [source.baostock] INFO: Baostock 获取成功: 603296.SH, 639 条
+2026-04-01 16:42:12 [source.baostock] INFO: Baostock 获取成功: 300483.SZ, 2612 条
+2026-04-01 16:43:59 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3790 条
+2026-04-01 16:44:04 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2244 条
+2026-04-01 16:44:09 [source.baostock] INFO: Baostock 获取成功: 600900.SH, 5432 条
+2026-04-01 16:44:15 [source.baostock] INFO: Baostock 获取成功: 002906.SZ, 2054 条
+2026-04-01 16:44:22 [source.baostock] INFO: Baostock 获取成功: 601689.SH, 2682 条
+2026-04-01 16:47:07 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3790 条
+2026-04-01 16:47:19 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2244 条
+2026-04-01 16:49:52 [source.baostock] INFO: Baostock 获取成功: 002920.SZ, 2002 条
+2026-04-01 16:49:59 [source.baostock] INFO: Baostock 获取成功: 688027.SH, 1388 条
+2026-04-01 16:50:09 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3790 条
+2026-04-01 16:50:23 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2244 条
+2026-04-01 17:10:35 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-01 17:11:14 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-01 17:11:16 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-01 17:11:18 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-01 22:13:48 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-01 22:13:50 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-01 22:13:52 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-01 22:13:53 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-01 22:13:54 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-01 22:13:55 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-01 22:13:57 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-01 22:13:59 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-01 22:14:01 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-01 22:14:01 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-01 22:14:05 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-01 22:14:06 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-01 22:14:09 [source.baostock] ERROR: Baostock 查询错误 399006.SZ: 网络接收错误。
+2026-04-01 22:14:10 [source.baostock] ERROR: Baostock 查询错误 000300.SH: 网络接收错误。
+2026-04-01 22:14:11 [source.baostock] ERROR: Baostock 查询错误 000688.SH: 网络接收错误。
+2026-04-01 22:15:23 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 22:15:24 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 22:15:26 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 22:17:19 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 22:17:20 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 22:17:23 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 22:17:38 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-01 22:17:40 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-01 22:17:41 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-01 22:19:31 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 22:19:32 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 22:19:35 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 22:19:38 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-01 22:19:40 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-01 22:19:42 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-01 22:19:43 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-01 22:19:46 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-01 22:19:50 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-01 22:19:51 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-01 22:19:52 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-01 22:19:55 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-01 22:23:36 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 22:23:39 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 22:23:42 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-01 22:23:44 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-01 22:25:43 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-01 22:25:46 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-01 22:25:57 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-01 22:25:58 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-01 22:26:04 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-01 22:26:06 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-01 22:26:08 [source.baostock] ERROR: Baostock 查询错误 399006.SZ: 网络接收错误。
+2026-04-01 22:26:11 [source.baostock] ERROR: Baostock 查询错误 000688.SH: 网络接收错误。
+2026-04-01 22:27:20 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-01 22:27:21 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-01 22:27:23 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-01 22:27:27 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-01 22:27:28 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-01 22:27:31 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-01 22:27:32 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-01 22:29:21 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-01 22:29:26 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-01 22:29:28 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-01 22:29:32 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-01 22:29:33 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-01 22:29:37 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-01 22:29:39 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-01 22:29:42 [source.baostock] ERROR: Baostock 查询错误 399006.SZ: 网络接收错误。
+2026-04-01 22:29:44 [source.baostock] ERROR: Baostock 查询错误 000300.SH: 网络接收错误。
+2026-04-01 22:29:45 [source.baostock] ERROR: Baostock 查询错误 000688.SH: 网络接收错误。
+2026-04-01 22:51:31 [source.baostock] INFO: Baostock 初始化成功
+2026-04-01 22:51:40 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3583 条
+2026-04-01 23:11:43 [source.baostock] INFO: Baostock 初始化成功
+2026-04-01 23:11:46 [source.baostock] INFO: Baostock 获取成功: 688027.SH, 1389 条
+2026-04-01 23:13:22 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3583 条
+2026-04-01 23:13:26 [source.baostock] INFO: Baostock 获取成功: 300750.SZ, 1894 条
+2026-04-01 23:13:58 [source.baostock] INFO: Baostock 获取成功: 002572.SZ, 3638 条
+2026-04-01 23:16:35 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3583 条
+2026-04-01 23:16:38 [source.baostock] INFO: Baostock 获取成功: 300750.SZ, 1894 条
+2026-04-01 23:16:46 [source.baostock] INFO: Baostock 获取成功: 002572.SZ, 3638 条
+2026-04-01 23:18:40 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3583 条
+2026-04-01 23:18:45 [source.baostock] INFO: Baostock 获取成功: 300750.SZ, 1894 条
+2026-04-02 00:00:50 [source.baostock] ERROR: Baostock 查询错误 600519.SH: 网络接收错误。
+2026-04-02 00:00:51 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-02 00:00:51 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-02 00:00:53 [source.baostock] ERROR: Baostock 查询错误 600009.SH: 网络接收错误。
+2026-04-02 00:00:54 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-02 00:00:57 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-02 00:00:57 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-02 00:00:58 [source.baostock] ERROR: Baostock 查询错误 600309.SH: 网络接收错误。
+2026-04-02 00:01:00 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-02 00:01:00 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-02 00:01:01 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-02 00:01:02 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-02 00:01:02 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-02 00:01:04 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-02 00:01:04 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-02 00:01:05 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-02 00:01:06 [source.baostock] ERROR: Baostock 查询错误 000858.SZ: 网络接收错误。
+2026-04-02 00:01:08 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-02 00:01:09 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-02 00:01:09 [source.baostock] ERROR: Baostock 查询错误 000001.SH: 网络接收错误。
+2026-04-02 00:01:10 [source.baostock] ERROR: Baostock 查询错误 399001.SZ: 网络接收错误。
+2026-04-02 00:01:11 [source.baostock] ERROR: Baostock 查询错误 399006.SZ: 网络接收错误。
+2026-04-02 00:01:11 [source.baostock] ERROR: Baostock 查询错误 000300.SH: 网络接收错误。
+2026-04-02 00:01:12 [source.baostock] ERROR: Baostock 查询错误 000688.SH: 网络接收错误。
+2026-04-02 09:50:42 [source.baostock] INFO: Baostock 初始化成功
+2026-04-02 09:50:48 [source.baostock] INFO: Baostock 获取成功: 002572.SZ, 3638 条
+2026-04-02 09:50:51 [source.baostock] INFO: Baostock 初始化成功
+2026-04-02 09:50:59 [source.baostock] INFO: Baostock 获取成功: 300274.SZ, 3500 条
+2026-04-02 09:51:10 [source.baostock] INFO: Baostock 获取成功: 002572.SZ, 3638 条
+2026-04-02 14:21:04 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-02 14:21:04 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-02 14:40:01 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-02 14:40:01 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-02 14:40:04 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-02 14:40:04 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-02 14:40:06 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-02 14:40:06 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-02 14:40:06 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-02 14:40:06 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-02 14:40:07 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-02 14:40:07 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-02 14:40:08 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-02 14:40:09 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-02 14:40:09 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-02 14:40:09 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-02 14:40:10 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-02 14:40:10 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-02 14:40:14 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-02 14:40:15 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-02 14:40:16 [source.baostock] ERROR: Baostock 查询错误 399006.SZ: 网络接收错误。
+2026-04-02 14:40:17 [source.baostock] ERROR: Baostock 查询错误 399006.SZ: 网络接收错误。
+2026-04-02 14:40:17 [source.baostock] ERROR: Baostock 查询错误 000300.SH: 网络接收错误。
+2026-04-02 14:40:17 [source.baostock] ERROR: Baostock 查询错误 000300.SH: 网络接收错误。
+2026-04-02 14:40:17 [source.baostock] ERROR: Baostock 查询错误 000688.SH: 网络接收错误。
+2026-04-02 14:40:18 [source.baostock] ERROR: Baostock 查询错误 000688.SH: 网络接收错误。
+2026-04-02 17:10:36 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-02 17:10:37 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-02 17:10:37 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-02 17:10:38 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-02 17:10:39 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-02 17:10:39 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-02 17:10:39 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-02 17:10:40 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-02 17:10:40 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-02 17:10:42 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-02 17:10:42 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-02 22:57:17 [source.baostock] INFO: Baostock 初始化成功
+2026-04-02 22:57:22 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3584 条
+2026-04-02 22:59:15 [source.baostock] INFO: Baostock 获取成功: 002572.SZ, 3639 条
+2026-04-02 22:59:22 [source.baostock] INFO: Baostock 获取成功: 300274.SZ, 3501 条
+2026-04-02 23:21:27 [source.baostock] INFO: Baostock 初始化成功
+2026-04-02 23:21:31 [source.baostock] INFO: Baostock 获取成功: 002572.SZ, 3639 条
+2026-04-02 23:22:30 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2246 条
+2026-04-02 23:22:35 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-02 23:23:27 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-02 23:23:30 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-02 23:23:37 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 00:00:31 [source.baostock] INFO: Baostock 初始化成功
+2026-04-03 00:00:31 [source.baostock] WARNING: Baostock 无数据: 600519.SH (20260403-20260403)
+2026-04-03 00:00:33 [source.baostock] WARNING: Baostock 无数据: 002594.SZ (20260403-20260403)
+2026-04-03 00:00:35 [source.baostock] WARNING: Baostock 无数据: 300750.SZ (20260403-20260403)
+2026-04-03 00:00:37 [source.baostock] WARNING: Baostock 无数据: 600009.SH (20260403-20260403)
+2026-04-03 00:00:40 [source.baostock] WARNING: Baostock 无数据: 002572.SZ (20260403-20260403)
+2026-04-03 00:00:44 [source.baostock] WARNING: Baostock 无数据: 300274.SZ (20260403-20260403)
+2026-04-03 00:00:46 [source.baostock] WARNING: Baostock 无数据: 002920.SZ (20260403-20260403)
+2026-04-03 00:00:48 [source.baostock] WARNING: Baostock 无数据: 600309.SH (20260403-20260403)
+2026-04-03 00:00:51 [source.baostock] WARNING: Baostock 无数据: 688027.SH (20260403-20260403)
+2026-04-03 00:00:53 [source.baostock] WARNING: Baostock 无数据: 002463.SZ (20260403-20260403)
+2026-04-03 00:00:55 [source.baostock] WARNING: Baostock 无数据: 002837.SZ (20260403-20260403)
+2026-04-03 00:00:57 [source.baostock] WARNING: Baostock 无数据: 600900.SH (20260403-20260403)
+2026-04-03 00:00:59 [source.baostock] WARNING: Baostock 无数据: 002906.SZ (20260403-20260403)
+2026-04-03 00:01:01 [source.baostock] WARNING: Baostock 无数据: 601689.SH (20260403-20260403)
+2026-04-03 00:01:03 [source.baostock] WARNING: Baostock 无数据: 688981.SH (20260403-20260403)
+2026-04-03 00:01:05 [source.baostock] WARNING: Baostock 无数据: 002371.SZ (20260403-20260403)
+2026-04-03 00:01:07 [source.baostock] WARNING: Baostock 无数据: 000858.SZ (20260403-20260403)
+2026-04-03 00:01:12 [source.baostock] WARNING: Baostock 无数据: 603296.SH (20260403-20260403)
+2026-04-03 00:01:14 [source.baostock] WARNING: Baostock 无数据: 300483.SZ (20260403-20260403)
+2026-04-03 00:01:15 [source.baostock] WARNING: Baostock 无数据: 000001.SH (20260403-20260403)
+2026-04-03 00:01:18 [source.baostock] WARNING: Baostock 无数据: 399001.SZ (20260403-20260403)
+2026-04-03 00:01:20 [source.baostock] WARNING: Baostock 无数据: 399006.SZ (20260403-20260403)
+2026-04-03 00:01:21 [source.baostock] WARNING: Baostock 无数据: 000300.SH (20260403-20260403)
+2026-04-03 00:01:23 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20260403-20260403)
+2026-04-03 00:06:49 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-03 00:07:11 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 00:07:13 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 00:07:14 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 00:07:16 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 00:07:16 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 00:07:20 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 00:07:21 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 00:08:30 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-03 00:08:31 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-03 00:08:34 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-03 00:08:38 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 00:08:39 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 00:10:31 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-03 00:10:32 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-03 00:10:35 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-03 00:10:38 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 00:10:40 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 00:12:30 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-03 00:12:32 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-03 00:12:34 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-03 00:12:38 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 00:12:39 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 09:50:16 [source.baostock] INFO: Baostock 初始化成功
+2026-04-03 09:50:17 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3792 条
+2026-04-03 09:50:17 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 09:50:18 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-03 09:50:18 [source.baostock] INFO: Baostock 初始化成功
+2026-04-03 09:50:18 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2246 条
+2026-04-03 09:50:19 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 09:50:20 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 09:50:21 [source.baostock] INFO: Baostock 获取成功: 600900.SH, 5434 条
+2026-04-03 09:50:21 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3792 条
+2026-04-03 09:50:22 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 09:50:23 [source.baostock] INFO: Baostock 获取成功: 002906.SZ, 2056 条
+2026-04-03 09:50:23 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 09:50:24 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2246 条
+2026-04-03 09:50:24 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 09:50:25 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 09:50:26 [source.baostock] INFO: Baostock 获取成功: 601689.SH, 2684 条
+2026-04-03 09:50:27 [source.baostock] INFO: Baostock 获取成功: 600900.SH, 5434 条
+2026-04-03 09:50:27 [source.baostock] INFO: Baostock 获取成功: 688981.SH, 1385 条
+2026-04-03 09:50:29 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 09:50:30 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 09:50:30 [source.baostock] INFO: Baostock 获取成功: 002906.SZ, 2056 条
+2026-04-03 09:50:30 [source.baostock] INFO: Baostock 获取成功: 002371.SZ, 3898 条
+2026-04-03 09:50:32 [source.baostock] ERROR: Baostock 查询错误 399006.SZ: 网络接收错误。
+2026-04-03 09:50:33 [source.baostock] ERROR: Baostock 查询错误 000300.SH: 网络接收错误。
+2026-04-03 09:50:34 [source.baostock] INFO: Baostock 获取成功: 601689.SH, 2684 条
+2026-04-03 09:50:34 [source.baostock] INFO: Baostock 获取成功: 603296.SH, 641 条
+2026-04-03 09:50:35 [source.baostock] ERROR: Baostock 查询错误 000688.SH: 网络接收错误。
+2026-04-03 09:50:36 [source.baostock] INFO: Baostock 获取成功: 688981.SH, 1385 条
+2026-04-03 09:50:36 [source.baostock] INFO: Baostock 获取成功: 300483.SZ, 2614 条
+2026-04-03 09:50:37 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-03 09:50:39 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-03 09:50:39 [source.baostock] INFO: Baostock 获取成功: 002371.SZ, 3898 条
+2026-04-03 09:50:40 [source.baostock] INFO: Baostock 获取成功: 399006.SZ, 3845 条
+2026-04-03 09:50:41 [source.baostock] ERROR: Baostock 查询错误 002572.SZ: 网络接收错误。
+2026-04-03 09:50:42 [source.baostock] INFO: Baostock 获取成功: 000300.SH, 5159 条
+2026-04-03 09:50:43 [source.baostock] WARNING: Baostock 无数据: 000688.SH (20030101-20260403)
+2026-04-03 09:50:44 [source.baostock] INFO: Baostock 获取成功: 603296.SH, 641 条
+2026-04-03 09:50:45 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 09:50:46 [source.baostock] INFO: Baostock 获取成功: 002594.SZ, 3584 条
+2026-04-03 09:50:48 [source.baostock] INFO: Baostock 获取成功: 300483.SZ, 2614 条
+2026-04-03 09:51:06 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 09:51:06 [source.baostock] INFO: Baostock 获取成功: 002906.SZ, 2056 条
+2026-04-03 09:51:08 [source.baostock] INFO: Baostock 获取成功: 601689.SH, 2684 条
+2026-04-03 09:51:09 [source.baostock] INFO: Baostock 获取成功: 688027.SH, 1390 条
+2026-04-03 09:51:09 [source.baostock] INFO: Baostock 获取成功: 688981.SH, 1385 条
+2026-04-03 09:51:10 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 09:51:11 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 09:51:11 [source.baostock] INFO: Baostock 获取成功: 002371.SZ, 3898 条
+2026-04-03 09:51:13 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3792 条
+2026-04-03 09:51:14 [source.baostock] INFO: Baostock 获取成功: 603296.SH, 641 条
+2026-04-03 09:51:16 [source.baostock] INFO: Baostock 获取成功: 300483.SZ, 2614 条
+2026-04-03 09:51:19 [source.baostock] INFO: Baostock 获取成功: 002837.SZ, 2246 条
+2026-04-03 09:51:22 [source.baostock] INFO: Baostock 获取成功: 600900.SH, 5434 条
+2026-04-03 14:20:59 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 14:21:01 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 14:21:03 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 14:21:04 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-03 14:21:06 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 14:21:07 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 14:21:09 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 14:21:11 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 14:21:12 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 14:21:13 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 14:21:16 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 14:21:16 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 14:21:16 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 14:21:16 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 14:21:16 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 14:21:17 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 14:21:18 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 14:21:18 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 14:21:19 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 14:21:19 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 14:21:19 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 14:21:19 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 14:21:20 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 14:21:20 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 14:21:22 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 14:21:22 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 14:21:23 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 14:21:23 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 14:40:11 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 14:40:12 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 14:40:12 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 14:40:12 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-03 14:40:13 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 14:40:14 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 14:40:14 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 14:40:15 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 14:40:15 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-03 14:40:16 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 14:40:16 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 14:40:17 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 14:40:17 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 14:40:17 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 14:40:19 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 14:40:19 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 14:40:20 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 14:40:20 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 14:40:21 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 14:40:22 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 14:40:26 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 14:45:07 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 14:45:07 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 14:45:08 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 14:45:08 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 14:45:09 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 14:45:09 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 14:45:09 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 14:45:10 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-03 14:45:10 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-03 14:45:11 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 14:45:11 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 14:45:11 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 14:45:12 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 14:45:12 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 14:45:12 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 14:45:12 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 14:45:13 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 14:45:14 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 14:45:14 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-03 14:45:14 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 14:45:14 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 14:45:14 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 14:45:15 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 14:45:15 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 14:45:15 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 14:45:16 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 14:45:17 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 14:45:17 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 14:45:17 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 14:45:18 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 14:45:18 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 14:45:19 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 14:45:20 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 14:45:21 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 14:45:25 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 14:45:26 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 17:10:00 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-03 17:10:00 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-03 17:10:01 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-03 17:10:01 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-03 17:10:01 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-03 17:10:01 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-03 17:10:05 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 17:10:05 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 17:10:05 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 17:10:06 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 17:10:06 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 17:10:07 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 17:10:07 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 17:10:07 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-03 17:10:08 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 17:10:08 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-03 17:10:08 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 17:10:08 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 17:10:09 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 17:10:09 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 17:10:10 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 17:10:10 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 17:10:10 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 17:10:24 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-03 17:10:24 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-03 17:10:24 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 17:10:25 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-03 17:10:25 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-03 17:10:28 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 17:10:29 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 17:10:29 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 17:10:29 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 17:10:30 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 17:10:30 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 17:10:31 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 17:10:31 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 17:10:32 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-03 17:10:32 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-03 17:10:33 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 17:10:33 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 17:10:33 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 17:10:34 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 17:10:34 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 17:10:35 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 17:10:36 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 17:10:36 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 17:10:36 [source.baostock] ERROR: Baostock 查询错误 002594.SZ: 网络接收错误。
+2026-04-03 17:10:36 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 17:10:36 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 17:10:37 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 17:10:37 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 17:10:38 [source.baostock] ERROR: Baostock 查询错误 300750.SZ: 网络接收错误。
+2026-04-03 17:10:39 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 17:10:40 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 17:10:41 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 17:10:41 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 17:10:44 [source.baostock] ERROR: Baostock 查询错误 300274.SZ: 网络接收错误。
+2026-04-03 17:10:45 [source.baostock] ERROR: Baostock 查询错误 002920.SZ: 网络接收错误。
+2026-04-03 17:10:48 [source.baostock] ERROR: Baostock 查询错误 688027.SH: 网络接收错误。
+2026-04-03 17:10:49 [source.baostock] ERROR: Baostock 查询错误 002463.SZ: 网络接收错误。
+2026-04-03 17:10:50 [source.baostock] ERROR: Baostock 查询错误 002837.SZ: 网络接收错误。
+2026-04-03 17:10:52 [source.baostock] ERROR: Baostock 查询错误 600900.SH: 网络接收错误。
+2026-04-03 17:10:53 [source.baostock] ERROR: Baostock 查询错误 002906.SZ: 网络接收错误。
+2026-04-03 17:10:55 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 17:10:56 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 17:10:57 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 21:44:06 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 21:44:07 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 21:44:09 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 21:44:10 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 21:45:50 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 21:45:50 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 21:45:51 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 21:45:53 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 21:45:54 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 21:49:49 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 21:49:50 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 21:49:51 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 21:49:53 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 21:49:54 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 21:51:49 [source.baostock] ERROR: Baostock 查询错误 601689.SH: 网络接收错误。
+2026-04-03 21:51:50 [source.baostock] ERROR: Baostock 查询错误 688981.SH: 网络接收错误。
+2026-04-03 21:51:51 [source.baostock] ERROR: Baostock 查询错误 002371.SZ: 网络接收错误。
+2026-04-03 21:51:53 [source.baostock] ERROR: Baostock 查询错误 603296.SH: 网络接收错误。
+2026-04-03 21:51:54 [source.baostock] ERROR: Baostock 查询错误 300483.SZ: 网络接收错误。
+2026-04-03 22:38:46 [source.baostock] INFO: Baostock 初始化成功
+2026-04-03 22:38:55 [source.baostock] INFO: Baostock 获取成功: 002463.SZ, 3793 条

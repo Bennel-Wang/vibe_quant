@@ -1,0 +1,197 @@
+2026-03-21 15:26:53 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-21 15:27:23 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SH, 38 条
+2026-03-21 15:27:29 [source.pytdx] WARNING: Pytdx 港股无数据: HSI.HK
+2026-03-21 15:27:59 [source.pytdx] INFO: Pytdx A股获取成功: 399006.SZ, 38 条
+2026-03-21 15:28:29 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SZ, 38 条
+2026-03-21 15:28:34 [source.pytdx] WARNING: Pytdx 港股无数据: 00700.HK
+2026-03-21 15:32:14 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-21 15:32:45 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SH, 38 条
+2026-03-21 15:32:50 [source.pytdx] WARNING: Pytdx 港股无数据: HSI.HK
+2026-03-21 15:33:20 [source.pytdx] INFO: Pytdx A股获取成功: 399006.SZ, 38 条
+2026-03-21 15:33:50 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SZ, 38 条
+2026-03-21 15:33:55 [source.pytdx] WARNING: Pytdx 港股无数据: 00700.HK
+2026-03-21 15:46:47 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-21 15:47:17 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SH, 38 条
+2026-03-21 15:47:22 [source.pytdx] WARNING: Pytdx 港股无数据: HSI.HK
+2026-03-21 15:47:52 [source.pytdx] INFO: Pytdx A股获取成功: 399006.SZ, 38 条
+2026-03-21 15:48:22 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SZ, 38 条
+2026-03-21 15:48:27 [source.pytdx] WARNING: Pytdx 港股无数据: 00700.HK
+2026-03-21 16:02:20 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-21 16:02:50 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SH, 38 条
+2026-03-21 16:02:51 [source.pytdx] INFO: Pytdx 港股获取成功: HSI.HK, 41 条
+2026-03-21 16:03:21 [source.pytdx] INFO: Pytdx A股获取成功: 399006.SZ, 38 条
+2026-03-21 16:03:51 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SZ, 38 条
+2026-03-21 16:03:51 [source.pytdx] INFO: Pytdx 港股获取成功: 00700.HK, 41 条
+2026-03-21 16:32:03 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-21 16:33:49 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-21 16:34:19 [source.pytdx] WARNING: Pytdx 无数据: 801010.SH
+2026-03-21 16:34:50 [source.pytdx] WARNING: Pytdx 无数据: 801020.SH
+2026-03-21 16:36:39 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-24 20:57:09 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-24 20:57:39 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SH, 37 条
+2026-03-24 20:57:39 [source.pytdx] INFO: Pytdx 港股获取成功: HSI.HK, 40 条
+2026-03-24 20:58:10 [source.pytdx] INFO: Pytdx A股获取成功: 399006.SZ, 37 条
+2026-03-24 20:58:40 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SZ, 37 条
+2026-03-24 20:58:40 [source.pytdx] INFO: Pytdx 港股获取成功: 00700.HK, 40 条
+2026-03-24 21:32:25 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-24 21:32:55 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SH, 57 条
+2026-03-24 21:32:55 [source.pytdx] INFO: Pytdx 港股获取成功: HSI.HK, 59 条
+2026-03-24 21:33:25 [source.pytdx] INFO: Pytdx A股获取成功: 399006.SZ, 57 条
+2026-03-24 21:33:56 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SZ, 57 条
+2026-03-24 21:33:56 [source.pytdx] INFO: Pytdx 港股获取成功: 00700.HK, 59 条
+2026-03-24 21:34:11 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-24 21:34:41 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SH, 57 条
+2026-03-24 21:34:41 [source.pytdx] INFO: Pytdx 港股获取成功: HSI.HK, 59 条
+2026-03-24 21:35:11 [source.pytdx] INFO: Pytdx A股获取成功: 399006.SZ, 57 条
+2026-03-24 21:35:42 [source.pytdx] INFO: Pytdx A股获取成功: 000001.SZ, 57 条
+2026-03-24 21:35:42 [source.pytdx] INFO: Pytdx 港股获取成功: 00700.HK, 59 条
+2026-03-28 22:08:40 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-28 22:09:10 [source.pytdx] WARNING: Pytdx 无数据: 000568.SH
+2026-03-30 21:00:00 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-30 21:00:00 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:00:20 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:00:21 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:00:49 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-30 21:00:49 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:00:50 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:00:50 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:00:50 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:00:50 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:00:52 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:01:14 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:01:14 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:01:15 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:01:35 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:01:36 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:01:37 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:01:57 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:01:57 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:01:59 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:02:17 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:02:17 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:02:17 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:02:20 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:02:22 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:02:23 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:02:44 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:02:45 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:02:46 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:03:06 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:03:07 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:03:08 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:03:29 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:03:29 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:03:30 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:03:52 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:03:52 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:03:52 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:03:53 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:03:53 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:03:54 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:04:16 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:04:17 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:04:18 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:04:39 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:04:40 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:04:41 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:05:13 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:05:22 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:05:22 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:05:23 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:05:36 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:05:37 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:05:38 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:05:54 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:06:10 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:06:26 [source.pytdx] WARNING: Pytdx 无数据: 002463.SH
+2026-03-30 21:06:42 [source.pytdx] WARNING: Pytdx 无数据: 002463.SH
+2026-03-30 21:06:57 [source.pytdx] WARNING: Pytdx 无数据: 002837.SH
+2026-03-30 21:07:13 [source.pytdx] WARNING: Pytdx 无数据: 002837.SH
+2026-03-30 21:07:36 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:07:37 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:07:38 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:08:11 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:08:23 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:08:24 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:08:24 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:08:36 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:08:37 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:08:38 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:08:56 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:09:11 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:09:29 [source.pytdx] WARNING: Pytdx 无数据: 002463.SH
+2026-03-30 21:09:37 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:09:37 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:09:38 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:10:06 [source.pytdx] ERROR: Pytdx HQ 所有服务器连接失败
+2026-03-30 21:10:11 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:10:52 [source.pytdx] WARNING: Pytdx 无数据: 002371.SH
+2026-03-30 21:11:11 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:11:12 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:11:13 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:11:31 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:11:31 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:11:32 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:11:45 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:12:03 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:12:24 [source.pytdx] WARNING: Pytdx 无数据: 01579.SZ
+2026-03-30 21:12:35 [source.pytdx] WARNING: Pytdx 无数据: 002463.SH
+2026-03-30 21:12:55 [source.pytdx] WARNING: Pytdx 无数据: 06862.SZ
+2026-03-30 21:13:14 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:13:15 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:13:16 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:13:17 [source.pytdx] ERROR: Pytdx HQ 所有服务器连接失败
+2026-03-30 21:13:22 [source.pytdx] ERROR: Pytdx HQ 所有服务器连接失败
+2026-03-30 21:13:22 [source.pytdx] ERROR: Pytdx HQ 所有服务器连接失败
+2026-03-30 21:13:23 [source.pytdx] WARNING: Pytdx 无数据: 002371.SH
+2026-03-30 21:13:31 [source.pytdx] WARNING: Pytdx 无数据: 002837.SH
+2026-03-30 21:13:48 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:13:56 [source.pytdx] WARNING: Pytdx 无数据: 002371.SH
+2026-03-30 21:14:12 [source.pytdx] WARNING: Pytdx 无数据: 002371.SH
+2026-03-30 21:14:26 [source.pytdx] WARNING: Pytdx 无数据: 01579.SZ
+2026-03-30 21:14:27 [source.pytdx] WARNING: Pytdx 无数据: 002371.SH
+2026-03-30 21:14:57 [source.pytdx] WARNING: Pytdx 无数据: 06862.SZ
+2026-03-30 21:15:00 [source.pytdx] WARNING: Pytdx 无数据: 01579.SZ
+2026-03-30 21:15:15 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:15:15 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:15:16 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:15:31 [source.pytdx] WARNING: Pytdx 无数据: 06862.SZ
+2026-03-30 21:15:31 [source.pytdx] ERROR: Pytdx HQ 所有服务器连接失败
+2026-03-30 21:15:31 [source.pytdx] ERROR: Pytdx HQ 所有服务器连接失败
+2026-03-30 21:15:31 [source.pytdx] WARNING: Pytdx 无数据: 002371.SH
+2026-03-30 21:15:48 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:16:16 [source.pytdx] INFO: Pytdx 初始化成功
+2026-03-30 21:16:16 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:16:17 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:16:18 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:16:20 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:16:20 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:16:21 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:16:51 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:16:52 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:17:24 [source.pytdx] WARNING: Pytdx 无数据: 002463.SH
+2026-03-30 21:17:29 [source.pytdx] WARNING: Pytdx 无数据: 01579.SZ
+2026-03-30 21:17:56 [source.pytdx] WARNING: Pytdx 无数据: 002837.SH
+2026-03-30 21:18:00 [source.pytdx] WARNING: Pytdx 无数据: 06862.SZ
+2026-03-30 21:18:38 [source.pytdx] WARNING: Pytdx 无数据: 002371.SH
+2026-03-30 21:19:09 [source.pytdx] WARNING: Pytdx 无数据: 01579.SZ
+2026-03-30 21:19:40 [source.pytdx] WARNING: Pytdx 无数据: 06862.SZ
+2026-03-30 21:21:00 [source.pytdx] WARNING: Pytdx 港股无数据: 300274.HK
+2026-03-30 21:21:00 [source.pytdx] WARNING: Pytdx 港股无数据: 002920.HK
+2026-03-30 21:21:01 [source.pytdx] WARNING: Pytdx 港股无数据: 600309.HK
+2026-03-30 21:21:32 [source.pytdx] WARNING: Pytdx 无数据: 03998.SH
+2026-03-30 21:22:04 [source.pytdx] WARNING: Pytdx 无数据: 002463.SH
+2026-03-30 21:22:36 [source.pytdx] WARNING: Pytdx 无数据: 002837.SH
+2026-03-30 21:23:17 [source.pytdx] WARNING: Pytdx 无数据: 002371.SH
+2026-03-30 21:23:48 [source.pytdx] WARNING: Pytdx 无数据: 01579.SZ
+2026-03-30 21:24:19 [source.pytdx] WARNING: Pytdx 无数据: 06862.SZ
+2026-04-03 07:11:03 [source.pytdx] INFO: Pytdx 初始化成功
+2026-04-03 07:11:14 [source.pytdx] WARNING: Pytdx 港股无数据: 800000.HK
+2026-04-03 07:11:26 [source.pytdx] WARNING: Pytdx 港股无数据: 800000.HK
+2026-04-03 07:12:16 [source.pytdx] WARNING: Pytdx 港股无数据: 800000.HK
+2026-04-03 07:12:16 [source.pytdx] WARNING: Pytdx 港股无数据: 800000.HK
+2026-04-03 07:13:13 [source.pytdx] WARNING: Pytdx 港股无数据: 800000.HK
+2026-04-03 14:45:35 [source.pytdx] WARNING: Pytdx 港股无数据: 800000.HK
+2026-04-03 21:54:35 [source.pytdx] WARNING: Pytdx 港股无数据: 800000.HK
+2026-04-03 21:55:19 [source.pytdx] WARNING: Pytdx 港股无数据: 800000.HK
+2026-04-03 21:55:19 [source.pytdx] WARNING: Pytdx 港股无数据: 800000.HK

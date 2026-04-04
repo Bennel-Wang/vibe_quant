@@ -136,8 +136,8 @@ class EmailNotifier:
 class NotificationManager:
     """通知管理器 - 支持微信(PushPlus)和邮件(SMTP)"""
 
-    # 同类通知 4 小时内只发一次，防当天多次重复推送
-    _DEDUP_WINDOW = 4 * 3600
+    # 同类通知 5分钟只发一次，防当天多次重复推送
+    _DEDUP_WINDOW = 5 * 60
 
     def __init__(self):
         self.notifier = PushPlusNotifier()
@@ -149,7 +149,7 @@ class NotificationManager:
         self._dedup_lock = __import__('threading').Lock()
 
     def _is_duplicate(self, title: str) -> bool:
-        """同标题前缀 4 小时内只发一次，返回 True 表示应跳过（线程安全）"""
+        """同标题前缀 5分钟内只发一次，返回 True 表示应跳过（线程安全）"""
         import time
         key = title[:20]
         now = time.time()

@@ -22,9 +22,9 @@ class FreshTechnicalIndicators:
     """全新设计的技术指标计算器"""
     
     def __init__(self):
-        # 统一使用 data_sourcing/data/ 目录，与 data_manager 共享同一份 CSV
+        # 统一使用 data/history/ 目录，与 data_manager 共享同一份 CSV
         self.data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                      'data_sourcing', 'data')
+                                      'data', 'history')
         self.rsi_config = config.get_rsi_config()
         self._ensure_dir()
     
@@ -169,9 +169,9 @@ class TechnicalIndicators:
     """技术指标计算器"""
     
     def __init__(self):
-        # 统一使用 data_sourcing/data/ 目录，与 data_manager 共享同一份 CSV
+        # 统一使用 data/history/ 目录，与 data_manager 共享同一份 CSV
         self.data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                      'data_sourcing', 'data')
+                                      'data', 'history')
         self.rsi_config = config.get_rsi_config()
         self._ensure_dir()
     
