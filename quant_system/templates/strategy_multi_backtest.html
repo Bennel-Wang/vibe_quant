@@ -89,6 +89,7 @@
                 <h6 class="mb-0">策略-股票配对</h6>
                 <div class="d-flex align-items-center gap-2">
                     <span class="text-muted small">资金分配合计：<span id="alloc-sum" class="alloc-sum-ok">0%</span></span>
+                    <button class="btn btn-sm btn-outline-warning" onclick="restoreDefaultPairs()" title="恢复为 stocks.yaml 中每只股票定义的默认策略">🔄 加载默认策略</button>
                     <button class="btn btn-sm btn-outline-success" onclick="addPairRow()">＋ 添加一行</button>
                 </div>
             </div>
@@ -247,6 +248,34 @@ function addDefaultRows() {
         addPairRow(buy, sell, stock, Math.floor(100 / n));
     }
     if (n === 0) addPairRow();
+    updateAllocSum();
+}
+
+function restoreDefaultPairs() {
+    // 清空当前所有行
+    $('#pairs-tbody').empty();
+    _pairCounter = 0;
+
+    // 筛选有策略配置的股票
+    var defaultStocks = _allStocks.filter(function(s) {
+        return s.buy_strategy || s.sell_strategy;
+    });
+
+    if (defaultStocks.length === 0) {
+        addPairRow();
+        updateAllocSum();
+        return;
+    }
+
+    // 平均分配资金，整数化
+    var allocPct = Math.floor(100 / defaultStocks.length);
+    if (allocPct < 1) allocPct = 1;
+
+    defaultStocks.forEach(function(s) {
+        var stockCode = s.full_code || s.code;
+        addPairRow(s.buy_strategy || '', s.sell_strategy || '', stockCode, allocPct);
+    });
+
     updateAllocSum();
 }
 

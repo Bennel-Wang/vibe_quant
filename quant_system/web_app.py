@@ -6256,7 +6256,7 @@ def api_multi_backtest_run():
                                 d_str = str(d)[:10]
                                 ec_map[d_str] = float(rec.get('equity', pair_capital))
                         if ec_map:
-                            all_equity_series.append(ec_map)
+                            all_equity_series.append((ec_map, pair_capital))
 
                     pair_results.append({
                         'index': i,
@@ -6290,12 +6290,14 @@ def api_multi_backtest_run():
             # ── 合并权益曲线 ──
             combined_equity_curve = []
             if all_equity_series:
-                all_dates = sorted(set().union(*[ec.keys() for ec in all_equity_series]))
-                # 对每个 series，用 forward-fill 填充缺失日期
+                all_dates = sorted(set().union(*[em.keys() for em, _ in all_equity_series]))
+                # 对每个 series 用 forward-fill 填充缺失日期；
+                # 用 init_capital 初始化，确保回测开始前的日期也贡献正确的初始资金，
+                # 避免出现合并权益曲线起点偏低、初始尖峰以及收益率虚高的问题。
                 filled = []
-                for ec_map in all_equity_series:
+                for ec_map, init_capital in all_equity_series:
                     arr = []
-                    last_val = None
+                    last_val = init_capital
                     for d in all_dates:
                         if d in ec_map:
                             last_val = ec_map[d]
@@ -6303,9 +6305,7 @@ def api_multi_backtest_run():
                     filled.append(arr)
 
                 for di, d in enumerate(all_dates):
-                    total_val = sum(
-                        (filled[si][di] or 0) for si in range(len(filled))
-                    )
+                    total_val = sum(filled[si][di] for si in range(len(filled)))
                     combined_equity_curve.append({'date': d, 'equity': round(total_val, 2)})
 
             # ── 组合汇总指标 ──

@@ -43,7 +43,7 @@ stocks:
   type: stock
   notes: 长期投资
   industry: 白酒
-  strategy: RSI超卖反弹买入
+  strategy: RSI超卖反弹买入(买) + RSI超买卖出(卖)
   buy_strategy: RSI超卖反弹买入
   sell_strategy: RSI超买卖出
 - name: 比亚迪
@@ -51,7 +51,7 @@ stocks:
   market: sz
   type: stock
   industry: 汽车整车
-  strategy: 长线4421极限买入
+  strategy: 长线4421极限买入(买) + 长线泡沫卖出(卖)
   buy_strategy: 长线4421极限买入
   sell_strategy: 长线泡沫卖出
 - name: 宁德时代
@@ -59,7 +59,7 @@ stocks:
   market: sz
   type: stock
   industry: 电气设备
-  strategy: 长线4421极限买入
+  strategy: 长线4421极限买入(买) + 长线泡沫卖出(卖)
   buy_strategy: 长线4421极限买入
   sell_strategy: 长线泡沫卖出
 - name: 阿里巴巴
@@ -75,7 +75,7 @@ stocks:
   market: sh
   type: stock
   industry: 机场
-  strategy: 布林带下轨买入
+  strategy: 布林带下轨买入(买) + 布林带上轨卖出(卖)
   buy_strategy: 布林带下轨买入
   sell_strategy: 布林带上轨卖出
 - name: 索菲亚
@@ -112,23 +112,23 @@ stocks:
   market: sz
   type: stock
   industry: 电气设备
-  strategy: 长线4421极限买入
-  buy_strategy: 长线4421极限买入
+  strategy: 混搭：中线超跌买入买×长线泡沫卖出卖
+  buy_strategy: 中线超跌买入
   sell_strategy: 长线泡沫卖出
 - name: 德赛西威
   code: 002920
   market: sz
   type: stock
   industry: 汽车配件
-  strategy: RSI12(25/75)
-  buy_strategy: RSI12(25/75)
-  sell_strategy: （含卖出）
+  strategy: 中线超跌买入(买) + 中线超跌卖出(卖)
+  buy_strategy: 中线超跌买入
+  sell_strategy: 中线超跌卖出
 - name: 万华化学
   code: '600309'
   market: sh
   type: stock
   industry: 化工原料
-  strategy: 中线超跌买入
+  strategy: 中线超跌买入(买) + 中线超跌卖出(卖)
   buy_strategy: 中线超跌买入
   sell_strategy: 中线超跌卖出
 - name: 波司登
@@ -143,7 +143,7 @@ stocks:
   market: sh
   type: stock
   industry: 通信设备
-  strategy: 长线4421极限买入
+  strategy: 长线4421极限买入(买) + 长线泡沫卖出(卖)
   buy_strategy: 长线4421极限买入
   sell_strategy: 长线泡沫卖出
 - name: 沪电股份
@@ -167,17 +167,17 @@ stocks:
   market: sh
   type: stock
   industry: 水力发电
-  strategy: 布林带下轨买入(买) + 布林带上轨卖出(卖)买×超级长线价值买入(买) + 超级长线卖出(卖)卖
-  buy_strategy: 布林带下轨买入(买) + 布林带上轨卖出(卖)买×超级长线价值买入(买) + 超级长线卖出(卖)卖
-  sell_strategy: 混搭
+  strategy: 布林带下轨买入(买) + 布林带上轨卖出(卖)
+  buy_strategy: 布林带下轨买入
+  sell_strategy: 布林带上轨卖出
 - name: 华阳集团
   code: 002906
   market: sz
   type: stock
   industry: 汽车配件
-  strategy: 布林带下轨买入(买) + 布林带上轨卖出(卖)买×KDJ超卖买入(买) + KDJ超买卖出(卖)卖
-  buy_strategy: 布林带下轨买入(买) + 布林带上轨卖出(卖)买×KDJ超卖买入(买) + KDJ超买卖出(卖)卖
-  sell_strategy: 混搭
+  strategy: 混搭：布林带下轨买入买×KDJ超买卖出卖
+  buy_strategy: 布林带下轨买入
+  sell_strategy: KDJ超买卖出
 - name: 腾讯控股
   code: '00700'
   market: hk
@@ -190,17 +190,17 @@ stocks:
   market: sh
   type: stock
   industry: 汽车配件
-  strategy: 长线4421极限买入
-  buy_strategy: 长线4421极限买入
-  sell_strategy: 长线泡沫卖出
+  strategy: KDJ超卖买入(买) + KDJ超买卖出(卖)
+  buy_strategy: KDJ超卖买入
+  sell_strategy: KDJ超买卖出
 - name: 中芯国际
   code: '688981'
   market: sh
   type: stock
   industry: 半导体
-  strategy: 布林带下轨买入(买) + 布林带上轨卖出(卖)买×超级长线价值买入(买) + 超级长线卖出(卖)卖
-  buy_strategy: 布林带下轨买入(买) + 布林带上轨卖出(卖)买×超级长线价值买入(买) + 超级长线卖出(卖)卖
-  sell_strategy: 混搭
+  strategy: 混搭：布林带下轨买入买×中线超跌卖出卖
+  buy_strategy: 布林带下轨买入
+  sell_strategy: 中线超跌卖出
 - name: 北方华创
   code: '002371'
   market: sz
@@ -214,6 +214,9 @@ stocks:
   market: sz
   type: stock
   industry: 白酒
+  strategy: 中线超跌买入(买) + 中线超跌卖出(卖)
+  buy_strategy: 中线超跌买入
+  sell_strategy: 中线超跌卖出
 - name: 颐海国际
   code: 01579
   market: hk
@@ -233,7 +236,7 @@ stocks:
   market: sh
   type: stock
   industry: 元器件
-  strategy: RSI超卖反弹买入
+  strategy: RSI超卖反弹买入(买) + RSI超买卖出(卖)
   buy_strategy: RSI超卖反弹买入
   sell_strategy: RSI超买卖出
 - name: 海底捞
@@ -248,7 +251,7 @@ stocks:
   market: sz
   type: stock
   industry: 石油开采
-  strategy: 长线4421极限买入
+  strategy: 长线4421极限买入(买) + 长线泡沫卖出(卖)
   buy_strategy: 长线4421极限买入
   sell_strategy: 长线泡沫卖出
 - name: '159632'
