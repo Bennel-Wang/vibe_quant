@@ -45,7 +45,7 @@
 </div>
 
 <div class="row mt-3" id="risk-summary-cards">
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card text-center border-0 bg-light">
             <div class="card-body py-2">
                 <div class="fs-4 fw-bold" id="summary-total-capital">-</div>
@@ -53,7 +53,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card text-center border-0 bg-light">
             <div class="card-body py-2">
                 <div class="fs-4 fw-bold" id="summary-available">-</div>
@@ -61,7 +61,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card text-center border-0 bg-light">
             <div class="card-body py-2">
                 <div class="fs-4 fw-bold" id="summary-position-value">-</div>
@@ -74,6 +74,19 @@
             <div class="card-body py-2">
                 <div class="fs-4 fw-bold" id="summary-pnl">-</div>
                 <div class="text-muted small">浮动盈亏</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center border-0 bg-light">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-center align-items-center gap-1">
+                    <div class="fs-4 fw-bold" id="summary-cumulative-pnl">-</div>
+                    <button class="btn btn-link btn-sm p-0 text-secondary" title="设置基准" onclick="showBaselineModal()">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                </div>
+                <div class="text-muted small">累计盈亏 <span id="summary-cumulative-pnl-pct" class="ms-1"></span></div>
             </div>
         </div>
     </div>
@@ -113,7 +126,10 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">资金管理</h5>
-                <button class="btn btn-sm btn-primary" onclick="editCapital()">编辑</button>
+                <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="showBaselineModal()" title="设置累计盈亏基准">基准</button>
+                    <button class="btn btn-sm btn-primary" onclick="editCapital()">编辑</button>
+                </div>
             </div>
             <div class="card-body">
                 <table class="table table-sm">
@@ -132,6 +148,10 @@
                     <tr>
                         <td>浮动盈亏</td>
                         <td id="unrealized-pnl" class="text-end">-</td>
+                    </tr>
+                    <tr>
+                        <td>累计盈亏 <small class="text-muted" id="baseline-hint"></small></td>
+                        <td id="cumulative-pnl" class="text-end fw-bold">-</td>
                     </tr>
                 </table>
             </div>
@@ -225,24 +245,50 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">编辑资金</h5>
+                <h5 class="modal-title">编辑可用资金</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="capital-form">
                     <div class="mb-3">
-                        <label class="form-label">总资产</label>
-                        <input type="number" class="form-control" id="edit-total-capital" required min="0" step="0.01">
+                        <label class="form-label">可用资金（现金）</label>
+                        <input type="number" class="form-control" id="edit-available-cash" required min="0" step="0.01">
+                        <div class="form-text">填写当前持有的现金金额。总资产 = 可用资金 + 持仓市值，会随行情自动变化。</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label text-muted">可用资金（自动 = 总资产 − 持仓市值）</label>
-                        <input type="text" class="form-control" id="edit-available-cash-display" disabled placeholder="自动计算">
+                        <label class="form-label text-muted">总资产（自动 = 可用资金 + 持仓市值）</label>
+                        <input type="text" class="form-control" id="edit-total-capital-display" disabled placeholder="自动计算">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-primary" onclick="saveCapital()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 设置累计盈亏基准模态框 -->
+<div class="modal fade" id="baseline-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">设置累计盈亏基准</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">累计盈亏 = 当前净值（总资产 + 浮动盈亏）− 基准金额。设为 0 则自动以当前总资产为基准。</p>
+                <form id="baseline-form">
+                    <div class="mb-3">
+                        <label class="form-label">基准金额（元）</label>
+                        <input type="number" class="form-control" id="baseline-input" min="0" step="0.01" placeholder="0 = 使用当前总资产">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveBaseline()">保存</button>
             </div>
         </div>
     </div>
@@ -287,12 +333,13 @@
 
 {% block extra_js %}
 <script>
-var positionModal, capitalModal, riskSettingsModal;
+var positionModal, capitalModal, riskSettingsModal, baselineModal;
 
 $(document).ready(function() {
     positionModal = new bootstrap.Modal(document.getElementById('position-modal'));
     capitalModal = new bootstrap.Modal(document.getElementById('capital-modal'));
     riskSettingsModal = new bootstrap.Modal(document.getElementById('risk-settings-modal'));
+    baselineModal = new bootstrap.Modal(document.getElementById('baseline-modal'));
     
     loadRiskData();
     loadStockList();
@@ -314,12 +361,17 @@ function loadRiskData() {
         $('#position-value').text('¥' + data.total_position_value.toLocaleString());
         
         var pnlEl = $('#unrealized-pnl');
-        pnlEl.text('¥' + data.total_unrealized_pnl.toLocaleString());
-        pnlEl.removeClass('positive negative');
-        if (data.total_unrealized_pnl > 0) {
-            pnlEl.addClass('positive');
-        } else if (data.total_unrealized_pnl < 0) {
-            pnlEl.addClass('negative');
+        var unrealized = data.total_unrealized_pnl || 0;
+        pnlEl.text((unrealized >= 0 ? '+' : '-') + '¥' + Math.abs(unrealized).toLocaleString());
+        pnlEl.removeClass('positive negative').addClass(unrealized >= 0 ? 'positive' : 'negative');
+
+        // 累计盈亏
+        var cumEl = $('#cumulative-pnl');
+        var cum = data.cumulative_pnl || 0;
+        cumEl.text((cum >= 0 ? '+' : '-') + '¥' + Math.abs(cum).toLocaleString());
+        cumEl.removeClass('positive negative').addClass(cum >= 0 ? 'positive' : 'negative');
+        if (data.initial_capital_baseline) {
+            $('#baseline-hint').text('基准 ¥' + data.initial_capital_baseline.toLocaleString());
         }
 
         // Update summary cards
@@ -328,8 +380,13 @@ function loadRiskData() {
         $('#summary-position-value').text('¥' + data.total_position_value.toLocaleString());
         var pnl = data.total_unrealized_pnl || 0;
         var pnlSummaryEl = $('#summary-pnl');
-        pnlSummaryEl.text((pnl >= 0 ? '+' : '') + '¥' + Math.abs(pnl).toLocaleString());
+        pnlSummaryEl.text((pnl >= 0 ? '+' : '-') + '¥' + Math.abs(pnl).toLocaleString());
         pnlSummaryEl.removeClass('positive negative').addClass(pnl >= 0 ? 'positive' : 'negative');
+        var cumSummaryEl = $('#summary-cumulative-pnl');
+        cumSummaryEl.text((cum >= 0 ? '+' : '-') + '¥' + Math.abs(cum).toLocaleString());
+        cumSummaryEl.removeClass('positive negative').addClass(cum >= 0 ? 'positive' : 'negative');
+        var pct = data.cumulative_pnl_pct || 0;
+        $('#summary-cumulative-pnl-pct').text((pct >= 0 ? '+' : '') + pct.toFixed(2) + '%');
         
         // 风险提醒
         var alertsHtml = '';
@@ -389,7 +446,7 @@ function loadStockList() {
         select.empty();
         select.append('<option value="">选择股票</option>');
         data.forEach(function(stock) {
-            if (stock.type === 'stock') {
+            if (stock.type === 'stock' || stock.type === 'etf') {
                 select.append('<option value="' + stock.full_code + '">' + stock.name + ' (' + stock.full_code + ')</option>');
             }
         });
@@ -498,19 +555,17 @@ function deletePosition(code) {
 
 function editCapital() {
     $.get('/api/risk/portfolio', function(data) {
-        $('#edit-total-capital').val(data.total_capital);
-        var posValue = data.total_position_value || 0;
-        var avail = data.total_capital - posValue;
-        $('#edit-available-cash-display').val('¥' + avail.toLocaleString() + ' (自动)');
+        $('#edit-available-cash').val(data.available_cash);
+        $('#edit-total-capital-display').val('¥' + (data.total_capital || 0).toLocaleString() + ' (自动)');
         capitalModal.show();
     });
 }
 
 function saveCapital() {
-    var totalCapital = parseFloat($('#edit-total-capital').val());
+    var availableCash = parseFloat($('#edit-available-cash').val());
     
-    if (isNaN(totalCapital) || totalCapital <= 0) {
-        alert('请填写有效的总资产金额');
+    if (isNaN(availableCash) || availableCash < 0) {
+        alert('请填写有效的可用资金金额');
         return;
     }
     
@@ -518,7 +573,7 @@ function saveCapital() {
         url: '/api/risk/capital',
         method: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({ total_capital: totalCapital }),
+        data: JSON.stringify({ available_cash: availableCash }),
         success: function(result) {
             capitalModal.hide();
             loadRiskData();
@@ -561,6 +616,31 @@ function saveRiskSettings() {
             riskSettingsModal.hide();
             loadRiskData();
             alert('风控设置已保存');
+        },
+        error: function(xhr) {
+            alert('保存失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));
+        }
+    });
+}
+
+function showBaselineModal() {
+    $.get('/api/risk/pnl-baseline', function(data) {
+        var baseline = data.initial_capital_baseline || 0;
+        $('#baseline-input').val(baseline > 0 ? baseline : '');
+        baselineModal.show();
+    });
+}
+
+function saveBaseline() {
+    var baseline = parseFloat($('#baseline-input').val()) || 0;
+    $.ajax({
+        url: '/api/risk/pnl-baseline',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ baseline: baseline }),
+        success: function() {
+            baselineModal.hide();
+            loadRiskData();
         },
         error: function(xhr) {
             alert('保存失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误'));

@@ -85,10 +85,6 @@ stocks:
   code: '01024'
   market: hk
   type: stock
-- name: 泡泡玛特
-  code: 09992
-  market: hk
-  type: stock
 - name: 特海国际
   code: 09658
   market: hk
@@ -183,3 +179,7 @@ stocks:
   market: sz
   type: stock
   industry: 石油开采
+- name: '159632'
+  code: '159632'
+  market: sz
+  type: etf

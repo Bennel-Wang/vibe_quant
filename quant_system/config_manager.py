@@ -103,7 +103,12 @@ class ConfigManager:
         return self.get('tokens.tushare_token', '')
     
     def get_pushplus_token(self) -> str:
-        """获取PushPlus Token"""
+        """获取PushPlus Token（向后兼容，取第一个账户的 token）"""
+        accounts = self.get('tokens.pushplus_accounts', [])
+        if isinstance(accounts, list):
+            for acc in accounts:
+                if isinstance(acc, dict) and acc.get('enabled') and acc.get('token'):
+                    return acc['token']
         return self.get('tokens.pushplus_token', '')
     
     def get_modelscope_token(self) -> str:

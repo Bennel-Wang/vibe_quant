@@ -617,12 +617,40 @@ function saveSchedulerConfig() {
 }
 
 function loadNotificationStatus() {
-    $.get('/api/notification/status', function(data) {
-        if (data.wechat) {
-            var badge = data.wechat.enabled ? '<span class="badge bg-success">已配置</span>' : '<span class="badge bg-secondary">未配置</span>';
-            $('#wechat-status').html('状态: ' + badge);
-            if (data.wechat.token_configured) $('#pushplus-token').attr('placeholder', '已配置（输入新值可更新）');
+    $.get('/api/notification/accounts', function(data) {
+        var tbody = $('#wechat-accounts-body');
+        tbody.empty();
+        var accounts = data.accounts || [];
+        if (accounts.length === 0) {
+            tbody.append('<tr><td colspan="4" class="text-center text-muted small">暂无账户，请添加</td></tr>');
+            $('#wechat-status').html('<span class="badge bg-secondary">未配置</span>');
+            return;
         }
+        var anyEnabled = false;
+        accounts.forEach(function(acc) {
+            if (acc.enabled) anyEnabled = true;
+            var enabledBadge = acc.enabled
+                ? '<span class="badge bg-success">启用</span>'
+                : '<span class="badge bg-secondary">禁用</span>';
+            var row = '<tr>' +
+                '<td>' + acc.name + '</td>' +
+                '<td class="text-muted small font-monospace">' + acc.token_masked + '</td>' +
+                '<td>' + enabledBadge + '</td>' +
+                '<td class="text-end">' +
+                  '<button class="btn btn-xs btn-outline-secondary btn-sm py-0 px-1 me-1" onclick="toggleAccount(\'' + acc.name + '\', ' + !acc.enabled + ')">' +
+                    (acc.enabled ? '禁用' : '启用') + '</button>' +
+                  '<button class="btn btn-xs btn-outline-danger btn-sm py-0 px-1" onclick="deleteAccount(\'' + acc.name + '\')">删除</button>' +
+                '</td>' +
+                '</tr>';
+            tbody.append(row);
+        });
+        var badge = anyEnabled ? '<span class="badge bg-success">已配置</span>' : '<span class="badge bg-secondary">未启用</span>';
+        $('#wechat-status').html('状态: ' + badge + ' (' + accounts.length + ' 个账户)');
+    }).fail(function() {
+        $('#wechat-accounts-body').html('<tr><td colspan="4" class="text-center text-danger small">加载失败</td></tr>');
+    });
+    // email status unchanged
+    $.get('/api/notification/status', function(data) {
         if (data.email) {
             var badge = data.email.enabled ? '<span class="badge bg-success">已配置</span>' : '<span class="badge bg-secondary">未配置</span>';
             $('#email-status').html('状态: ' + badge);
@@ -632,9 +660,55 @@ function loadNotificationStatus() {
     });
 }
 
+function showAddAccountModal() {
+    $('#account-modal-title').text('添加微信账户');
+    $('#account-name').val('').prop('disabled', false);
+    $('#account-token').val('');
+    $('#account-enabled').prop('checked', true);
+    $('#account-modal-mode').val('add');
+    new bootstrap.Modal(document.getElementById('wechat-account-modal')).show();
+}
+
+function saveAccount() {
+    var name = $('#account-name').val().trim();
+    var token = $('#account-token').val().trim();
+    var enabled = $('#account-enabled').is(':checked');
+    var mode = $('#account-modal-mode').val();
+    if (!name || !token) { alert('名称和 Token 不能为空'); return; }
+    if (mode === 'add') {
+        $.ajax({ url: '/api/notification/accounts', method: 'POST', contentType: 'application/json',
+            data: JSON.stringify({ name: name, token: token, enabled: enabled }),
+            success: function() { bootstrap.Modal.getInstance(document.getElementById('wechat-account-modal')).hide(); loadNotificationStatus(); },
+            error: function(xhr) { alert('添加失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误')); }
+        });
+    } else {
+        $.ajax({ url: '/api/notification/accounts/' + encodeURIComponent(name), method: 'PATCH',
+            contentType: 'application/json', data: JSON.stringify({ token: token, enabled: enabled }),
+            success: function() { bootstrap.Modal.getInstance(document.getElementById('wechat-account-modal')).hide(); loadNotificationStatus(); },
+            error: function(xhr) { alert('更新失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误')); }
+        });
+    }
+}
+
+function deleteAccount(name) {
+    if (!confirm('确认删除账户「' + name + '」？')) return;
+    $.ajax({ url: '/api/notification/accounts/' + encodeURIComponent(name), method: 'DELETE',
+        success: function() { loadNotificationStatus(); },
+        error: function(xhr) { alert('删除失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误')); }
+    });
+}
+
+function toggleAccount(name, enabled) {
+    $.ajax({ url: '/api/notification/accounts/' + encodeURIComponent(name), method: 'PATCH',
+        contentType: 'application/json', data: JSON.stringify({ enabled: enabled }),
+        success: function() { loadNotificationStatus(); },
+        error: function(xhr) { alert('操作失败: ' + (xhr.responseJSON ? xhr.responseJSON.error : '未知错误')); }
+    });
+}
+
 function saveNotificationConfig() {
-    var cfg = { smtp_host: $('#smtp-host').val(), smtp_port: parseInt($('#smtp-port').val()) || 465, sender: $('#smtp-sender').val(), password: $('#smtp-password').val(), receiver: $('#smtp-receiver').val(), pushplus_token: $('#pushplus-token').val() };
-    $.ajax({ url: '/api/notification/config', method: 'POST', contentType: 'application/json', data: JSON.stringify(cfg), success: function(data) { alert(data.success ? '通知配置已保存' : ('保存失败: ' + (data.error || ''))); loadNotificationStatus(); }, error: function() { alert('保存失败'); } });
+    var cfg = { smtp_host: $('#smtp-host').val(), smtp_port: parseInt($('#smtp-port').val()) || 465, sender: $('#smtp-sender').val(), password: $('#smtp-password').val(), receiver: $('#smtp-receiver').val() };
+    $.ajax({ url: '/api/notification/config', method: 'POST', contentType: 'application/json', data: JSON.stringify(cfg), success: function(data) { alert(data.success ? '邮件配置已保存' : ('保存失败: ' + (data.error || ''))); loadNotificationStatus(); }, error: function() { alert('保存失败'); } });
 }
 
 function testNotification(channel) {
@@ -643,6 +717,38 @@ function testNotification(channel) {
 </script>
 
 <!-- 通知设置 -->
+
+<!-- 微信账户管理模态框 -->
+<div class="modal fade" id="wechat-account-modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="account-modal-title">添加微信账户</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="account-modal-mode" value="add">
+        <div class="mb-3">
+          <label class="form-label">账户名称 <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="account-name" placeholder="例如：主账号、备用账号">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">PushPlus Token <span class="text-danger">*</span></label>
+          <input type="text" class="form-control font-monospace" id="account-token" placeholder="在 pushplus.hxtrip.com 获取">
+          <div class="form-text">前往 <a href="https://www.pushplus.plus" target="_blank">pushplus.plus</a> 获取 Token</div>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="account-enabled" checked>
+          <label class="form-check-label" for="account-enabled">启用此账户</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" onclick="saveAccount()">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- 自定义任务编辑模态框 -->
 <div class="modal fade" id="custom-task-modal" tabindex="-1">
@@ -699,13 +805,26 @@ function testNotification(channel) {
     <div class="row">
       <div class="col-md-6">
         <div class="card">
-          <div class="card-header bg-success bg-opacity-10"><strong>微信推送 (PushPlus)</strong></div>
-          <div class="card-body">
-            <div id="wechat-status" class="mb-2"></div>
-            <div class="mb-2">
-              <label class="form-label small">Token</label>
-              <input type="text" class="form-control form-control-sm" id="pushplus-token" placeholder="PushPlus Token">
-            </div>
+          <div class="card-header bg-success bg-opacity-10 d-flex justify-content-between align-items-center">
+            <strong>微信推送 (PushPlus)</strong>
+            <button class="btn btn-sm btn-success" onclick="showAddAccountModal()"><i class="bi bi-plus-lg"></i> 添加账户</button>
+          </div>
+          <div class="card-body p-2">
+            <div id="wechat-status" class="mb-2 small text-muted"></div>
+            <!-- 账户列表 -->
+            <table class="table table-sm mb-2" id="wechat-accounts-table">
+              <thead class="table-light">
+                <tr>
+                  <th>名称</th>
+                  <th>Token</th>
+                  <th>状态</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="wechat-accounts-body">
+                <tr><td colspan="4" class="text-center text-muted small">加载中…</td></tr>
+              </tbody>
+            </table>
             <button class="btn btn-sm btn-outline-primary" onclick="testNotification('wechat')">发送测试</button>
           </div>
         </div>

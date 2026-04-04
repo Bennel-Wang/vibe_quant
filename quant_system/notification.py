@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class PushPlusNotifier:
-    """PushPlus消息推送器"""
+    """PushPlus消息推送器（单 Token）"""
     
     API_URL = "http://www.pushplus.plus/send"
     
@@ -134,19 +134,128 @@ class EmailNotifier:
 
 
 class NotificationManager:
-    """通知管理器 - 支持微信(PushPlus)和邮件(SMTP)"""
+    """通知管理器 - 支持微信(PushPlus 多账户)和邮件(SMTP)"""
 
     # 同类通知 5分钟只发一次，防当天多次重复推送
     _DEDUP_WINDOW = 5 * 60
 
     def __init__(self):
-        self.notifier = PushPlusNotifier()
+        # ── 多账户 PushPlus ──────────────────────────────────────────
+        # 账户列表结构: [{name, token, enabled}, ...]
+        # 向后兼容：若仅配置了单 token，自动包装成列表
+        self._wechat_accounts: List[Dict] = self._load_wechat_accounts()
+
+        # 主 notifier（向后兼容，取第一个启用账户的 token）
+        self.notifier = self._make_primary_notifier()
+        self.wechat_enabled = any(a['enabled'] for a in self._wechat_accounts)
+
         self.email_notifier = EmailNotifier()
-        self.wechat_enabled = bool(config.get_pushplus_token())
         self.email_enabled = self.email_notifier.is_configured
         self.enabled = self.wechat_enabled or self.email_enabled
-        self._last_sent: Dict[str, float] = {}  # dedup: title前缀 -> 上次发送时间戳
+        self._last_sent: Dict[str, float] = {}
         self._dedup_lock = __import__('threading').Lock()
+
+    # ── 多账户管理 ────────────────────────────────────────────────────
+
+    def _load_wechat_accounts(self) -> List[Dict]:
+        """从 config 加载微信账户列表，向后兼容单 token 配置"""
+        accounts = config.get('tokens.pushplus_accounts', [])
+        if isinstance(accounts, list) and accounts:
+            return accounts
+        # 向后兼容：单 token 迁移
+        single_token = config.get_pushplus_token()
+        if single_token:
+            return [{'name': '默认账户', 'token': single_token, 'enabled': True}]
+        return []
+
+    def _make_primary_notifier(self) -> PushPlusNotifier:
+        """取第一个启用账户的 token 构造主 notifier"""
+        for acc in self._wechat_accounts:
+            if acc.get('enabled') and acc.get('token'):
+                return PushPlusNotifier(acc['token'])
+        return PushPlusNotifier('')
+
+    def _save_wechat_accounts(self):
+        """将账户列表持久化到 config"""
+        config.set('tokens.pushplus_accounts', self._wechat_accounts)
+        config.save()
+
+    def add_wechat_account(self, name: str, token: str, enabled: bool = True) -> bool:
+        """
+        添加微信通知账户
+
+        Args:
+            name: 账户名称（唯一标识）
+            token: PushPlus Token
+            enabled: 是否启用
+
+        Returns:
+            True 表示添加成功，False 表示名称已存在
+        """
+        if any(a['name'] == name for a in self._wechat_accounts):
+            return False
+        self._wechat_accounts.append({'name': name, 'token': token, 'enabled': enabled})
+        self.wechat_enabled = any(a['enabled'] for a in self._wechat_accounts)
+        self.notifier = self._make_primary_notifier()
+        self.enabled = self.wechat_enabled or self.email_enabled
+        self._save_wechat_accounts()
+        return True
+
+    def remove_wechat_account(self, name: str) -> bool:
+        """
+        移除微信通知账户
+
+        Args:
+            name: 账户名称
+
+        Returns:
+            True 表示移除成功，False 表示账户不存在
+        """
+        before = len(self._wechat_accounts)
+        self._wechat_accounts = [a for a in self._wechat_accounts if a['name'] != name]
+        if len(self._wechat_accounts) == before:
+            return False
+        self.wechat_enabled = any(a['enabled'] for a in self._wechat_accounts)
+        self.notifier = self._make_primary_notifier()
+        self.enabled = self.wechat_enabled or self.email_enabled
+        self._save_wechat_accounts()
+        return True
+
+    def update_wechat_account(self, name: str, token: str = None, enabled: bool = None) -> bool:
+        """
+        更新微信通知账户（token 或启用状态）
+
+        Args:
+            name: 账户名称
+            token: 新 Token（None 表示不修改）
+            enabled: 新启用状态（None 表示不修改）
+
+        Returns:
+            True 表示更新成功，False 表示账户不存在
+        """
+        for acc in self._wechat_accounts:
+            if acc['name'] == name:
+                if token is not None:
+                    acc['token'] = token
+                if enabled is not None:
+                    acc['enabled'] = enabled
+                self.wechat_enabled = any(a['enabled'] for a in self._wechat_accounts)
+                self.notifier = self._make_primary_notifier()
+                self.enabled = self.wechat_enabled or self.email_enabled
+                self._save_wechat_accounts()
+                return True
+        return False
+
+    def list_wechat_accounts(self) -> List[Dict]:
+        """返回账户列表（token 脱敏，只显示后4位）"""
+        result = []
+        for acc in self._wechat_accounts:
+            t = acc.get('token', '')
+            masked = ('*' * max(0, len(t) - 4) + t[-4:]) if len(t) > 4 else '****'
+            result.append({'name': acc['name'], 'token_masked': masked, 'enabled': acc.get('enabled', True)})
+        return result
+
+    # ── 去重与统一发送 ────────────────────────────────────────────────
 
     def _is_duplicate(self, title: str) -> bool:
         """同标题前缀 5分钟内只发一次，返回 True 表示应跳过（线程安全）"""
@@ -160,11 +269,15 @@ class NotificationManager:
             return False
 
     def _send(self, title: str, content: str, channels: List[str] = None):
-        """统一发送到所有启用的渠道"""
+        """统一发送到所有启用的渠道（微信发送到所有启用账户）"""
         channels = channels or ['wechat', 'email']
         results = {}
         if 'wechat' in channels and self.wechat_enabled:
-            results['wechat'] = self.notifier.send_markdown_message(title, content)
+            for acc in self._wechat_accounts:
+                if acc.get('enabled') and acc.get('token'):
+                    notifier = PushPlusNotifier(acc['token'])
+                    ok = notifier.send_markdown_message(title, content)
+                    results[f"wechat_{acc['name']}"] = ok
         if 'email' in channels and self.email_enabled:
             results['email'] = self.email_notifier.send_email(title, content)
         return results
@@ -181,7 +294,8 @@ class NotificationManager:
         return {
             'wechat': {
                 'enabled': self.wechat_enabled,
-                'token_configured': bool(config.get_pushplus_token()),
+                'accounts': self.list_wechat_accounts(),
+                'token_configured': self.wechat_enabled,
             },
             'email': {
                 'enabled': self.email_enabled,

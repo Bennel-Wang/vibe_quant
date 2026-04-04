@@ -85,8 +85,8 @@ def resample_to_weekly(df):
     df = df.copy()
     df.set_index('date', inplace=True)
     
-    # 按周重采样
-    weekly = df.resample('W').agg({
+    # 按周重采样（W-FRI：以周五为周末，对齐A股交易周）
+    weekly = df.resample('W-FRI').agg({
         'open': 'first',
         'high': 'max',
         'low': 'min',
@@ -108,18 +108,17 @@ def resample_to_monthly(df):
     df = df.copy()
     df.set_index('date', inplace=True)
     
-    # 按月重采样（兼容不同pandas版本）
+    # 按月重采样（ME：以月末为标签，pandas 3.x 兼容）
     try:
-        monthly = df.resample('M').agg({
+        monthly = df.resample('ME').agg({
             'open': 'first',
             'high': 'max',
             'low': 'min',
             'close': 'last',
             'volume': 'sum'
         })
-    except ValueError:
-        # 如果'M'不行，尝试'MS'
-        monthly = df.resample('MS').agg({
+    except Exception:
+        monthly = df.resample('M').agg({
             'open': 'first',
             'high': 'max',
             'low': 'min',
@@ -259,7 +258,13 @@ def api_stocks_add():
             validated = True
 
         if not validated:
-            return jsonify({'error': f'无效的股票代码: {code}，请检查代码是否正确'}), 400
+            # ETF 不在 stock_list.csv 中，允许直接添加（用户自行确认代码）
+            if stock_type == 'etf':
+                if not name or name == code:
+                    name = code  # 以代码为名
+                validated = True
+            else:
+                return jsonify({'error': f'无效的股票代码: {code}，请检查代码是否正确'}), 400
 
         stock_manager.add_stock(name=name, code=code, market=market,
                                 stock_type=stock_type, industry=industry, save=True)
@@ -367,9 +372,13 @@ def api_stocks_search():
                             market_val = str(row.get('market', 'sh')).lower()
                     else:
                         market_val = str(row.get('market', 'sh')).lower()
+                    # ETF 代码识别：深市 15xxxx，沪市 5xxxxx（6位数字）
+                    is_etf = (len(bare_code) == 6 and
+                              (bare_code.startswith('15') and market_val == 'sz' or
+                               bare_code.startswith('5') and market_val == 'sh'))
                     results.append({
                         'code': bare_code, 'name': str(row.get('name', '')),
-                        'market': market_val, 'type': 'stock',
+                        'market': market_val, 'type': 'etf' if is_etf else 'stock',
                         'exists': False
                     })
                     existing_codes.add(bare_code)
@@ -1940,24 +1949,22 @@ def api_risk_capital():
         
         elif request.method == 'POST':
             data = request.json
-            total_capital = data.get('total_capital')
+            available_cash = data.get('available_cash')
             
-            if total_capital is not None:
-                risk_manager.total_capital = float(total_capital)
-                # Recalculate available_cash = total_capital - total_position_value
-                total_position_value = sum(
-                    p.shares * p.current_price
-                    for p in risk_manager.positions.values()
-                )
-                risk_manager.available_cash = max(0.0, float(total_capital) - total_position_value)
+            if available_cash is not None:
+                risk_manager.available_cash = float(available_cash)
             
             # 保存状态
             save_system_state()
             
+            # 返回动态总资产
+            total_pos_value = sum(
+                p.shares * p.current_price for p in risk_manager.positions.values()
+            )
             return jsonify({
                 'success': True,
-                'total_capital': risk_manager.total_capital,
                 'available_cash': risk_manager.available_cash,
+                'total_capital': risk_manager.available_cash + total_pos_value,
             })
     except Exception as e:
         logger.error(f"操作资金信息失败: {e}")
@@ -2009,19 +2016,43 @@ def api_risk_position():
             if not code:
                 return jsonify({'error': '股票代码不能为空'}), 400
             
-            # 删除持仓
+            # 删除持仓时记录已实现盈亏
             if code in risk_manager.positions:
+                pos = risk_manager.positions[code]
+                realized = (pos.current_price - pos.avg_cost) * pos.shares
+                risk_manager.realized_pnl += realized
+                # 归还持仓市值到可用资金
+                risk_manager.available_cash += pos.shares * pos.current_price
                 del risk_manager.positions[code]
                 save_system_state()
                 return jsonify({
                     'success': True,
-                    'message': f'持仓 {code} 已删除'
+                    'message': f'持仓 {code} 已删除',
+                    'realized_pnl_delta': round(realized, 2),
                 })
             else:
                 return jsonify({'error': '持仓不存在'}), 404
                 
     except Exception as e:
         logger.error(f"操作持仓失败: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/risk/pnl-baseline', methods=['GET', 'POST'])
+def api_risk_pnl_baseline():
+    """获取或设置累计盈亏基准"""
+    try:
+        if request.method == 'GET':
+            return jsonify(risk_manager.get_cumulative_pnl())
+        
+        elif request.method == 'POST':
+            data = request.json or {}
+            baseline = float(data.get('baseline', 0))
+            risk_manager.set_initial_capital_baseline(baseline)
+            save_system_state()
+            return jsonify({'success': True, **risk_manager.get_cumulative_pnl()})
+    except Exception as e:
+        logger.error(f"操作盈亏基准失败: {e}")
         return jsonify({'error': str(e)}), 500
 
 
@@ -4094,6 +4125,51 @@ def api_notification_config():
         config.save()
         
         return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/notification/accounts', methods=['GET'])
+def api_notification_accounts_list():
+    """获取所有微信通知账户"""
+    return jsonify({'accounts': notification_manager.list_wechat_accounts()})
+
+
+@app.route('/api/notification/accounts', methods=['POST'])
+def api_notification_accounts_add():
+    """添加微信通知账户"""
+    try:
+        data = request.json or {}
+        name = data.get('name', '').strip()
+        token = data.get('token', '').strip()
+        enabled = data.get('enabled', True)
+        if not name or not token:
+            return jsonify({'error': '账户名称和 Token 不能为空'}), 400
+        notification_manager.add_wechat_account(name, token, enabled)
+        return jsonify({'success': True, 'accounts': notification_manager.list_wechat_accounts()})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/notification/accounts/<name>', methods=['DELETE'])
+def api_notification_accounts_delete(name: str):
+    """删除微信通知账户"""
+    try:
+        notification_manager.remove_wechat_account(name)
+        return jsonify({'success': True, 'accounts': notification_manager.list_wechat_accounts()})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/notification/accounts/<name>', methods=['PATCH'])
+def api_notification_accounts_update(name: str):
+    """更新微信通知账户（token / enabled）"""
+    try:
+        data = request.json or {}
+        token = data.get('token')
+        enabled = data.get('enabled')
+        notification_manager.update_wechat_account(name, token=token, enabled=enabled)
+        return jsonify({'success': True, 'accounts': notification_manager.list_wechat_accounts()})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

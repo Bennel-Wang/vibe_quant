@@ -62,11 +62,57 @@ class RiskManager:
         self.available_cash: float = 1000000
         self.positions: Dict[str, Position] = {}
         self.position_history: List[Dict] = []
+
+        # 累计盈亏基准
+        # initial_capital_baseline == 0 表示未设置（首次使用时自动以当前 total_capital 为基准）
+        self.initial_capital_baseline: float = 0.0
+        # 已实现盈亏（记录清仓/减仓时锁定的利润）
+        self.realized_pnl: float = 0.0
     
     def update_capital(self, total_capital: float, available_cash: float):
         """更新资金信息"""
         self.total_capital = total_capital
         self.available_cash = available_cash
+
+    def set_initial_capital_baseline(self, baseline: float):
+        """
+        设置累计盈亏基准（起始本金）
+
+        Args:
+            baseline: 基准金额；传 0 则以当前总资产（可用资金+持仓市值）自动设定
+        """
+        if baseline > 0:
+            self.initial_capital_baseline = baseline
+        else:
+            total_position_value = sum(p.market_value for p in self.positions.values())
+            self.initial_capital_baseline = self.available_cash + total_position_value
+        logger.info(f"累计盈亏基准已设置为: ¥{self.initial_capital_baseline:,.2f}")
+
+    def get_cumulative_pnl(self) -> Dict[str, float]:
+        """
+        计算累计盈亏
+
+        Returns:
+            {
+              'initial_capital_baseline': 起始基准,
+              'cumulative_pnl': 当前净值 - 基准,
+              'cumulative_pnl_pct': 累计收益率(%),
+              'unrealized_pnl': 当前浮动盈亏,
+            }
+        """
+        unrealized = sum(p.unrealized_pnl for p in self.positions.values())
+        total_position_value = sum(p.market_value for p in self.positions.values())
+        # 当前净值 = 可用资金 + 持仓市值（随行情浮动）
+        current_nav = self.available_cash + total_position_value
+        baseline = self.initial_capital_baseline if self.initial_capital_baseline > 0 else current_nav
+        cumulative_pnl = current_nav - baseline
+        cumulative_pnl_pct = (cumulative_pnl / baseline * 100) if baseline > 0 else 0.0
+        return {
+            'initial_capital_baseline': baseline,
+            'cumulative_pnl': round(cumulative_pnl, 2),
+            'cumulative_pnl_pct': round(cumulative_pnl_pct, 4),
+            'unrealized_pnl': round(unrealized, 2),
+        }
     
     def update_position(self, code: str, shares: int, avg_cost: float, 
                         current_price: float, prev_close: float = 0.0):
@@ -117,10 +163,15 @@ class RiskManager:
         current_value = self.positions.get(code, Position(code, "", 0, 0, 0, 0, 0)).market_value
         total_value = proposed_value + current_value
         
+        # 动态总资产 = 可用资金 + 持仓市值
+        dyn_total = self.available_cash + sum(p.market_value for p in self.positions.values())
+        if dyn_total <= 0:
+            dyn_total = 1  # avoid division by zero
+
         # 检查单只股票仓位限制
-        single_stock_ratio = total_value / self.total_capital
+        single_stock_ratio = total_value / dyn_total
         if single_stock_ratio > self.max_single_stock_ratio:
-            max_value = self.total_capital * self.max_single_stock_ratio
+            max_value = dyn_total * self.max_single_stock_ratio
             max_additional = max(0, max_value - current_value)
             suggested_shares = int(max_additional / price / 100) * 100
             
@@ -135,7 +186,7 @@ class RiskManager:
         
         # 检查总仓位限制
         total_position_value = sum(p.market_value for p in self.positions.values()) + proposed_value
-        total_position_ratio = total_position_value / self.total_capital
+        total_position_ratio = total_position_value / dyn_total
         
         if total_position_ratio > self.max_position_ratio:
             return RiskCheckResult(
@@ -260,7 +311,9 @@ class RiskManager:
             风险指标字典
         """
         total_position_value = sum(p.market_value for p in self.positions.values())
-        total_position_ratio = total_position_value / self.total_capital if self.total_capital > 0 else 0
+        # 总资产动态计算 = 可用资金 + 持仓市值（随行情变化）
+        total_capital = self.available_cash + total_position_value
+        total_position_ratio = total_position_value / total_capital if total_capital > 0 else 0
         
         # 计算集中度
         if self.positions:
@@ -286,7 +339,7 @@ class RiskManager:
                 })
         
         return {
-            'total_capital': self.total_capital,
+            'total_capital': total_capital,
             'available_cash': self.available_cash,
             'total_position_value': total_position_value,
             'position_ratio': total_position_ratio,
@@ -295,7 +348,8 @@ class RiskManager:
             'total_today_pnl': total_today_pnl,
             'positions_count': len(self.positions),
             'stop_loss_alerts': stop_loss_alerts,
-            'risk_level': self._assess_risk_level(total_position_ratio, concentration)
+            'risk_level': self._assess_risk_level(total_position_ratio, concentration),
+            **self.get_cumulative_pnl(),
         }
     
     def _assess_risk_level(self, position_ratio: float, concentration: float) -> str:
@@ -341,6 +395,8 @@ class RiskManager:
         return {
             'total_capital': self.total_capital,
             'available_cash': self.available_cash,
+            'initial_capital_baseline': self.initial_capital_baseline,
+            'realized_pnl': self.realized_pnl,
             'positions': {
                 code: {
                     'code': p.code,
@@ -357,6 +413,8 @@ class RiskManager:
         """从字典加载"""
         self.total_capital = data.get('total_capital', 1000000)
         self.available_cash = data.get('available_cash', 1000000)
+        self.initial_capital_baseline = data.get('initial_capital_baseline', 0.0)
+        self.realized_pnl = data.get('realized_pnl', 0.0)
         
         for code, p_data in data.get('positions', {}).items():
             self.update_position(

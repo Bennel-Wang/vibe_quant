@@ -172,6 +172,7 @@
                     <div class="col-md-2">
                         <select class="form-select" id="add-stock-type">
                             <option value="stock">个股</option>
+                            <option value="etf">ETF</option>
                             <option value="index">指数</option>
                         </select>
                     </div>
@@ -612,10 +613,11 @@ $('#add-stock-input').on('input', function() {
             }
             results.forEach(function(r) {
                 var badge = r.exists ? '<span class="badge bg-secondary ms-1">已添加</span>' : '';
+                var typeBadge = r.type === 'etf' ? '<span class="badge bg-info ms-1">ETF</span>' : (r.type === 'index' ? '<span class="badge bg-warning ms-1">指数</span>' : '');
                 container.append(
                     '<a href="#" class="list-group-item list-group-item-action py-1 px-2 small" ' +
-                    'data-code="' + r.code + '" data-name="' + r.name + '" data-market="' + r.market + '">' +
-                    r.name + ' (' + r.code + ') ' + badge + '</a>'
+                    'data-code="' + r.code + '" data-name="' + r.name + '" data-market="' + r.market + '" data-type="' + (r.type || 'stock') + '">' +
+                    r.name + ' (' + r.code + ') ' + typeBadge + badge + '</a>'
                 );
             });
             container.show();
@@ -624,6 +626,9 @@ $('#add-stock-input').on('input', function() {
                 $('#add-stock-input').val($(this).data('code'));
                 if ($(this).data('market')) {
                     $('#add-stock-market').val($(this).data('market'));
+                }
+                if ($(this).data('type')) {
+                    $('#add-stock-type').val($(this).data('type'));
                 }
                 container.hide();
             });

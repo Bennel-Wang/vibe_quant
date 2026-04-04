@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 class StockType(Enum):
     """股票类型"""
     STOCK = "stock"      # 个股
+    ETF = "etf"          # ETF基金（如 510300.SH、159919.SZ）
     SECTOR = "sector"    # 板块
     INDEX = "index"      # 大盘指数
 
@@ -275,18 +276,18 @@ class StockManager:
                   stock_type: str = "stock", industry: str = "", save: bool = True):
         """
         添加股票
-        
+
         Args:
             name: 股票名称
             code: 股票代码
-            market: 市场
-            stock_type: 类型 (stock/sector/index)
+            market: 市场 (sh/sz/hk)
+            stock_type: 类型 (stock/etf/sector/index)
             industry: 所属板块
             save: 是否保存到配置文件
         """
         stock = StockInfo(name=name, code=code, market=market, type=stock_type, industry=industry)
         
-        if stock_type == "stock":
+        if stock_type in ("stock", "etf"):  # ETF 与个股存储在同一列表，仅 type 字段区分
             self.stocks.append(stock)
         elif stock_type == "sector":
             self.sectors.append(stock)

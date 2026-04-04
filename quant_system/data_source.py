@@ -464,10 +464,13 @@ class UnifiedDataSource:
             df.set_index('date', inplace=True)
         agg_dict = {'open': 'first', 'high': 'max', 'low': 'min', 'close': 'last', 'volume': 'sum'}
         agg_dict = {k: v for k, v in agg_dict.items() if k in df.columns}
+        # 规范化规则别名（兼容 pandas 3.x）
+        rule_map = {'W': 'W-FRI', 'M': 'ME'}
+        rule = rule_map.get(rule, rule)
         try:
             result = df.resample(rule).agg(agg_dict)
-        except ValueError:
-            result = df.resample(rule + 'S').agg(agg_dict)
+        except Exception:
+            result = df.resample('ME').agg(agg_dict)
         return result.dropna().reset_index()
 
     def _standardize_columns(self, df: pd.DataFrame) -> pd.DataFrame:
