@@ -268,7 +268,8 @@ function applyResult(code, resp) {
     retText += ' <small class="text-muted">(较昨日' + diffSign + diff.toFixed(2) + '%)</small>';
     row.querySelector('.return-cell').innerHTML = '<span class="fw-bold ' + retCls + '">' + retText + '</span>';
 
-    var sigCls = resp.signal.includes('买入') ? 'badge bg-success' :
+    var sigCls = resp.signal === '未分配策略' ? 'badge bg-light text-secondary border' :
+                 resp.signal.includes('买入') ? 'badge bg-success' :
                  resp.signal.includes('卖出') ? 'badge bg-danger' :
                  resp.signal.includes('加仓') ? 'badge bg-success' : 'badge bg-secondary';
     row.querySelector('.signal-cell').innerHTML = '<span class="' + sigCls + '">' + resp.signal + '</span>';
@@ -324,7 +325,7 @@ function sendToWechat() {
     var items = [];
     Object.keys(_stockAlerts).forEach(function(code) {
         var info = _stockAlerts[code];
-        if (info.computed) {
+        if (info.computed && info.buy_strategy && info.signal !== '未分配策略') {
             items.push({
                 code: code,
                 name: info.name,

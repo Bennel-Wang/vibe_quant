@@ -520,68 +520,17 @@ class TradingScheduler:
             logger.error(f"发送AI日报失败: {e}")
 
     def run_strategy_backtest_alert(self, force: bool = False):
-        """策略提醒：对所有股票近一年数据进行全因子回测，给出最优策略、收益(含较昨日对比)及当前建议，发送通知"""
+        """策略提醒：调用web_app中的compute_and_send_strategy_alerts，
+        与「策略提醒」子页面的「全部计算」+「发送到微信」完全一致。"""
         if not force and not self.is_trading_day():
             logger.info("跳过策略回测提醒：今天不是交易日")
             return
         logger.info("开始执行策略回测提醒任务")
-        start_date = (datetime.now() - timedelta(days=365)).strftime('%Y%m%d')
-        stocks = stock_manager.get_stocks()
-        lines = []
-
-        for stock in stocks:
-            try:
-                df = unified_data.get_historical_data(stock.full_code, start_date=start_date)
-                if df is None or df.empty or len(df) < 20:
-                    continue
-                df_ind = technical_indicators.calculate_all_indicators_from_df(df.copy())
-                if df_ind.empty or len(df_ind) < 20:
-                    continue
-
-                strategy_returns = {
-                    'RSI策略': self._backtest_rsi(df_ind),
-                    'MACD策略': self._backtest_macd(df_ind),
-                    '均线策略': self._backtest_ma(df_ind),
-                    '布林带策略': self._backtest_boll(df_ind),
-                }
-                best_strategy = max(strategy_returns, key=lambda k: strategy_returns[k])
-                ret_today = strategy_returns[best_strategy]
-
-                # 回测到昨天（去掉最后一行）
-                df_yesterday = df_ind.iloc[:-1].copy() if len(df_ind) > 20 else df_ind
-                ret_yesterday = {
-                    'RSI策略': self._backtest_rsi(df_yesterday),
-                    'MACD策略': self._backtest_macd(df_yesterday),
-                    '均线策略': self._backtest_ma(df_yesterday),
-                    '布林带策略': self._backtest_boll(df_yesterday),
-                }.get(best_strategy, ret_today)
-
-                diff = ret_today - ret_yesterday
-                latest = df_ind.iloc[-1]
-                prev = df_ind.iloc[-2] if len(df_ind) >= 2 else latest
-                signal = self._get_current_signal(best_strategy, latest, prev)
-
-                ret_sign = '+' if ret_today >= 0 else ''
-                diff_sign = '+' if diff >= 0 else ''
-                lines.append(
-                    f"**{stock.name}({stock.code})**  "
-                    f"{best_strategy}  "
-                    f"{ret_sign}{ret_today:.2f}% (较昨日{diff_sign}{diff:.2f}%)  "
-                    f"**{signal}**"
-                )
-            except Exception as e:
-                logger.debug(f"策略回测失败 {stock.code}: {e}")
-                continue
-
-        if not lines:
-            logger.warning("策略回测无数据，跳过发送")
-            return
-
-        date_str = datetime.now(BEIJING_TZ).strftime('%Y-%m-%d')
-        content = f"## 📈 策略提醒 ({date_str})\n\n"
-        content += "\n\n".join(lines)
-        notification_manager.send_markdown_message(f"策略提醒 {date_str}", content)
-        logger.info("策略回测提醒已发送")
+        try:
+            from .web_app import compute_and_send_strategy_alerts
+            compute_and_send_strategy_alerts()
+        except Exception as e:
+            logger.error(f"策略回测提醒失败: {e}")
 
     def run_market_strategy_analysis(self, force: bool = False):
         """大盘T/V评分阶段分析 + 个股评分匹配推荐，发送每日通知"""

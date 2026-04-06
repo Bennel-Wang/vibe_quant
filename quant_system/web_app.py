@@ -3759,13 +3759,27 @@ def api_strategy_alerts_compute():
     try:
         data = request.get_json(force=True)
         code = data.get('code', '')
-        buy_strategy_name = data.get('buy_strategy') or data.get('strategy', 'RSI策略')
+        buy_strategy_name = data.get('buy_strategy') or data.get('strategy', '')
         sell_strategy_name = data.get('sell_strategy') or buy_strategy_name
         from datetime import timedelta
 
         stock = stock_manager.get_stock_by_code(code)
         if stock is None:
             return jsonify({'success': False, 'error': f'股票不存在: {code}'}), 404
+
+        # 未分配策略时直接返回，不运行回测
+        if not buy_strategy_name:
+            return jsonify({
+                'success': True,
+                'code': code,
+                'name': stock.name,
+                'strategy': '',
+                'sell_strategy': '',
+                'return_today': 0.0,
+                'return_yesterday': 0.0,
+                'signal': '未分配策略',
+                'no_strategy': True,
+            })
 
         end_today = datetime.now().strftime('%Y%m%d')
         end_yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y%m%d')
@@ -3799,54 +3813,117 @@ def api_strategy_alerts_compute():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+def _compute_strategy_alerts(items):
+    """计算批量股票策略回测结果，与「策略提醒」页面的「全部计算」逻辑完全一致。
+    items: list of {code, buy_strategy, sell_strategy}
+    返回: list of result dicts"""
+    from datetime import timedelta
+    end_today = datetime.now().strftime('%Y%m%d')
+    end_yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y%m%d')
+    start_date = (datetime.now() - timedelta(days=365)).strftime('%Y%m%d')
+    results = []
+
+    for item in items:
+        code = item.get('code', '')
+        buy_strategy_name = item.get('buy_strategy') or item.get('strategy', '')
+        sell_strategy_name = item.get('sell_strategy') or buy_strategy_name
+        try:
+            stock = stock_manager.get_stock_by_code(code)
+            if stock is None:
+                results.append({'code': code, 'success': False, 'error': '不存在'})
+                continue
+
+            # 未分配策略时直接返回，不运行回测
+            if not buy_strategy_name:
+                results.append({
+                    'code': code, 'name': stock.name, 'success': True,
+                    'strategy': '', 'sell_strategy': '',
+                    'return_today': 0.0, 'return_yesterday': 0.0,
+                    'signal': '未分配策略', 'no_strategy': True,
+                })
+                continue
+
+            return_today = _backtest_one_strategy_with_end(stock.full_code, buy_strategy_name, end_today, sell_strategy_name)
+            return_yesterday = _backtest_one_strategy_with_end(stock.full_code, buy_strategy_name, end_yesterday, sell_strategy_name)
+
+            signal = '无信号'
+            df = unified_data.get_historical_data(stock.full_code, start_date=start_date)
+            if df is not None and not df.empty and len(df) >= 2:
+                df_ind = technical_indicators.calculate_all_indicators_from_df(df.copy())
+                if not df_ind.empty and len(df_ind) >= 2:
+                    latest = df_ind.iloc[-1]
+                    prev = df_ind.iloc[-2]
+                    signal = scheduler._get_current_signal(buy_strategy_name, latest, prev)
+
+            results.append({
+                'code': code,
+                'name': stock.name,
+                'success': True,
+                'strategy': buy_strategy_name,
+                'sell_strategy': sell_strategy_name if sell_strategy_name != buy_strategy_name else '',
+                'return_today': round(return_today, 2),
+                'return_yesterday': round(return_yesterday, 2),
+                'signal': signal,
+            })
+        except Exception as e:
+            results.append({'code': code, 'success': False, 'error': str(e)})
+
+    return results
+
+
+def _send_strategy_alerts(items):
+    """将策略提醒结果格式化后发送到微信，与「策略提醒」页面的「发送到微信」逻辑完全一致。"""
+    date_str = datetime.now().strftime('%Y-%m-%d')
+    content = f"## 📈 策略提醒 ({date_str})\n\n"
+    for item in items:
+        if not item.get('success', True) or item.get('no_strategy'):
+            continue
+        ret_today = item.get('return_today', 0)
+        ret_yesterday = item.get('return_yesterday', 0)
+        diff = ret_today - ret_yesterday
+        ret_sign = '+' if ret_today >= 0 else ''
+        diff_sign = '+' if diff >= 0 else ''
+        sell_strat = item.get('sell_strategy', '')
+        strat_label = (f"{item.get('strategy', '')} / {sell_strat}" if sell_strat
+                       else item.get('strategy', ''))
+        content += (
+            f"**{item.get('name', '')}({item.get('code', '')})**  "
+            f"{strat_label}  "
+            f"{ret_sign}{ret_today:.2f}% (较昨日{diff_sign}{diff:.2f}%)  "
+            f"**{item.get('signal', '')}**\n\n"
+        )
+    notification_manager.send_markdown_message(f"策略提醒 {date_str}", content)
+
+
+def compute_and_send_strategy_alerts():
+    """全量计算所有已分配策略的股票回测结果并发送到微信。
+    供调度器直接调用，与页面「全部计算」+「发送到微信」完全等价。"""
+    stocks = stock_manager.get_stocks()
+    items = []
+    for stock in stocks:
+        buy = getattr(stock, 'buy_strategy', '') or ''
+        sell = getattr(stock, 'sell_strategy', '') or buy
+        if buy:
+            items.append({'code': stock.code, 'buy_strategy': buy, 'sell_strategy': sell})
+    if not items:
+        logger.warning("策略提醒：没有已分配策略的股票，跳过")
+        return
+    results = _compute_strategy_alerts(items)
+    valid = [r for r in results if r.get('success', False)]
+    if not valid:
+        logger.warning("策略提醒：所有股票回测均失败，跳过发送")
+        return
+    _send_strategy_alerts(valid)
+    logger.info(f"策略提醒已发送，共 {len(valid)} 只股票")
+
+
 @app.route('/api/strategy/alerts/compute-all', methods=['POST'])
 def api_strategy_alerts_compute_all():
     """批量计算所有股票的策略回测"""
     try:
         data = request.get_json(force=True)
         items = data.get('items', [])
-        from datetime import timedelta
-        end_today = datetime.now().strftime('%Y%m%d')
-        end_yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y%m%d')
-        start_date = (datetime.now() - timedelta(days=365)).strftime('%Y%m%d')
-        results = []
-
-        for item in items:
-            code = item.get('code', '')
-            buy_strategy_name = item.get('buy_strategy') or item.get('strategy', 'RSI策略')
-            sell_strategy_name = item.get('sell_strategy') or buy_strategy_name
-            try:
-                stock = stock_manager.get_stock_by_code(code)
-                if stock is None:
-                    results.append({'code': code, 'success': False, 'error': '不存在'})
-                    continue
-
-                return_today = _backtest_one_strategy_with_end(stock.full_code, buy_strategy_name, end_today, sell_strategy_name)
-                return_yesterday = _backtest_one_strategy_with_end(stock.full_code, buy_strategy_name, end_yesterday, sell_strategy_name)
-
-                # 获取当前信号
-                signal = '无信号'
-                df = unified_data.get_historical_data(stock.full_code, start_date=start_date)
-                if df is not None and not df.empty and len(df) >= 2:
-                    df_ind = technical_indicators.calculate_all_indicators_from_df(df.copy())
-                    if not df_ind.empty and len(df_ind) >= 2:
-                        latest = df_ind.iloc[-1]
-                        prev = df_ind.iloc[-2]
-                        signal = scheduler._get_current_signal(buy_strategy_name, latest, prev)
-
-                results.append({
-                    'code': code,
-                    'name': stock.name,
-                    'success': True,
-                    'strategy': buy_strategy_name,
-                    'sell_strategy': sell_strategy_name if sell_strategy_name != buy_strategy_name else '',
-                    'return_today': round(return_today, 2),
-                    'return_yesterday': round(return_yesterday, 2),
-                    'signal': signal,
-                })
-            except Exception as e:
-                results.append({'code': code, 'success': False, 'error': str(e)})
-
+        results = _compute_strategy_alerts(items)
         return jsonify({'success': True, 'results': results})
     except Exception as e:
         logger.error(f"批量策略计算失败: {e}")
@@ -3861,23 +3938,7 @@ def api_strategy_alerts_send():
         items = data.get('items', [])
         if not items:
             return jsonify({'success': False, 'error': '无数据可发送'})
-
-        date_str = datetime.now().strftime('%Y-%m-%d')
-        content = f"## 📈 策略提醒 ({date_str})\n\n"
-        for item in items:
-            ret_today = item.get('return_today', 0)
-            ret_yesterday = item.get('return_yesterday', 0)
-            diff = ret_today - ret_yesterday
-            ret_sign = '+' if ret_today >= 0 else ''
-            diff_sign = '+' if diff >= 0 else ''
-            content += (
-                f"**{item.get('name', '')}({item.get('code', '')})**  "
-                f"{item.get('strategy', '')}  "
-                f"{ret_sign}{ret_today:.2f}% (较昨日{diff_sign}{diff:.2f}%)  "
-                f"**{item.get('signal', '')}**\n\n"
-            )
-
-        notification_manager.send_markdown_message(f"策略提醒 {date_str}", content)
+        _send_strategy_alerts(items)
         return jsonify({'success': True, 'message': '已发送'})
     except Exception as e:
         logger.error(f"发送策略提醒失败: {e}")
