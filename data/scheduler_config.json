@@ -49,31 +49,8 @@
       "types": [
         "data_update",
         "ai_report",
-        "strategy_alert"
-      ],
-      "enabled": true,
-      "skip_non_trading_day": true
-    },
-    {
-      "id": "de00458e",
-      "time": "14:40",
-      "name": "交易日盘中数据更新，策略提醒2",
-      "content": "",
-      "types": [
-        "data_update",
-        "strategy_alert"
-      ],
-      "enabled": true,
-      "skip_non_trading_day": true
-    },
-    {
-      "id": "eef58c91",
-      "time": "09:50",
-      "name": "交易日开盘数据更新，发送日报",
-      "content": "",
-      "types": [
-        "data_update",
-        "ai_report"
+        "strategy_alert",
+        "market_strategy_analysis"
       ],
       "enabled": true,
       "skip_non_trading_day": true
@@ -86,22 +63,11 @@
       "types": [
         "data_update",
         "ai_report",
-        "strategy_alert"
-      ],
-      "enabled": true,
-      "skip_non_trading_day": false
-    },
-    {
-      "id": "c068f56b",
-      "time": "14:45",
-      "name": "每日大盘策略分析推荐",
-      "content": "自动检测大盘环境，分类股票类型，匹配最优策略并发送通知",
-      "types": [
-        "data_update",
+        "strategy_alert",
         "market_strategy_analysis"
       ],
       "enabled": true,
-      "skip_non_trading_day": true
+      "skip_non_trading_day": false
     }
   ]
 }
