@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  quant_web:
+    build: .
+    container_name: quant_web
+    ports:
+      - "8080:8080"
+    volumes:
+      # 将本机配置文件挂载进容器（不要把 config.yaml 打包进镜像）
+      - ./config.yaml:/app/config.yaml:ro
+      # 数据和日志持久化
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - QUANT_CONFIG=/app/config.yaml
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  quant_scheduler:
+    build: .
+    container_name: quant_scheduler
+    command: ["python", "run_scheduler.py"]
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - QUANT_CONFIG=/app/config.yaml
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    depends_on:
+      - quant_web

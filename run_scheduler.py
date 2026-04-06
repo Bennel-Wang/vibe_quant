@@ -19,21 +19,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from quant_system.scheduler import scheduler, start_scheduler
 from quant_system.config_manager import config
+from quant_system.logging_config import setup_logging
 
 # 配置日志
-def setup_logging():
-    """设置日志"""
-    log_dir = Path('./logs')
-    log_dir.mkdir(exist_ok=True)
-    
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler('./logs/scheduler.log', encoding='utf-8'),
-            logging.StreamHandler()
-        ]
-    )
+def setup_logging_local():
+    """已废弃，保留为空以防外部调用"""
+    pass
 
 
 def main():
@@ -45,7 +36,8 @@ def main():
     
     args = parser.parse_args()
     
-    setup_logging()
+    setup_logging_local()
+    setup_logging(config)
     logger = logging.getLogger(__name__)
     
     if args.once:

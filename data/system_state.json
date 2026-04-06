@@ -1,9 +1,9 @@
 {
   "risk_manager": {
     "total_capital": 1000000.0,
-    "available_cash": 689205.0,
-    "initial_capital_baseline": 1000000.0,
-    "realized_pnl": 0.0,
+    "available_cash": 729205.0,
+    "initial_capital_baseline": 900000.0,
+    "realized_pnl": -24000.0,
     "positions": {
       "09988": {
         "code": "09988",
@@ -35,5 +35,5 @@
       }
     }
   },
-  "timestamp": "2026-04-04 11:33:43"
+  "timestamp": "2026-04-05 22:29:52"
 }

@@ -289,10 +289,18 @@
                 <h5 class="mb-0">🏆 最优策略汇总
                     <span class="badge bg-secondary ms-1" id="best-result-count"></span>
                 </h5>
-                <div class="d-flex gap-2 align-items-center">
+                <div class="d-flex gap-2 align-items-center flex-wrap">
                     <span class="text-muted small" id="best-result-meta"></span>
                     <button class="btn btn-sm btn-outline-success" onclick="bindAllBestStrategies()" title="将所有最优策略绑定到策略提醒">
                         🔗 一键绑定全部
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary" id="best-export-btn" onclick="exportBestReport()" title="导出为 HTML 报告文件">
+                        <span id="export-spinner" class="spinner-border spinner-border-sm d-none"></span>
+                        📄 导出报告
+                    </button>
+                    <button class="btn btn-sm btn-outline-success" id="best-wechat-btn" onclick="sendBestReportWechat()" title="通过 PushPlus 发送微信通知">
+                        <span id="wechat-spinner" class="spinner-border spinner-border-sm d-none"></span>
+                        📱 发送微信
                     </button>
                 </div>
             </div>
@@ -302,7 +310,10 @@
                         <thead class="table-light">
                             <tr>
                                 <th>代码</th><th>名称</th><th>最优策略</th>
-                                <th>综合评分</th><th>仓位年化%</th><th>胜率%</th>
+                                <th>综合评分</th>
+                                <th title="回测实际年化收益率（基于总资金，与直接回测结果一致）">实际年化%↕</th>
+                                <th title="仓位效率年化 = 实际年化 ÷ 最大仓位比，衡量资本利用效率，用于策略间横向比较">仓位效率%ℹ️</th>
+                                <th>胜率%</th>
                                 <th>最大回撤%</th><th>加仓建议</th><th>操作</th>
                             </tr>
                         </thead>
@@ -610,8 +621,8 @@ function runFactorOptimize() {
                 html += '<h5>' + pairName + '</h5>';
                 html += '<p class="text-muted small">' + (b.description || '') + '</p>';
                 html += '<div class="row">';
-                html += '<div class="col-3"><strong>年化(总):</strong> ' + (b.annual_return || 0) + '%</div>';
-                html += '<div class="col-3"><strong>年化(仓位):</strong> <span class="text-primary fw-bold">' + (b.adj_annual_return || b.annual_return || 0) + '%</span></div>';
+                html += '<div class="col-3"><strong>年化(实际):</strong> <span class="fw-bold">' + (b.annual_return || 0) + '%</span></div>';
+                html += '<div class="col-3"><strong>仓位效率:</strong> <span class="text-primary">' + (b.adj_annual_return || b.annual_return || 0) + '%</span> <span class="text-muted" style="font-size:0.75em" title="= 实际年化 ÷ 最大仓位比">ℹ️</span></div>';
                 html += '<div class="col-3"><strong>夏普:</strong> ' + (b.sharpe_ratio || 0) + '</div>';
                 html += '<div class="col-3"><strong>胜率:</strong> ' + (b.win_rate || 0) + '%</div>';
                 html += '</div></div></div>';
@@ -834,8 +845,15 @@ function _buildBestRow(item) {
     var b       = item.best_strategy;
     var score   = b.composite_score || 0;
     var scoreBg = score >= 70 ? 'bg-success' : score >= 50 ? 'bg-warning' : 'bg-secondary';
-    var adjAr   = b.adj_annual_return != null ? b.adj_annual_return : b.annual_return;
-    var retCls  = (adjAr || 0) > 0 ? 'text-success fw-bold' : 'text-danger fw-bold';
+
+    // 实际年化：回测真实结果，与直接回测一致
+    var realAr  = b.annual_return;
+    var realCls = (realAr || 0) > 0 ? 'text-success fw-bold' : 'text-danger fw-bold';
+
+    // 仓位效率：实际年化 ÷ 最大仓位比，仅用于横向比较，不代表实际收益
+    var adjAr   = b.adj_annual_return;
+    var adjCls  = (adjAr || 0) > 0 ? 'text-primary' : 'text-secondary';
+
     var isCross = b.strategy_name && b.strategy_name.indexOf('×') >= 0;
     var nameTag = isCross
         ? '<span class="badge bg-info text-dark me-1">混搭</span>' + b.strategy_name
@@ -846,7 +864,8 @@ function _buildBestRow(item) {
     html += '<td>' + item.name + '</td>';
     html += '<td class="small">' + nameTag + '</td>';
     html += '<td><span class="badge ' + scoreBg + '">' + score + '</span></td>';
-    html += '<td class="' + retCls + '">' + (adjAr != null ? adjAr + '%' : '-') + '</td>';
+    html += '<td class="' + realCls + '">' + (realAr != null ? realAr + '%' : '-') + '</td>';
+    html += '<td class="' + adjCls + ' small">' + (adjAr != null ? adjAr + '%' : '-') + '</td>';
     html += '<td>' + (b.win_rate != null ? b.win_rate + '%' : '-') + '</td>';
     html += '<td>' + (b.max_drawdown_pct != null ? b.max_drawdown_pct + '%' : '-') + '</td>';
     html += '<td class="small text-muted">' + adv + '</td>';
@@ -906,20 +925,21 @@ function _buildDetailHtml(item) {
         html += '<h6>📋 所有达标策略对比</h6>';
         html += '<div class="table-responsive"><table class="table table-sm table-hover">';
         html += '<thead class="table-light"><tr><th>#</th><th>策略</th><th>综合评分</th>';
-        html += '<th>仓位年化%</th><th>总资金年化%</th><th>胜率%</th><th>最大回撤%</th><th>夏普</th><th>交易次数</th></tr></thead><tbody>';
+        html += '<th title="回测实际年化收益，与直接回测一致">实际年化%</th>';
+        html += '<th title="仓位效率年化 = 实际年化 ÷ 最大仓位比，用于横向比较" class="text-primary">仓位效率%</th>';
+        html += '<th>胜率%</th><th>最大回撤%</th><th>夏普</th><th>交易次数</th></tr></thead><tbody>';
         qualified.forEach(function(r, idx) {
             var bg      = idx === 0 ? 'class="table-success"' : '';
             var isCross = r.strategy_name && r.strategy_name.indexOf('×') >= 0;
             var nameCell = isCross
                 ? '<span class="badge bg-info text-dark me-1">混搭</span>' + r.strategy_name
                 : r.strategy_name;
-            var adjAr = r.adj_annual_return != null ? r.adj_annual_return : r.annual_return;
             html += '<tr ' + bg + '>';
             html += '<td>' + (idx + 1) + '</td>';
             html += '<td class="small">' + nameCell + '</td>';
             html += '<td><strong>' + (r.composite_score || 0) + '</strong></td>';
-            html += '<td class="text-primary fw-semibold">' + (adjAr != null ? adjAr + '%' : '-') + '</td>';
-            html += '<td>' + (r.annual_return != null ? r.annual_return + '%' : '-') + '</td>';
+            html += '<td class="fw-semibold">' + (r.annual_return != null ? r.annual_return + '%' : '-') + '</td>';
+            html += '<td class="text-primary small">' + (r.adj_annual_return != null ? r.adj_annual_return + '%' : '-') + '</td>';
             html += '<td>' + (r.win_rate != null ? r.win_rate + '%' : '-') + '</td>';
             html += '<td>' + (r.max_drawdown_pct != null ? r.max_drawdown_pct + '%' : '-') + '</td>';
             html += '<td>' + (r.sharpe_ratio || '-') + '</td>';
@@ -942,14 +962,17 @@ function showUnfitDetail(code) {
     } else {
         html += '<div class="table-responsive"><table class="table table-sm table-hover">';
         html += '<thead class="table-light"><tr><th>#</th><th>策略</th>';
-        html += '<th>仓位年化%</th><th>总资金年化%</th><th>胜率%</th><th>最大回撤%</th><th>夏普</th><th>交易次数</th></tr></thead><tbody>';
+        html += '<th title="回测实际年化收益">实际年化%</th>';
+        html += '<th title="仓位效率年化" class="text-primary">仓位效率%</th>';
+        html += '<th>胜率%</th><th>最大回撤%</th><th>夏普</th><th>交易次数</th></tr></thead><tbody>';
         raws.forEach(function(r, idx) {
-            var adjAr = r.adj_annual_return != null ? r.adj_annual_return : r.annual_return;
-            var retCls = (adjAr||0) > 0 ? 'text-success' : 'text-danger';
+            var realAr = r.annual_return;
+            var adjAr  = r.adj_annual_return;
+            var retCls = (realAr||0) > 0 ? 'text-success' : 'text-danger';
             html += '<tr><td>' + (idx+1) + '</td>';
             html += '<td class="small">' + (r.strategy_name||'—') + '</td>';
-            html += '<td class="'+retCls+' fw-semibold">' + (adjAr!=null?adjAr+'%':'—') + '</td>';
-            html += '<td>' + (r.annual_return!=null?r.annual_return+'%':'—') + '</td>';
+            html += '<td class="'+retCls+' fw-semibold">' + (realAr!=null?realAr+'%':'—') + '</td>';
+            html += '<td class="text-primary small">' + (adjAr!=null?adjAr+'%':'—') + '</td>';
             html += '<td>' + (r.win_rate!=null?r.win_rate+'%':'—') + '</td>';
             html += '<td>' + (r.max_drawdown_pct!=null?r.max_drawdown_pct+'%':'—') + '</td>';
             html += '<td>' + (r.sharpe_ratio||'—') + '</td>';
@@ -1027,6 +1050,53 @@ function bindAllBestStrategies() {
             success: function(resp) { if (resp.success) successCount++; else failCount++; checkDone(); },
             error:   function()      { failCount++; checkDone(); }
         });
+    });
+}
+
+function exportBestReport() {
+    if (!_bestRunId) { alert('请先完成最佳因子分析'); return; }
+    var btn = $('#best-export-btn');
+    btn.prop('disabled', true);
+    $('#export-spinner').removeClass('d-none');
+    // trigger browser file download
+    var url = '/api/factors/best/export?run_id=' + encodeURIComponent(_bestRunId);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = '';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function() {
+        btn.prop('disabled', false);
+        $('#export-spinner').addClass('d-none');
+    }, 1500);
+}
+
+function sendBestReportWechat() {
+    if (!_bestRunId) { alert('请先完成最佳因子分析'); return; }
+    var btn = $('#best-wechat-btn');
+    btn.prop('disabled', true);
+    $('#wechat-spinner').removeClass('d-none');
+    $.ajax({
+        url: '/api/factors/best/send-wechat',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ run_id: _bestRunId }),
+        success: function(resp) {
+            btn.prop('disabled', false);
+            $('#wechat-spinner').addClass('d-none');
+            if (resp.success) {
+                alert('✅ ' + resp.message);
+            } else {
+                alert('❌ 发送失败：' + (resp.error || '未知错误'));
+            }
+        },
+        error: function(xhr) {
+            btn.prop('disabled', false);
+            $('#wechat-spinner').addClass('d-none');
+            var msg = (xhr.responseJSON && xhr.responseJSON.error) ? xhr.responseJSON.error : '请求失败';
+            alert('❌ ' + msg);
+        }
     });
 }
 </script>

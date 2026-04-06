@@ -12,35 +12,17 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from quant_system.config_manager import config
+from quant_system.logging_config import setup_logging
 from quant_system.stock_manager import stock_manager
 from quant_system.data_source import unified_data
 from quant_system.news_collector import news_collector, news_pipeline
-from quant_system.indicators import technical_indicators, indicator_analyzer
+from quant_system.indicators import technical_indicators, indicator_analyzer, update_all_indicators
 from quant_system.data_cleaner import data_cleaner, data_validator
 from quant_system.feature_extractor import feature_extractor
 from quant_system.strategy import strategy_manager, ai_decision_maker
 from quant_system.backtest import backtest_engine, backtest_analyzer
 from quant_system.risk_manager import risk_manager, risk_report_generator
 from quant_system.notification import notification_manager
-
-# 配置日志
-def setup_logging():
-    """设置日志"""
-    log_level = config.get('logging.level', 'INFO')
-    log_file = config.get('logging.file', './logs/quant_system.log')
-    
-    # 确保日志目录存在
-    os.makedirs(os.path.dirname(log_file), exist_ok=True)
-    
-    logging.basicConfig(
-        level=getattr(logging, log_level),
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler(log_file, encoding='utf-8'),
-            logging.StreamHandler()
-        ]
-    )
-
 
 logger = logging.getLogger(__name__)
 
@@ -49,12 +31,9 @@ def cmd_update_data(args):
     """更新数据命令"""
     logger.info("开始更新数据...")
     
-    if args.code:
-        codes = [args.code]
-    else:
-        codes = None
+    codes = [args.code] if args.code else None
     
-    unified_data.update_all_data(refresh=args.refresh)
+    unified_data.update_all_data(codes=codes, refresh=args.refresh)
     logger.info("数据更新完成")
 
 
@@ -62,12 +41,9 @@ def cmd_update_indicators(args):
     """更新技术指标命令"""
     logger.info("开始更新技术指标...")
     
-    if args.code:
-        codes = [args.code]
-    else:
-        codes = None
+    codes = [args.code] if args.code else None
     
-    technical_indicators.update_all_indicators(codes)
+    update_all_indicators(codes)
     logger.info("技术指标更新完成")
 
 
@@ -354,7 +330,7 @@ def main():
         return
     
     # 设置日志
-    setup_logging()
+    setup_logging(config)
     # 启动时更新交易日（A股 / 港股）并保存到 data/trading_dates.json
     try:
         from data_sourcing.trading_calendar import update_trading_dates

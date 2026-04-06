@@ -778,6 +778,48 @@ class IndicatorAnalyzer:
         return report
 
 
+def update_all_indicators(codes: List[str] = None, max_workers: int = 4):
+    """
+    并行更新所有股票的技术指标。
+
+    Args:
+        codes      : 要更新的股票代码列表（None 表示全部）
+        max_workers: 并行线程数（I/O 密集型，建议 4~8）
+    """
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    if codes is None:
+        from .stock_manager import stock_manager as _sm
+        codes = [s.full_code for s in _sm.get_all_stocks()]
+
+    calc = TechnicalIndicators()
+    success, failed = 0, 0
+
+    def _worker(code: str):
+        try:
+            df = calc.calculate_all_indicators(code)
+            if not df.empty:
+                calc.save_indicators(code, df)
+                return code, True, None
+            return code, False, "计算结果为空"
+        except Exception as e:
+            return code, False, str(e)
+
+    logger.info(f"开始并行更新 {len(codes)} 只股票指标（workers={max_workers}）")
+    with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="indicator") as executor:
+        futures = {executor.submit(_worker, c): c for c in codes}
+        for fut in as_completed(futures):
+            code_r, ok, err = fut.result()
+            if ok:
+                success += 1
+            else:
+                failed += 1
+                logger.warning(f"指标计算失败 {code_r}: {err}")
+
+    logger.info(f"指标更新完成：成功 {success}，失败 {failed}")
+    return success, failed
+
+
 # 全局实例
 technical_indicators = TechnicalIndicators()
 indicator_analyzer = IndicatorAnalyzer()

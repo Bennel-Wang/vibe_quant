@@ -60,6 +60,13 @@ class BacktestResult:
     avg_profit: float
     avg_loss: float
     profit_factor: float
+    # ─── 基准对比指标 ──────────────────────────────────────────────────
+    benchmark_code: str = ""           # 基准代码（如 000300.SH）
+    benchmark_return_pct: float = 0.0  # 基准期间涨跌幅
+    alpha: float = 0.0                 # 超额收益（Alpha = 策略年化 - 基准年化）
+    beta: float = 0.0                  # 相对基准的 Beta
+    information_ratio: float = 0.0     # 信息比率（超额收益/跟踪误差）
+    # ─── 交易明细 ────────────────────────────────────────────────────
     trades: List[TradeRecord] = field(default_factory=list)
     daily_returns: pd.DataFrame = None
     equity_curve: pd.DataFrame = None
@@ -436,8 +443,15 @@ class BacktestEngine:
                 # 考虑滑点
                 buy_price = price * (1 + self.slippage)
 
-                # 严格整手（100股倍数），不足1手则放弃本次买入
+                # 严格整手（100股倍数）
                 shares = int(buy_amount / buy_price / 100) * 100
+
+                # 若策略仓位比例不足以买入1手（高价股），则尝试以1手(100股)代替
+                if shares == 0 and buy_amount > 0:
+                    min_lot_cost = buy_price * 100 * (1 + self.commission_rate)
+                    # 如果有足够现金（不受max_position_value限制），允许买入1手以支持高价股
+                    if min_lot_cost <= capital:
+                        shares = 100
 
                 if shares > 0:
                     actual_amount = shares * buy_price
@@ -474,7 +488,8 @@ class BacktestEngine:
                         # 卖出超出持仓时全部卖出
                         sell_shares = min(desired_shares, position)
                         if sell_shares == 0 and position > 0:
-                            sell_shares = 0  # 不足1手则跳过
+                            # 目标卖出金额不足1手时，至少卖出1手（或全部持仓取小值）
+                            sell_shares = min(100, position)
                 except Exception as e:
                     logger.exception(f"计算卖出股数失败: position={position}, trade_ratio={trade_ratio}: {e}")
                     sell_shares = 0
@@ -630,6 +645,47 @@ class BacktestEngine:
             trades=trades,
             equity_curve=equity_df
         )
+
+        # ── 基准对比指标计算 ──────────────────────────────────────────────────
+        try:
+            benchmark_code = self.config.get('benchmark_code', '000300.SH')
+            bm_df = unified_data.get_historical_data(benchmark_code, start_date, end_date)
+            if bm_df is not None and not bm_df.empty and 'close' in bm_df.columns:
+                bm_close = bm_df['close'].astype(float)
+                bm_return = (bm_close.iloc[-1] - bm_close.iloc[0]) / bm_close.iloc[0] * 100
+                bm_daily = bm_close.pct_change().dropna()
+
+                strategy_daily = equity_df['equity'].pct_change().dropna()
+
+                # 对齐
+                if len(strategy_daily) > 0 and len(bm_daily) > 0:
+                    n = min(len(strategy_daily), len(bm_daily))
+                    sd = strategy_daily.iloc[-n:].values
+                    bd = bm_daily.iloc[-n:].values
+
+                    # Beta
+                    cov_mat = np.cov(sd, bd)
+                    beta = cov_mat[0, 1] / cov_mat[1, 1] if cov_mat[1, 1] != 0 else 0.0
+
+                    # Alpha（年化）
+                    trading_days = len(strategy_daily)
+                    years = trading_days / 252
+                    bm_annual = ((1 + bm_return / 100) ** (1 / max(years, 0.01)) - 1) * 100
+                    alpha = annual_return - bm_annual
+
+                    # 信息比率
+                    excess_returns = sd - bd
+                    ir = (excess_returns.mean() / excess_returns.std() * np.sqrt(252)
+                          if excess_returns.std() != 0 else 0.0)
+
+                    result.benchmark_code = benchmark_code
+                    result.benchmark_return_pct = round(bm_return, 4)
+                    result.alpha = round(alpha, 4)
+                    result.beta = round(beta, 4)
+                    result.information_ratio = round(ir, 4)
+        except Exception as e:
+            logger.debug(f"基准对比计算失败（不影响回测结果）: {e}")
+
         try:
             duration_seconds = _time.time() - start_time
             setattr(result, 'duration_seconds', duration_seconds)

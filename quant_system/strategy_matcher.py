@@ -1,238 +1,153 @@
 """
-策略匹配引擎
-根据大盘环境 + 股票类型 → 推荐适用策略
+大盘阶段 + 个股T/V评分 → 操作建议引擎
+不推荐具体策略，只判断：买入 / 观望 / 空仓 / 可布局
 """
 
 import logging
 from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass
+from datetime import datetime
 
 from .market_regime import MarketRegime, MarketAnalysis, market_regime_detector
-from .stock_classifier import StockCategory, StockClassification, stock_classifier
-from .strategy import strategy_manager
+from .scoring import compute_stock_score as _compute_stock_score_full
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class StrategyRecommendation:
-    """策略推荐结果"""
-    strategy_name: str
-    reason: str
-    priority: int            # 1=最优先, 数字越大越靠后
+# ═══════════════════════════════════════════════════════════════════
+# 操作建议常量
+# ═══════════════════════════════════════════════════════════════════
+ACTION_BUY    = 'buy'      # 买入
+ACTION_LAYOUT = 'layout'   # 可布局（极度悲观/底部建仓）
+ACTION_WATCH  = 'watch'    # 观望/轻仓
+ACTION_EMPTY  = 'empty'    # 空仓
 
-    def to_dict(self) -> Dict:
-        return {
-            'strategy_name': self.strategy_name,
-            'reason': self.reason,
-            'priority': self.priority,
-        }
-
-
-# 策略-大盘环境映射表 (用户定义)
-# key: MarketRegime, value: [(buy_strategy_name, sell_strategy_name, reason, priority)]
-REGIME_STRATEGY_MAP: Dict[MarketRegime, List[Tuple[str, str, str, int]]] = {
-    MarketRegime.OPTIMISTIC: [
-        ('RSI超卖反弹买入', 'RSI超买卖出', '短线波段：大盘乐观适合快进快出', 1),
-        ('MACD金叉买入', 'MACD死叉卖出', '短线趋势：大盘乐观MACD信号有效', 2),
-        ('均线多头买入', '均线空头卖出', '短线均线：乐观市追涨MA突破', 3),
-        ('短线突破买入', '短线趋势卖出', '短线突破：放量二次突破配合大盘', 4),
-        ('中线1反身性买入', '中线1反身性卖出', '中线反身：乐观市反身增强效应最明显', 5),
-    ],
-    MarketRegime.CHAOTIC: [
-        ('中线2三重保护买入', '中线2估值修复卖出', '中线三重保护：震荡市低估值+支撑有效', 1),
-        ('震荡市RSI波段买入', '震荡市RSI波段卖出', '震荡RSI波段：专为震荡设计,Sharpe=0.39', 2),
-        ('布林带下轨买入', '布林带上轨卖出', '布林带均值回归：震荡市效果最佳', 3),
-        ('KDJ超卖买入', 'KDJ超买卖出', 'KDJ超卖反弹：混沌市用超卖捕捉底部', 4),
-    ],
-    MarketRegime.PESSIMISTIC: [
-        # 悲观市以空仓为主，仅用防御策略小仓位
-        ('防御股熊市超跌买入', '防御股熊市超跌卖出', '防御超跌：仅限防御型股票,小仓位快进快出', 1),
-    ],
-    MarketRegime.EXTREMELY_PESSIMISTIC: [
-        ('长线4421极限买入', '长线泡沫卖出', '长线4421：极度悲观是长线买入最佳时机', 1),
-    ],
+ACTION_DISPLAY = {
+    ACTION_BUY:    {'label': '买入',   'badge': 'bg-success',             'icon': '🟢'},
+    ACTION_LAYOUT: {'label': '可布局', 'badge': 'bg-primary',             'icon': '🔵'},
+    ACTION_WATCH:  {'label': '观望',   'badge': 'bg-warning text-dark',   'icon': '🟡'},
+    ACTION_EMPTY:  {'label': '空仓',   'badge': 'bg-secondary',           'icon': '⚪'},
 }
 
-# 全天候策略(无视大盘)
-ALWAYS_ON_STRATEGIES = [
-    ('超级长线价值买入', '超级长线卖出', '超级长线：无视大盘,只看企业价值', 10),
-    ('成长股强势动量买入', '成长股强势动量卖出', '全天候成长：相对强度选股,不依赖大盘方向', 11),
-    ('AI共振买入v19', 'AI共振卖出v19', 'AI共振：5轮迭代最优通用策略', 12),
-]
 
-# 股票类型 → 策略偏好映射 (在大盘策略基础上再做类型筛选)
-CATEGORY_STRATEGY_PREFERENCE = {
-    StockCategory.GROWTH: [
-        '成长股强势动量买入', 'MACD金叉买入', '均线多头买入',
-        '短线突破买入', '中线1反身性买入', 'AI共振买入v19',
-    ],
-    StockCategory.DEFENSIVE: [
-        '防御股熊市超跌买入', '低PE价值买入', '中线2三重保护买入',
-        '超级长线价值买入', '震荡市RSI波段买入',
-    ],
-    StockCategory.CYCLICAL: [
-        '震荡市RSI波段买入', '布林带下轨买入', 'KDJ超卖买入',
-        '中线超跌买入', '中线2三重保护买入',
-    ],
-}
+def _decide_action(regime: MarketRegime, scores: Dict) -> Tuple[str, str]:
+    """根据大盘阶段 + 个股 T/V 综合评分，返回 (action, reason)。
+
+    规则（严格门槛优先）：
+    ──────────────────────────────────────────────────────────────
+    乐观  : T>=58 → 买入；T>=45 → 观望；T<35 → 空仓；其余观望
+    混沌  : total>=58 → 谨慎买入；total>=47 → 观望；total<38 → 空仓
+    悲观  : 全部空仓（大盘下跌趋势未止，不逆势操作）
+    极度悲观: V>=65 且 total>=50 → 可布局；V>=55 → 观望；其余空仓
+    ──────────────────────────────────────────────────────────────
+    """
+    t     = float(scores.get('t_score',     50) or 50)
+    v     = float(scores.get('v_score',     30) or 30)
+    total = float(scores.get('total_score', 45) or 45)
+
+    if regime == MarketRegime.OPTIMISTIC:
+        if t >= 58:
+            return ACTION_BUY,   f'乐观市，T分={t:.0f}（趋势强劲，顺势买入）'
+        if t >= 45:
+            return ACTION_WATCH, f'乐观市，T分={t:.0f}（趋势一般，等待更强信号）'
+        if t < 35:
+            return ACTION_EMPTY, f'乐观市但个股T分={t:.0f}（无趋势，不参与）'
+        return ACTION_WATCH,     f'乐观市，T分={t:.0f}（趋势偏弱，观望为主）'
+
+    if regime == MarketRegime.CHAOTIC:
+        if total >= 58:
+            return ACTION_BUY,   f'混沌市，综合分={total:.0f}（评分优秀，谨慎买入）'
+        if total >= 47:
+            return ACTION_WATCH, f'混沌市，综合分={total:.0f}（评分一般，观望等待）'
+        return ACTION_EMPTY,     f'混沌市，综合分={total:.0f}（评分偏低，空仓为主）'
+
+    if regime == MarketRegime.PESSIMISTIC:
+        return ACTION_EMPTY,     f'悲观市，大盘下跌未止，全部空仓等待（综合分={total:.0f}）'
+
+    if regime == MarketRegime.EXTREMELY_PESSIMISTIC:
+        if v >= 65 and total >= 50:
+            return ACTION_LAYOUT, f'极度悲观，V分={v:.0f}且综合分={total:.0f}（底部价值高，可长线布局）'
+        if v >= 55:
+            return ACTION_WATCH,  f'极度悲观，V分={v:.0f}（有底部价值，轻仓观察）'
+        return ACTION_EMPTY,      f'极度悲观，V分={v:.0f}（底部价值不足，继续空仓）'
+
+    return ACTION_EMPTY, '未知阶段，默认空仓'
 
 
 class StrategyMatcher:
-    """策略匹配引擎"""
+    """大盘阶段+个股T/V评分 → 操作建议引擎"""
 
-    def get_recommendations(
-        self,
-        market: MarketAnalysis,
-        stock_class: StockClassification,
-    ) -> List[StrategyRecommendation]:
-        """根据大盘环境+股票类型获取推荐策略
-        
-        Returns:
-            排序后的策略推荐列表(优先级从高到低)
-        """
-        recommendations = []
-        regime = market.regime
+    def _compute_stock_scores(self, code: str, date: Optional[str] = None) -> Dict:
+        """计算个股T/V评分，委托给 scoring.py 统一实现"""
+        _default = {'t_score': 50.0, 'v_score': 30.0, 'total_score': 45.0}
+        try:
+            result = _compute_stock_score_full(code, date)
+            t   = result.get('t_score')   if result.get('t_score')   is not None else result.get('trend_score_total')
+            v   = result.get('v_score')   if result.get('v_score')   is not None else result.get('value_score')
+            tot = result.get('total_score')
+            return {
+                't_score':     float(t)   if t   is not None else 50.0,
+                'v_score':     float(v)   if v   is not None else 30.0,
+                'total_score': float(tot) if tot is not None else 45.0,
+            }
+        except Exception as e:
+            logger.debug(f"个股评分计算失败 {code}: {e}")
+            return _default
 
-        # 1. 获取大盘环境对应的策略
-        regime_strategies = REGIME_STRATEGY_MAP.get(regime, [])
-        for buy_name, sell_name, reason, priority in regime_strategies:
-            # 检查策略是否存在
-            if strategy_manager.get_strategy(buy_name):
-                recommendations.append(StrategyRecommendation(
-                    strategy_name=buy_name,
-                    reason=f"[{regime.label}]{reason}",
-                    priority=priority,
-                ))
-
-        # 2. 添加全天候策略
-        for buy_name, sell_name, reason, priority in ALWAYS_ON_STRATEGIES:
-            if strategy_manager.get_strategy(buy_name):
-                recommendations.append(StrategyRecommendation(
-                    strategy_name=buy_name,
-                    reason=reason,
-                    priority=priority,
-                ))
-
-        # 3. 根据股票类型过滤/排序
-        preferred = CATEGORY_STRATEGY_PREFERENCE.get(stock_class.category, [])
-        for rec in recommendations:
-            if rec.strategy_name in preferred:
-                rec.priority -= 5  # 匹配股票类型的策略优先级提升
-
-        recommendations.sort(key=lambda r: r.priority)
-        return recommendations
-
-    def get_best_strategy_pair(
-        self,
-        market: MarketAnalysis,
-        stock_class: StockClassification,
-    ) -> Optional[Tuple[str, str, str]]:
-        """获取最优买卖策略对
-        
-        Returns:
-            (buy_strategy, sell_strategy, reason) 或 None(悲观市空仓且非防御股)
-        """
-        regime = market.regime
-
-        # 悲观市 + 非防御股 = 空仓
-        if regime == MarketRegime.PESSIMISTIC and stock_class.category != StockCategory.DEFENSIVE:
-            return None
-
-        recs = self.get_recommendations(market, stock_class)
-        if not recs:
-            return None
-
-        best = recs[0]
-        buy_name = best.strategy_name
-
-        # 找到对应的卖出策略
-        sell_name = self._find_sell_strategy(buy_name)
-
-        return (buy_name, sell_name, best.reason)
-
-    def _find_sell_strategy(self, buy_name: str) -> str:
-        """根据买入策略名找到对应的卖出策略"""
-        # 策略命名约定: XXX买入 → XXX卖出
-        sell_candidates = [
-            buy_name.replace('买入', '卖出'),
-        ]
-
-        # 特殊映射
-        special_map = {
-            'RSI超卖反弹买入': 'RSI超买卖出',
-            'MACD金叉买入': 'MACD死叉卖出',
-            '均线多头买入': '均线空头卖出',
-            '低PE价值买入': '高PE高位卖出',
-        }
-        if buy_name in special_map:
-            sell_candidates.insert(0, special_map[buy_name])
-
-        for name in sell_candidates:
-            if strategy_manager.get_strategy(name):
-                return name
-
-        return buy_name.replace('买入', '卖出')
+    # ── 单股分析 ────────────────────────────────────────────────────
 
     def analyze_stock(self, code: str, date: Optional[str] = None) -> Dict:
-        """完整分析一只股票: 大盘检测+分类+策略匹配
-        
-        Returns:
-            {market, classification, recommendations, best_pair, is_empty_position}
-        """
-        market = market_regime_detector.detect(date)
-        classification = stock_classifier.classify(code)
-        recommendations = self.get_recommendations(market, classification)
-        best_pair = self.get_best_strategy_pair(market, classification)
+        """完整分析一只股票：大盘检测 + 个股T/V评分 + 操作建议"""
+        from .stock_manager import stock_manager
+        stock = stock_manager.get_stock_by_code(code)
+        name  = stock.name if stock else code
 
-        is_empty = (
-            market.regime == MarketRegime.PESSIMISTIC
-            and classification.category != StockCategory.DEFENSIVE
-        )
+        market = market_regime_detector.detect(date)
+        scores = self._compute_stock_scores(code, date)
+        action, reason = _decide_action(market.regime, scores)
 
         return {
-            'market': market.to_dict(),
-            'classification': classification.to_dict(),
-            'recommendations': [r.to_dict() for r in recommendations],
-            'best_pair': {
-                'buy': best_pair[0],
-                'sell': best_pair[1],
-                'reason': best_pair[2],
-            } if best_pair else None,
-            'is_empty_position': is_empty,
-            'action_summary': '空仓观望' if is_empty else f"推荐策略: {best_pair[0] if best_pair else '无'}",
+            'code':    code,
+            'name':    name,
+            'market':  market.to_dict(),
+            'scores':  scores,
+            'action':  action,
+            'reason':  reason,
+            'action_display': ACTION_DISPLAY.get(action, ACTION_DISPLAY[ACTION_EMPTY]),
+            'is_empty_position': action == ACTION_EMPTY,
         }
 
+    # ── 全量股票分析 ─────────────────────────────────────────────────
+
     def analyze_all_stocks(self, date: Optional[str] = None) -> Dict:
-        """分析所有监控股票
-        
-        Returns:
-            {market, stocks: [{classification, recommendations, best_pair}]}
-        """
-        market = market_regime_detector.detect(date)
-        all_classified = stock_classifier.classify_all()
+        """分析所有监控股票，返回大盘信息 + 每只股票操作建议"""
+        from .stock_manager import stock_manager
+
+        market      = market_regime_detector.detect(date)
+        stocks_info = stock_manager.get_all_stocks()
 
         stock_results = []
-        for code, classification in all_classified.items():
-            recs = self.get_recommendations(market, classification)
-            best_pair = self.get_best_strategy_pair(market, classification)
-            is_empty = (
-                market.regime == MarketRegime.PESSIMISTIC
-                and classification.category != StockCategory.DEFENSIVE
-            )
-
+        for stock in stocks_info:
+            code      = stock.code
+            full_code = getattr(stock, 'full_code', code)
+            scores    = self._compute_stock_scores(code, date)
+            action, reason = _decide_action(market.regime, scores)
             stock_results.append({
-                'code': code,
-                'name': classification.name,
-                'classification': classification.to_dict(),
-                'best_pair': {
-                    'buy': best_pair[0],
-                    'sell': best_pair[1],
-                    'reason': best_pair[2],
-                } if best_pair else None,
-                'is_empty_position': is_empty,
-                'top_strategies': [r.to_dict() for r in recs[:3]],
+                'code':      code,
+                'full_code': full_code,
+                'name':      stock.name,
+                'scores':    scores,
+                'action':    action,
+                'reason':    reason,
+                'action_display': ACTION_DISPLAY.get(action, ACTION_DISPLAY[ACTION_EMPTY]),
+                'is_empty_position': action == ACTION_EMPTY,
             })
+
+        # 排序：买入 > 可布局 > 观望 > 空仓，同组内按 total_score 降序
+        _order = {ACTION_BUY: 0, ACTION_LAYOUT: 1, ACTION_WATCH: 2, ACTION_EMPTY: 3}
+        stock_results.sort(key=lambda s: (
+            _order.get(s['action'], 9),
+            -s['scores'].get('total_score', 0),
+        ))
 
         return {
             'market': market.to_dict(),
@@ -242,3 +157,4 @@ class StrategyMatcher:
 
 # 全局实例
 strategy_matcher = StrategyMatcher()
+

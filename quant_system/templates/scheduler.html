@@ -320,14 +320,23 @@ function loadTasks() {
             );
         }
 
-        // 只渲染自定义任务
-        var customKeys = Object.keys(tasks).filter(function(k) {
-            return k.startsWith('custom_') && tasks[k];
-        });
-        if (customKeys.length === 0) {
-            tbody.append('<tr><td colspan="8" class="text-center text-muted py-4">暂无自定义任务，请在下方添加</td></tr>');
+        // 渲染内置任务 + 自定义任务
+        var builtinKeys = Object.keys(tasks).filter(function(k) { return !k.startsWith('custom_') && tasks[k]; });
+        var customKeys  = Object.keys(tasks).filter(function(k) { return k.startsWith('custom_') && tasks[k]; });
+
+        if (builtinKeys.length === 0 && customKeys.length === 0) {
+            tbody.append('<tr><td colspan="8" class="text-center text-muted py-4">暂无任务，请在下方添加自定义任务</td></tr>');
         } else {
-            customKeys.forEach(function(k) { renderRow(k, tasks[k], true); });
+            // 先显示内置任务
+            if (builtinKeys.length > 0) {
+                tbody.append('<tr class="custom-tasks-divider"><td colspan="8">内置任务</td></tr>');
+                builtinKeys.forEach(function(k) { renderRow(k, tasks[k], false); });
+            }
+            // 再显示自定义任务
+            if (customKeys.length > 0) {
+                tbody.append('<tr class="custom-tasks-divider"><td colspan="8">自定义任务</td></tr>');
+                customKeys.forEach(function(k) { renderRow(k, tasks[k], true); });
+            }
         }
     });
 }

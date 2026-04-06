@@ -502,6 +502,13 @@ class NotificationManager:
         
         self._send(title, content)
 
+    def send_system_alert(self, title: str, content: str):
+        """发送系统告警（任务失败等）"""
+        if not self.enabled:
+            logger.warning(f"[告警未推送-通知未启用] {title}: {content}")
+            return
+        self._send(title, content)
+
 
 # 全局实例
 notification_manager = NotificationManager()

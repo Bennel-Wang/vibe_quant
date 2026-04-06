@@ -1,0 +1,101 @@
+# 量化交易系统配置文件示例
+# 复制此文件为 config.yaml 并填入真实 Token
+# config.yaml 已被 .gitignore 排除，不会提交到版本控制
+
+# ─── API Token 配置 ────────────────────────────────────────────────────────────
+tokens:
+  tushare_token: "YOUR_TUSHARE_TOKEN"        # Tushare Pro API Token: https://tushare.pro
+  pushplus_token: "YOUR_PUSHPLUS_TOKEN"      # PushPlus 微信推送 Token: https://www.pushplus.plus
+  modelscope_token: "YOUR_MODELSCOPE_TOKEN"  # ModelScope Token: https://modelscope.cn
+  # 多账号推送（可选，配置后同时推送到多个微信）
+  pushplus_accounts:
+    - token: "YOUR_PUSHPLUS_TOKEN"
+      enabled: true
+  # Web 管理界面认证（Basic Auth）
+  web_username: "admin"
+  web_password: "changeme"
+
+# ─── 数据存储配置 ──────────────────────────────────────────────────────────────
+data_storage:
+  data_dir: "./data"
+  history_dir: "./data/history"
+  realtime_dir: "./data/realtime"
+  news_dir: "./data/news"
+  indicators_dir: "./data/indicators"
+  features_dir: "./data/features"
+  backtest_dir: "./data/backtests"
+  history_source: "easyquotation"   # options: easyquotation, tushare
+
+# ─── 股票代码配置 ──────────────────────────────────────────────────────────────
+stocks:
+  config_file: "./config/stocks.yaml"
+
+# ─── 数据采集配置 ──────────────────────────────────────────────────────────────
+data_collection:
+  history:
+    start_date: "20030101"
+  realtime:
+    interval: 5
+  news:
+    track_days: 5
+    sentiment_model: "local"   # local | modelscope
+
+# ─── 技术指标配置 ──────────────────────────────────────────────────────────────
+technical_indicators:
+  rsi:
+    periods: [6, 12, 24]
+    timeframes: ["day", "week", "month"]
+    history_lookback: 252
+  ma:
+    periods: [5, 10, 20, 60, 120, 250]
+  macd:
+    fast: 12
+    slow: 26
+    signal: 9
+
+# ─── AI 模型配置 ───────────────────────────────────────────────────────────────
+ai_models:
+  provider: "modelscope"   # modelscope | openai | local
+  model_name: "qwen-max"
+  max_tokens: 2000
+  temperature: 0.7
+  retry_times: 3           # 失败重试次数
+  retry_delay: 2           # 初始重试间隔（秒，指数退避）
+
+# ─── 回测配置 ──────────────────────────────────────────────────────────────────
+backtest:
+  initial_capital: 1000000
+  commission_rate: 0.0003
+  slippage: 0.001
+  benchmark_code: "000300.SH"   # 基准指数（沪深300）
+
+# ─── 风控配置 ──────────────────────────────────────────────────────────────────
+risk_management:
+  max_position_ratio: 0.8
+  max_single_stock_ratio: 0.3
+  stop_loss_ratio: 0.05
+  take_profit_ratio: 0.1
+  trailing_stop_ratio: 0.03     # 跟踪止损回撤比例（0 表示禁用）
+  var_confidence: 0.95          # VaR 置信水平
+  var_window: 252               # VaR 历史窗口（交易日）
+
+# ─── Web 服务配置 ──────────────────────────────────────────────────────────────
+web:
+  host: "0.0.0.0"
+  port: 8080
+  debug: false
+  auth_enabled: true            # 是否启用 Basic Auth
+
+# ─── 日志配置 ──────────────────────────────────────────────────────────────────
+logging:
+  level: "INFO"
+  file: "./logs/quant_system.log"
+  max_bytes: 10485760    # 10 MB
+  backup_count: 5
+
+# ─── 调度器配置 ────────────────────────────────────────────────────────────────
+scheduler:
+  enabled: true
+  afternoon_times: ["14:25", "14:45"]
+  alert_on_failure: true         # 任务失败时发送告警通知
+  task_timeout: 300              # 单任务最长执行时间（秒）

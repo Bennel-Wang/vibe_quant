@@ -14,23 +14,30 @@
     "update_news": false
   },
   "task_schedule": {
+    "data_update": {
+      "hour": 15,
+      "minute": 30,
+      "enabled": false
+    },
     "indicators": {
       "hour": 15,
       "minute": 35,
-      "enabled": false,
-      "skip_non_trading_day": true
+      "enabled": false
     },
     "news": {
       "hour": 15,
       "minute": 45,
-      "enabled": false,
-      "skip_non_trading_day": true
+      "enabled": false
+    },
+    "notification": {
+      "hour": 16,
+      "minute": 0,
+      "enabled": false
     },
     "ai_analysis": {
       "hour": 16,
       "minute": 30,
-      "enabled": false,
-      "skip_non_trading_day": true
+      "enabled": false
     }
   },
   "custom_tasks": [

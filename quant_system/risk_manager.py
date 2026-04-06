@@ -56,6 +56,9 @@ class RiskManager:
         self.max_single_stock_ratio = self.risk_config['max_single_stock_ratio']
         self.stop_loss_ratio = self.risk_config['stop_loss_ratio']
         self.take_profit_ratio = self.risk_config['take_profit_ratio']
+        self.trailing_stop_ratio = self.risk_config.get('trailing_stop_ratio', 0.0)
+        self.var_confidence = self.risk_config.get('var_confidence', 0.95)
+        self.var_window = self.risk_config.get('var_window', 252)
         
         # 当前状态
         self.total_capital: float = 1000000
@@ -63,10 +66,11 @@ class RiskManager:
         self.positions: Dict[str, Position] = {}
         self.position_history: List[Dict] = []
 
+        # 跟踪止损：记录每只持仓的历史最高价
+        self._price_highs: Dict[str, float] = {}
+
         # 累计盈亏基准
-        # initial_capital_baseline == 0 表示未设置（首次使用时自动以当前 total_capital 为基准）
         self.initial_capital_baseline: float = 0.0
-        # 已实现盈亏（记录清仓/减仓时锁定的利润）
         self.realized_pnl: float = 0.0
     
     def update_capital(self, total_capital: float, available_cash: float):
@@ -145,6 +149,11 @@ class RiskManager:
             today_pnl=today_pnl,
             today_pnl_pct=today_pnl_pct
         )
+
+        # 更新跟踪止损最高价记录
+        if self.trailing_stop_ratio > 0:
+            prev_high = self._price_highs.get(code, current_price)
+            self._price_highs[code] = max(prev_high, current_price)
     
     def check_position_limit(self, code: str, proposed_shares: int, 
                              price: float) -> RiskCheckResult:
@@ -160,7 +169,7 @@ class RiskManager:
             风控检查结果
         """
         proposed_value = proposed_shares * price
-        current_value = self.positions.get(code, Position(code, "", 0, 0, 0, 0, 0)).market_value
+        current_value = self.positions.get(code, Position(code, "", 0, 0, 0, 0, 0, 0)).market_value
         total_value = proposed_value + current_value
         
         # 动态总资产 = 可用资金 + 持仓市值
@@ -207,6 +216,76 @@ class RiskManager:
             risk_level="low"
         )
     
+    def check_trailing_stop(self, code: str) -> Optional[RiskCheckResult]:
+        """
+        跟踪止损检查：价格从历史最高点回撤超过 trailing_stop_ratio 时触发卖出。
+        仅在 trailing_stop_ratio > 0 时生效。
+        """
+        if self.trailing_stop_ratio <= 0:
+            return None
+        position = self.positions.get(code)
+        if not position or position.shares == 0:
+            return None
+        price_high = self._price_highs.get(code, position.current_price)
+        if price_high <= 0:
+            return None
+        drawdown = (price_high - position.current_price) / price_high
+        if drawdown >= self.trailing_stop_ratio:
+            return RiskCheckResult(
+                passed=False,
+                code=code,
+                action="sell",
+                message=(f"触发跟踪止损：从最高价 {price_high:.2f} 回撤 "
+                         f"{drawdown:.2%}（阈值 {self.trailing_stop_ratio:.2%}）"),
+                suggested_position=position.shares,
+                risk_level="high",
+            )
+        return None
+
+    def calculate_portfolio_var(self, daily_returns: Optional[pd.Series] = None,
+                                 portfolio_value: float = None) -> Dict[str, float]:
+        """
+        历史模拟法计算组合 VaR（在险价值）。
+
+        Args:
+            daily_returns : 日收益率序列（可选，不传则基于持仓市值估算）
+            portfolio_value: 组合总市值（默认取当前持仓市值）
+
+        Returns:
+            {'var_1d': 单日 VaR 金额, 'var_pct': VaR 百分比, 'cvar_1d': CVaR 金额}
+        """
+        pv = portfolio_value or sum(p.market_value for p in self.positions.values())
+        if pv <= 0:
+            return {'var_1d': 0.0, 'var_pct': 0.0, 'cvar_1d': 0.0}
+
+        if daily_returns is not None and len(daily_returns) >= 30:
+            returns = daily_returns.dropna()
+        else:
+            # 若无历史数据，使用持仓浮亏作为粗略估计
+            avg_loss = (
+                sum(p.unrealized_pnl for p in self.positions.values() if p.unrealized_pnl < 0)
+                / max(len(self.positions), 1)
+            )
+            var_est = abs(avg_loss) if avg_loss < 0 else pv * 0.02  # 默认 2% 估计
+            return {
+                'var_1d': round(var_est, 2),
+                'var_pct': round(var_est / pv * 100, 4),
+                'cvar_1d': round(var_est * 1.3, 2),
+            }
+
+        alpha = 1 - self.var_confidence
+        sorted_returns = returns.sort_values()
+        var_pct = float(sorted_returns.quantile(alpha))
+        cvar_pct = float(sorted_returns[sorted_returns <= var_pct].mean())
+
+        var_1d = abs(var_pct) * pv
+        cvar_1d = abs(cvar_pct) * pv
+        return {
+            'var_1d': round(var_1d, 2),
+            'var_pct': round(abs(var_pct) * 100, 4),
+            'cvar_1d': round(cvar_1d, 2),
+        }
+
     def check_stop_loss_take_profit(self, code: str) -> Optional[RiskCheckResult]:
         """
         检查止损止盈
@@ -336,6 +415,15 @@ class RiskManager:
                     'name': position.name,
                     'pnl_pct': position.unrealized_pnl_pct,
                     'reason': result.message
+                })
+            # 跟踪止损检查
+            trailing = self.check_trailing_stop(code)
+            if trailing:
+                stop_loss_alerts.append({
+                    'code': code,
+                    'name': position.name,
+                    'pnl_pct': position.unrealized_pnl_pct,
+                    'reason': trailing.message
                 })
         
         return {

@@ -22,80 +22,80 @@ logger = logging.getLogger(__name__)
 
 
 class AIModelClient:
-    """AI模型客户端"""
+    """AI模型客户端（支持重试、结构化输出）"""
     
     def __init__(self):
         self.ai_config = config.get_ai_config()
         self.provider = self.ai_config.get('provider', 'modelscope')
         self.token = config.get_modelscope_token()
+        self._retry_times = self.ai_config.get('retry_times', 3)
+        self._retry_delay = self.ai_config.get('retry_delay', 2)
     
     def call(self, prompt: str, system_prompt: str = None) -> str:
         """
-        调用AI模型
-        
+        调用AI模型（含指数退避重试）
+
         Args:
             prompt: 用户提示
             system_prompt: 系统提示
-        
+
         Returns:
-            AI响应文本
+            AI响应文本（失败时返回 mock 结果）
         """
-        if self.provider == 'modelscope':
-            return self._call_modelscope(prompt, system_prompt)
-        else:
-            return self._call_mock(prompt, system_prompt)
+        import time
+        last_err = None
+        for attempt in range(self._retry_times):
+            try:
+                if self.provider == 'modelscope':
+                    result = self._call_modelscope(prompt, system_prompt)
+                else:
+                    result = self._call_mock(prompt, system_prompt)
+                return result
+            except Exception as e:
+                last_err = e
+                wait = self._retry_delay * (2 ** attempt)
+                logger.warning(f"AI调用失败 (第{attempt+1}次), {wait}s后重试: {e}")
+                time.sleep(wait)
+        logger.error(f"AI调用全部重试失败，使用本地fallback: {last_err}")
+        return self._call_mock(prompt, system_prompt)
     
     def _call_modelscope(self, prompt: str, system_prompt: str = None) -> str:
-        """调用ModelScope API"""
-        try:
-            import http.client
-            import socket
-            
-            conn = http.client.HTTPSConnection("api.modelscope.cn", timeout=15)
-            
-            payload = json.dumps({
-                "input": {
-                    "prompt": prompt,
-                    "system": system_prompt or "你是一个专业的量化投资分析师。"
-                },
-                "parameters": {
-                    "max_tokens": self.ai_config.get('max_tokens', 2000),
-                    "temperature": self.ai_config.get('temperature', 0.7),
-                }
-            })
-            
-            headers = {
-                'Authorization': f'Bearer {self.token}',
-                'Content-Type': 'application/json'
-            }
-            
-            conn.request("POST", "/api/v1/studio/iic/nlp_qwen_chat/gradio/api/predict",
-                        payload, headers)
-            
-            res = conn.getresponse()
-            data = res.read()
-            result = json.loads(data.decode("utf-8"))
-            
-            if 'data' in result:
-                return result['data']
-            else:
-                return result.get('text', '')
-                
-        except Exception as e:
-            # 处理网络类错误（例如Windows上的 getaddrinfo 11001）并自动退回到本地模式
-            import socket as _socket
-            err_no = getattr(e, 'errno', None)
-            if isinstance(e, OSError) and err_no in (11001,):
-                logger.warning(f"ModelScope 网络错误 (getaddrinfo 失败, errno={err_no})，已切换为本地AI回退: {e}")
-                # 将 provider 切换为本地，避免短时间内重复尝试网络调用
-                try:
-                    self.provider = 'local'
-                except Exception:
-                    pass
-                return self._call_mock(prompt, system_prompt)
-            else:
-                logger.error(f"ModelScope API调用失败: {e}")
-                return self._call_mock(prompt, system_prompt)
+        """调用ModelScope OpenAI兼容接口"""
+        import urllib.request
+        import urllib.error
+
+        endpoint = "https://api-inference.modelscope.cn/v1/chat/completions"
+        model = self.ai_config.get('model_name', 'Qwen/Qwen2.5-72B-Instruct')
+
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
+
+        payload = json.dumps({
+            "model": model,
+            "messages": messages,
+            "max_tokens": self.ai_config.get('max_tokens', 2000),
+            "temperature": self.ai_config.get('temperature', 0.7),
+        }).encode("utf-8")
+
+        req = urllib.request.Request(
+            endpoint,
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {self.token}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            result = json.loads(resp.read().decode("utf-8"))
+
+        choices = result.get("choices", [])
+        if not choices:
+            raise ValueError(f"ModelScope 返回空 choices: {result}")
+        return choices[0]["message"]["content"]
     
     def _call_mock(self, prompt: str, system_prompt: str = None) -> str:
         """模拟AI响应（当API不可用时）"""

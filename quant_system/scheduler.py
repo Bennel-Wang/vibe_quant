@@ -584,7 +584,7 @@ class TradingScheduler:
         logger.info("策略回测提醒已发送")
 
     def run_market_strategy_analysis(self, force: bool = False):
-        """大盘环境分析+股票分类+策略匹配推荐，发送每日通知"""
+        """大盘T/V评分阶段分析 + 个股评分匹配推荐，发送每日通知"""
         if not force and not self.is_trading_day():
             logger.info("跳过大盘策略分析：今天不是交易日")
             return
@@ -597,53 +597,52 @@ class TradingScheduler:
             date_str = datetime.now(BEIJING_TZ).strftime('%Y-%m-%d')
             regime_emoji = market.get('regime_emoji', '❓')
             regime_label = market.get('regime_label', '未知')
-            score = market.get('score', 0)
+            t_score = market.get('t_score', 0)
+            v_score = market.get('v_score', 0)
             detail = market.get('detail', '')
 
-            content = f"## {regime_emoji} 大盘策略分析 ({date_str})\n\n"
-            content += f"### 大盘环境: {regime_label} (评分: {score})\n"
+            content = f"## {regime_emoji} 大盘操作建议 ({date_str})\n\n"
+            content += f"### 大盘阶段: {regime_label}（T评分={t_score:.0f} / V评分={v_score:.0f}）\n"
             content += f"{detail}\n\n"
 
-            # 按类型分组
-            groups = {'成长型': [], '防御型': [], '周期价值型': []}
-            empty_positions = []
-            for s in stocks_data:
-                cat_label = s['classification'].get('category_label', '未知')
-                if s.get('is_empty_position'):
-                    empty_positions.append(s)
-                elif cat_label in groups:
-                    groups[cat_label].append(s)
-                else:
-                    groups.setdefault(cat_label, []).append(s)
+            ACTION_ICONS  = {'buy': '🟢', 'layout': '🔵', 'watch': '🟡', 'empty': '⚪'}
+            ACTION_LABELS = {'buy': '买入', 'layout': '可布局', 'watch': '观望', 'empty': '空仓'}
 
-            if empty_positions:
-                content += f"### ⛔ 建议空仓 ({len(empty_positions)}只)\n"
-                for s in empty_positions:
-                    content += f"- {s['name']}({s['code']}) [{s['classification'].get('category_label','')}]\n"
+            buy_stocks   = [s for s in stocks_data if s.get('action') in ('buy', 'layout')]
+            watch_stocks = [s for s in stocks_data if s.get('action') == 'watch']
+            empty_stocks = [s for s in stocks_data if s.get('action') == 'empty']
+
+            if buy_stocks:
+                content += f"### ✅ 建议操作 ({len(buy_stocks)}只)\n\n"
+                for s in buy_stocks:
+                    sc   = s.get('scores', {})
+                    t    = sc.get('t_score', '-')
+                    v    = sc.get('v_score', '-')
+                    icon = ACTION_ICONS.get(s.get('action', 'empty'), '⚪')
+                    lbl  = ACTION_LABELS.get(s.get('action', 'empty'), '')
+                    content += f"{icon} **{s['name']}({s['code']})** T={t}/V={v} [{lbl}]\n"
+                    content += f"  {s.get('reason', '')}\n"
                 content += "\n"
 
-            for cat_name, cat_stocks in groups.items():
-                if not cat_stocks:
-                    continue
-                content += f"### {cat_name} ({len(cat_stocks)}只)\n\n"
-                for s in cat_stocks:
-                    bp = s.get('best_pair')
-                    if bp:
-                        content += (
-                            f"- **{s['name']}({s['code']})** → "
-                            f"买入:{bp['buy']} / 卖出:{bp['sell']}\n"
-                            f"  理由: {bp['reason']}\n"
-                        )
-                    else:
-                        content += f"- {s['name']}({s['code']}) → 暂无推荐\n"
+            if watch_stocks:
+                content += f"### 🟡 观望 ({len(watch_stocks)}只)\n"
+                for s in watch_stocks[:10]:
+                    sc = s.get('scores', {})
+                    t  = sc.get('t_score', '-')
+                    v  = sc.get('v_score', '-')
+                    content += f"- {s['name']}({s['code']}) T={t}/V={v}  {s.get('reason','')}\n"
                 content += "\n"
+
+            if empty_stocks:
+                content += f"### ⚪ 空仓 ({len(empty_stocks)}只)\n"
+                content += '、'.join(s['name'] for s in empty_stocks[:12]) + "\n\n"
 
             content += f"\n---\n*生成时间: {datetime.now(BEIJING_TZ).strftime('%Y-%m-%d %H:%M')}*"
 
             notification_manager.send_markdown_message(
                 f"{regime_emoji} 大盘策略分析 {date_str} | {regime_label}", content
             )
-            logger.info(f"大盘策略分析通知已发送: {regime_label}(score={score})")
+            logger.info(f"大盘策略分析通知已发送: {regime_label}(T={t_score}/V={v_score})")
 
         except Exception as e:
             logger.error(f"大盘策略分析失败: {e}", exc_info=True)
@@ -1185,6 +1184,20 @@ class TradingScheduler:
         else:
             self.run_daily_tasks()
 
+    def _send_failure_alert(self, task_name: str, error: str):
+        """任务失败时发送告警通知"""
+        if not self.config.get('alert_on_failure', True):
+            return
+        try:
+            label = self._task_labels.get(task_name, task_name)
+            now = datetime.now(BEIJING_TZ).strftime('%Y-%m-%d %H:%M:%S')
+            notification_manager.send_system_alert(
+                f"⚠️ 调度任务失败: {label}",
+                f"任务 [{label}] 在 {now} 执行失败\n\n错误信息:\n{error}"
+            )
+        except Exception as e:
+            logger.warning(f"发送失败告警本身出错: {e}")
+
     def run_single_task(self, task_name: str) -> Dict:
         """手动触发单个任务"""
         if task_name not in self._task_funcs_map:
@@ -1218,6 +1231,7 @@ class TradingScheduler:
                     'result': f'执行失败: {str(e)}',
                     'success': False,
                 })
+                self._send_failure_alert(task_name, str(e))
 
         thread = Thread(target=_run, daemon=True)
         thread.start()

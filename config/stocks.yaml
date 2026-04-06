@@ -43,9 +43,9 @@ stocks:
   type: stock
   notes: 长期投资
   industry: 白酒
-  strategy: RSI超卖反弹买入(买) + RSI超买卖出(卖)
-  buy_strategy: RSI超卖反弹买入
-  sell_strategy: RSI超买卖出
+  strategy: 周线超卖均值回归买入(买) + 周线超买均值回归卖出(卖)
+  buy_strategy: 周线超卖均值回归买入
+  sell_strategy: 周线超买均值回归卖出
 - name: 比亚迪
   code: 002594
   market: sz
@@ -59,17 +59,17 @@ stocks:
   market: sz
   type: stock
   industry: 电气设备
-  strategy: 长线4421极限买入(买) + 长线泡沫卖出(卖)
-  buy_strategy: 长线4421极限买入
-  sell_strategy: 长线泡沫卖出
+  strategy: 防御慢牛回调买入(买) + 防御慢牛顶部卖出(卖)
+  buy_strategy: 防御慢牛回调买入
+  sell_strategy: 防御慢牛顶部卖出
 - name: 阿里巴巴
   code: 09988
   market: hk
   type: stock
   notes: 这个坑
-  strategy: 布林带反弹
-  buy_strategy: 布林带反弹
-  sell_strategy: （含卖出）
+  strategy: RSI超卖反弹买入(买) + RSI超买卖出(卖)
+  buy_strategy: RSI超卖反弹买入
+  sell_strategy: RSI超买卖出
 - name: 上海机场
   code: '600009'
   market: sh
@@ -83,16 +83,16 @@ stocks:
   market: sz
   type: stock
   industry: 家居用品
-  strategy: 中线超跌买入
+  strategy: 中线超跌买入(买) + 中线超跌卖出(卖)
   buy_strategy: 中线超跌买入
   sell_strategy: 中线超跌卖出
 - name: 优必选
   code: 09880
   market: hk
   type: stock
-  strategy: 长线4421极限买入
-  buy_strategy: 长线4421极限买入
-  sell_strategy: 长线泡沫卖出
+  strategy: 短线突破买入(买) + 短线趋势卖出(卖)
+  buy_strategy: 短线突破买入
+  sell_strategy: 短线趋势卖出
 - name: 快手-W
   code: '01024'
   market: hk
@@ -104,7 +104,7 @@ stocks:
   code: 09658
   market: hk
   type: stock
-  strategy: 长线4421极限买入
+  strategy: 长线4421极限买入(买) + 长线泡沫卖出(卖)
   buy_strategy: 长线4421极限买入
   sell_strategy: 长线泡沫卖出
 - name: 阳光电源
@@ -112,9 +112,9 @@ stocks:
   market: sz
   type: stock
   industry: 电气设备
-  strategy: 混搭：中线超跌买入买×长线泡沫卖出卖
-  buy_strategy: 中线超跌买入
-  sell_strategy: 长线泡沫卖出
+  strategy: 混搭：长线4421极限买入买×RSI超买卖出卖
+  buy_strategy: 长线4421极限买入
+  sell_strategy: RSI超买卖出
 - name: 德赛西威
   code: 002920
   market: sz
@@ -128,30 +128,30 @@ stocks:
   market: sh
   type: stock
   industry: 化工原料
-  strategy: 中线超跌买入(买) + 中线超跌卖出(卖)
-  buy_strategy: 中线超跌买入
-  sell_strategy: 中线超跌卖出
+  strategy: RSI超卖反弹买入(买) + RSI超买卖出(卖)
+  buy_strategy: RSI超卖反弹买入
+  sell_strategy: RSI超买卖出
 - name: 波司登
   code: 03998
   market: hk
   type: stock
-  strategy: 长线4421极限买入
-  buy_strategy: 长线4421极限买入
-  sell_strategy: 长线泡沫卖出
+  strategy: 短线突破买入(买) + 短线趋势卖出(卖)
+  buy_strategy: 短线突破买入
+  sell_strategy: 短线趋势卖出
 - name: 国盾量子
   code: '688027'
   market: sh
   type: stock
   industry: 通信设备
-  strategy: 长线4421极限买入(买) + 长线泡沫卖出(卖)
-  buy_strategy: 长线4421极限买入
-  sell_strategy: 长线泡沫卖出
+  strategy: 防御慢牛回调买入(买) + 防御慢牛顶部卖出(卖)
+  buy_strategy: 防御慢牛回调买入
+  sell_strategy: 防御慢牛顶部卖出
 - name: 沪电股份
   code: '002463'
   market: sz
   type: stock
   industry: 元器件
-  strategy: 中线超跌买入
+  strategy: 中线超跌买入(买) + 中线超跌卖出(卖)
   buy_strategy: 中线超跌买入
   sell_strategy: 中线超跌卖出
 - name: 英维克
@@ -159,7 +159,7 @@ stocks:
   market: sz
   type: stock
   industry: 专用机械
-  strategy: 中线超跌买入
+  strategy: 中线超跌买入(买) + 中线超跌卖出(卖)
   buy_strategy: 中线超跌买入
   sell_strategy: 中线超跌卖出
 - name: 长江电力
@@ -182,7 +182,7 @@ stocks:
   code: '00700'
   market: hk
   type: stock
-  strategy: 长线4421极限买入
+  strategy: 长线4421极限买入(买) + 长线泡沫卖出(卖)
   buy_strategy: 长线4421极限买入
   sell_strategy: 长线泡沫卖出
 - name: 拓普集团
@@ -190,25 +190,25 @@ stocks:
   market: sh
   type: stock
   industry: 汽车配件
-  strategy: KDJ超卖买入(买) + KDJ超买卖出(卖)
-  buy_strategy: KDJ超卖买入
-  sell_strategy: KDJ超买卖出
+  strategy: 防御慢牛回调买入(买) + 防御慢牛顶部卖出(卖)
+  buy_strategy: 防御慢牛回调买入
+  sell_strategy: 防御慢牛顶部卖出
 - name: 中芯国际
   code: '688981'
   market: sh
   type: stock
   industry: 半导体
-  strategy: 混搭：布林带下轨买入买×中线超跌卖出卖
-  buy_strategy: 布林带下轨买入
-  sell_strategy: 中线超跌卖出
+  strategy: 混搭：RSI超卖反弹买入买×布林带上轨卖出卖
+  buy_strategy: RSI超卖反弹买入
+  sell_strategy: 布林带上轨卖出
 - name: 北方华创
   code: '002371'
   market: sz
   type: stock
   industry: 半导体
-  strategy: 低PE价值买入
-  buy_strategy: 低PE价值买入
-  sell_strategy: 高PE高位卖出
+  strategy: 混搭：长线4421极限买入买×KDJ超买卖出卖
+  buy_strategy: 长线4421极限买入
+  sell_strategy: KDJ超买卖出
 - name: 五粮液
   code: 000858
   market: sz
@@ -221,14 +221,14 @@ stocks:
   code: 01579
   market: hk
   type: stock
-  strategy: 短线突破买入
+  strategy: 短线突破买入(买) + 短线趋势卖出(卖)
   buy_strategy: 短线突破买入
   sell_strategy: 短线趋势卖出
 - name: 小米集团-W
   code: 01810
   market: hk
   type: stock
-  strategy: 长线4421极限买入
+  strategy: 长线4421极限买入(买) + 长线泡沫卖出(卖)
   buy_strategy: 长线4421极限买入
   sell_strategy: 长线泡沫卖出
 - name: 华勤技术
@@ -236,25 +236,32 @@ stocks:
   market: sh
   type: stock
   industry: 元器件
-  strategy: RSI超卖反弹买入(买) + RSI超买卖出(卖)
-  buy_strategy: RSI超卖反弹买入
-  sell_strategy: RSI超买卖出
+  strategy: 价值动量共振买入(买) + 价值动量共振卖出(卖)
+  buy_strategy: 价值动量共振买入
+  sell_strategy: 价值动量共振卖出
 - name: 海底捞
   code: 06862
   market: hk
   type: stock
-  strategy: 长线4421极限买入
-  buy_strategy: 长线4421极限买入
-  sell_strategy: 长线泡沫卖出
+  strategy: 布林带下轨买入(买) + 布林带上轨卖出(卖)
+  buy_strategy: 布林带下轨买入
+  sell_strategy: 布林带上轨卖出
 - name: 首华燃气
   code: '300483'
   market: sz
   type: stock
   industry: 石油开采
-  strategy: 长线4421极限买入(买) + 长线泡沫卖出(卖)
+  strategy: 混搭：长线4421极限买入买×RSI超买卖出卖
   buy_strategy: 长线4421极限买入
-  sell_strategy: 长线泡沫卖出
+  sell_strategy: RSI超买卖出
 - name: '159632'
   code: '159632'
   market: sz
   type: etf
+- name: 泡泡玛特
+  code: 09992
+  market: hk
+  type: stock
+  strategy: 长线4421极限买入(买) + 长线泡沫卖出(卖)
+  buy_strategy: 长线4421极限买入
+  sell_strategy: 长线泡沫卖出
