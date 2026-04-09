@@ -3787,16 +3787,8 @@ def api_strategy_alerts_compute():
         return_today = _backtest_one_strategy_with_end(stock.full_code, buy_strategy_name, end_today, sell_strategy_name)
         return_yesterday = _backtest_one_strategy_with_end(stock.full_code, buy_strategy_name, end_yesterday, sell_strategy_name)
 
-        # 获取当前信号
-        start_date = (datetime.now() - timedelta(days=365)).strftime('%Y%m%d')
-        df = unified_data.get_historical_data(stock.full_code, start_date=start_date)
-        signal = '无信号'
-        if df is not None and not df.empty and len(df) >= 2:
-            df_ind = technical_indicators.calculate_all_indicators_from_df(df.copy())
-            if not df_ind.empty and len(df_ind) >= 2:
-                latest = df_ind.iloc[-1]
-                prev = df_ind.iloc[-2]
-                signal = scheduler._get_current_signal(buy_strategy_name, latest, prev)
+        # 获取当前信号（使用策略实际规则评估，而非硬编码分支）
+        signal = scheduler._signal_from_decision(buy_strategy_name, stock.full_code)
 
         return jsonify({
             'success': True,
@@ -3846,14 +3838,8 @@ def _compute_strategy_alerts(items):
             return_today = _backtest_one_strategy_with_end(stock.full_code, buy_strategy_name, end_today, sell_strategy_name)
             return_yesterday = _backtest_one_strategy_with_end(stock.full_code, buy_strategy_name, end_yesterday, sell_strategy_name)
 
-            signal = '无信号'
-            df = unified_data.get_historical_data(stock.full_code, start_date=start_date)
-            if df is not None and not df.empty and len(df) >= 2:
-                df_ind = technical_indicators.calculate_all_indicators_from_df(df.copy())
-                if not df_ind.empty and len(df_ind) >= 2:
-                    latest = df_ind.iloc[-1]
-                    prev = df_ind.iloc[-2]
-                    signal = scheduler._get_current_signal(buy_strategy_name, latest, prev)
+            # 使用策略实际规则评估当前信号
+            signal = scheduler._signal_from_decision(buy_strategy_name, stock.full_code)
 
             results.append({
                 'code': code,

@@ -43,9 +43,9 @@ stocks:
   type: stock
   notes: 长期投资
   industry: 白酒
-  strategy: 周线超卖均值回归买入(买) + 周线超买均值回归卖出(卖)
-  buy_strategy: 周线超卖均值回归买入
-  sell_strategy: 周线超买均值回归卖出
+  strategy: 低等策略7_周线超卖均值回归买入(买) + 低等策略8_周线超买均值回归卖出(卖)
+  buy_strategy: 低等策略7_周线超卖均值回归买入
+  sell_strategy: 低等策略8_周线超买均值回归卖出
 - name: 比亚迪
   code: 002594
   market: sz
@@ -106,8 +106,8 @@ stocks:
   market: sz
   type: stock
   industry: 电气设备
-  strategy: 混搭：4421极限底部买入买×价值动量共振卖出卖
-  buy_strategy: 4421极限底部买入
+  strategy: 混搭：低等策略1_4421极限底部买入买×价值动量共振卖出卖
+  buy_strategy: 低等策略1_4421极限底部买入
   sell_strategy: 价值动量共振卖出
 - name: 德赛西威
   code: 002920
@@ -131,9 +131,9 @@ stocks:
   market: sh
   type: stock
   industry: 通信设备
-  strategy: 防御慢牛回调买入(买) + 防御慢牛顶部卖出(卖)
-  buy_strategy: 防御慢牛回调买入
-  sell_strategy: 防御慢牛顶部卖出
+  strategy: 高等策略15_防御慢牛回调买入(买) + 高等策略16_防御慢牛顶部卖出(卖)
+  buy_strategy: 高等策略15_防御慢牛回调买入
+  sell_strategy: 高等策略16_防御慢牛顶部卖出
 - name: 沪电股份
   code: '002463'
   market: sz
@@ -155,6 +155,9 @@ stocks:
   market: sh
   type: stock
   industry: 水力发电
+  strategy: 4421极限底部买入(买) + 4421极限顶部卖出(卖)
+  buy_strategy: 4421极限底部买入
+  sell_strategy: 4421极限顶部卖出
 - name: 华阳集团
   code: 002906
   market: sz
@@ -172,17 +175,17 @@ stocks:
   market: sh
   type: stock
   industry: 汽车配件
-  strategy: 价值动量共振买入(买) + 价值动量共振卖出(卖)
-  buy_strategy: 价值动量共振买入
-  sell_strategy: 价值动量共振卖出
+  strategy: 混搭：高等策略3_低PE价值底部买入买×低等策略4_高PE泡沫卖出卖
+  buy_strategy: 高等策略3_低PE价值底部买入
+  sell_strategy: 低等策略4_高PE泡沫卖出
 - name: 中芯国际
   code: '688981'
   market: sh
   type: stock
   industry: 半导体
-  strategy: 防御慢牛回调买入(买) + 防御慢牛顶部卖出(卖)
-  buy_strategy: 防御慢牛回调买入
-  sell_strategy: 防御慢牛顶部卖出
+  strategy: 低等策略15_防御慢牛回调买入(买) + 低等策略16_防御慢牛顶部卖出(卖)
+  buy_strategy: 低等策略15_防御慢牛回调买入
+  sell_strategy: 低等策略16_防御慢牛顶部卖出
 - name: 北方华创
   code: '002371'
   market: sz
@@ -215,9 +218,9 @@ stocks:
   market: sh
   type: stock
   industry: 元器件
-  strategy: 价值动量共振买入(买) + 价值动量共振卖出(卖)
+  strategy: 混搭：价值动量共振买入买×低等策略18_价值动量共振卖出卖
   buy_strategy: 价值动量共振买入
-  sell_strategy: 价值动量共振卖出
+  sell_strategy: 低等策略18_价值动量共振卖出
 - name: 海底捞
   code: 06862
   market: hk
@@ -227,9 +230,9 @@ stocks:
   market: sz
   type: stock
   industry: 石油开采
-  strategy: 防御慢牛回调买入(买) + 防御慢牛顶部卖出(卖)
-  buy_strategy: 防御慢牛回调买入
-  sell_strategy: 防御慢牛顶部卖出
+  strategy: 低等策略15_防御慢牛回调买入(买) + 低等策略16_防御慢牛顶部卖出(卖)
+  buy_strategy: 低等策略15_防御慢牛回调买入
+  sell_strategy: 低等策略16_防御慢牛顶部卖出
 - name: '159632'
   code: '159632'
   market: sz

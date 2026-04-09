@@ -4,6 +4,7 @@
 """
 
 import os
+import math
 import logging
 from typing import List, Dict, Optional, Union, Tuple
 from pathlib import Path
@@ -16,6 +17,14 @@ from .data_source import unified_data
 from .stock_manager import stock_manager
 
 logger = logging.getLogger(__name__)
+
+
+def _isnan(v):
+    """Safe NaN check for float/numpy scalar."""
+    try:
+        return math.isnan(float(v))
+    except (TypeError, ValueError):
+        return False
 
 
 class FreshTechnicalIndicators:
@@ -628,6 +637,9 @@ class IndicatorAnalyzer:
             'wr_14': latest.get('wr_14', -50),
             'volatility': latest.get('volatility', 0),
             'overall_score': self._calculate_overall_score(latest),
+            # 百分位指标（calculate_all_indicators_from_df 已计算，直接读取）
+            'rsi6_pct100': latest.get('rsi6_pct100', 50),
+            'pettm_pct10y': latest.get('pettm_pct10y', 50),
         }
 
         # ---- 附加周线指标（前缀 w_）----
@@ -640,10 +652,12 @@ class IndicatorAnalyzer:
             'ma_5', 'ma_20', 'ma_60',
             'volume_ratio', 'volume_ma_5', 'volume_ma_20',
             'wr_14', 'volatility',
+            'rsi6_pct100',  # 周/月线 RSI_6 百分位（w_rsi6_pct100 / m_rsi6_pct100）
         ]
         _defaults = {'rsi_6': 50, 'rsi_12': 50, 'rsi_24': 50,
                      'kdj_k': 50, 'kdj_d': 50, 'kdj_j': 50,
-                     'boll_position': 0.5, 'volume_ratio': 1, 'wr_14': -50}
+                     'boll_position': 0.5, 'volume_ratio': 1, 'wr_14': -50,
+                     'rsi6_pct100': 50}
         for _prefix, _freq in (('w_', 'week'), ('m_', 'month')):
             try:
                 _df = self.calculator.load_indicators(code, _freq)
@@ -656,6 +670,35 @@ class IndicatorAnalyzer:
                     signals[f'{_prefix}overall_score'] = self._calculate_overall_score(_row)
             except Exception as _e:
                 logger.debug(f"加载{_freq}线指标失败({code}): {_e}")
+
+        # ---- 附加大盘相对强弱指标（rel_strength_N、idx_ret_N）----
+        try:
+            _BENCHMARK = '000001.SH'
+            from .data_source import unified_data as _ud
+            _idx_raw = _ud.get_historical_data(_BENCHMARK)
+            if _idx_raw is not None and not _idx_raw.empty:
+                import pandas as _pd
+                _idx = _idx_raw[['date', 'close']].copy()
+                _idx['date'] = _pd.to_datetime(_idx['date'])
+                _idx = _idx.sort_values('date').reset_index(drop=True)
+                # 获取股票日线数据以计算股票本身的N日收益
+                _stk_raw = _ud.get_historical_data(code)
+                if _stk_raw is not None and not _stk_raw.empty:
+                    _stk = _stk_raw[['date', 'close']].copy()
+                    _stk['date'] = _pd.to_datetime(_stk['date'])
+                    _stk = _stk.sort_values('date').reset_index(drop=True)
+                    for _n in [5, 10, 20, 60]:
+                        _idx_ret = _idx['close'].pct_change(_n).iloc[-1] * 100 if len(_idx) > _n else 0.0
+                        _stk_ret = _stk['close'].pct_change(_n).iloc[-1] * 100 if len(_stk) > _n else 0.0
+                        signals[f'idx_ret_{_n}'] = round(float(_idx_ret), 2) if not _isnan(_idx_ret) else 0.0
+                        signals[f'rel_strength_{_n}'] = round(float(_stk_ret - _idx_ret), 2) if not (_isnan(_stk_ret) or _isnan(_idx_ret)) else 0.0
+                    signals['idx_pct_chg'] = round(float(_idx['close'].pct_change().iloc[-1] * 100), 2) if len(_idx) > 1 else 0.0
+        except Exception as _rex:
+            logger.debug(f"计算相对强弱指标失败({code}): {_rex}")
+            for _n in [5, 10, 20, 60]:
+                signals.setdefault(f'idx_ret_{_n}', 0.0)
+                signals.setdefault(f'rel_strength_{_n}', 0.0)
+            signals.setdefault('idx_pct_chg', 0.0)
 
         # ---- 附加新闻情感指标 ----
         try:

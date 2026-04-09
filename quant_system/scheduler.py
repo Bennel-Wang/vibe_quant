@@ -723,6 +723,17 @@ class TradingScheduler:
             return '持有观望'
         return '观望'
 
+    def _signal_from_decision(self, strategy_name: str, code: str) -> str:
+        """用 strategy_manager 评估策略规则，返回人类可读的信号字符串。"""
+        try:
+            from .strategy import strategy_manager
+            decision = strategy_manager.run_strategy(strategy_name, code)
+            _map = {'buy': '建议买入', 'sell': '建议卖出', 'hold': '观望'}
+            return _map.get(decision.action, '观望')
+        except Exception as _e:
+            logger.debug(f"strategy_manager 评估失败 ({strategy_name}, {code}): {_e}")
+            return '观望'
+
     def _send_analysis_report(self, results: List[Dict]):
         """发送分析报告到微信"""
         now = datetime.now(BEIJING_TZ).strftime('%Y-%m-%d %H:%M')

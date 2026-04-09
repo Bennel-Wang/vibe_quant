@@ -822,7 +822,8 @@ class QuantStrategy:
             ]
             _w_defaults = {'rsi_6': 50, 'rsi_12': 50, 'rsi_24': 50,
                            'kdj_k': 50, 'kdj_d': 50, 'kdj_j': 50,
-                           'boll_position': 0.5, 'volume_ratio': 1, 'wr_14': -50}
+                           'boll_position': 0.5, 'volume_ratio': 1, 'wr_14': -50,
+                           'rsi6_pct100': 50}
             for _col in _w_indicator_cols:
                 _default = _w_defaults.get(_col, 0)
                 safe_locals[f'w_{_col}'] = indicators.get(f'w_{_col}', _default)
