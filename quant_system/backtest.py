@@ -201,20 +201,21 @@ class BacktestEngine:
             logger.info(f"使用预计算DataFrame回测 {code}, 策略 {strategy.name}, 行数={len(df)}")
         else:
             stock = stock_manager.get_stock_by_code(code)
-        
-            # 获取历史数据
+
+            # 为了让历史百分位/长周期指标保持真实口径，先拉取截止到 end_date 的全历史数据，
+            # 再在指标计算完成后裁剪到回测区间做交易模拟。
             logger.info(f"开始回测 {code} 使用策略 {strategy.name}, 区间: {start_date} - {end_date}")
-            df = unified_data.get_historical_data(code, start_date, end_date)
-            
+            df = unified_data.get_historical_data(code, '', end_date)
+
             if df.empty:
-                logger.error(f"无法获取 {code} 的历史数据 (start={start_date}, end={end_date})")
+                logger.error(f"无法获取 {code} 的历史数据 (end={end_date})")
                 raise ValueError(f"无法获取 {code} 的历史数据")
-            logger.info(f"获取历史数据行数: {len(df)}, 列: {list(df.columns)}")
+            logger.info(f"获取全历史数据行数: {len(df)}, 列: {list(df.columns)}")
             logger.debug(f"历史数据样例: {df.head(3).to_dict(orient='records')}")
-            
-            # 计算技术指标
+
+            # 计算技术指标（必须使用截止到 end_date 的全历史口径）
             try:
-                df = technical_indicators.calculate_all_indicators(code, start_date, end_date)
+                df = technical_indicators.calculate_all_indicators(code, end_date=end_date)
             except Exception as e:
                 logger.exception(f"计算技术指标时抛出异常: {e}")
                 raise
@@ -237,27 +238,10 @@ class BacktestEngine:
                 df['date'] = pd.to_datetime(df['date'])
             df = self._merge_weekly_monthly(code, df)
 
-            # 按日期范围过滤（技术指标需要回看数据，计算完再过滤）
-            if 'date' in df.columns:
-                try:
-                    sd = pd.to_datetime(str(start_date), format='%Y%m%d', errors='coerce')
-                    ed = pd.to_datetime(str(end_date), format='%Y%m%d', errors='coerce') if end_date else None
-                    if pd.notna(sd):
-                        df = df[df['date'] >= sd]
-                    if ed is not None and pd.notna(ed):
-                        df = df[df['date'] <= ed]
-                    df = df.reset_index(drop=True)
-                    logger.info(f"按日期过滤后数据: {len(df)} 行, {start_date} ~ {end_date}")
-                except Exception as e:
-                    logger.warning(f"日期过滤失败: {e}")
-
-            if df.empty:
-                raise ValueError(f"过滤日期范围后数据为空 {code} ({start_date}-{end_date})")
-
             # ── 加载基准指数（上证综指）并计算超额收益 ───────────────────────────────
             _BENCHMARK = '000001.SH'
             try:
-                _idx_raw = unified_data.get_historical_data(_BENCHMARK, start_date, end_date)
+                _idx_raw = unified_data.get_historical_data(_BENCHMARK, '', end_date)
                 if _idx_raw is not None and not _idx_raw.empty:
                     _idx = _idx_raw.copy()
                     _idx['date'] = pd.to_datetime(_idx['date'])
@@ -279,6 +263,23 @@ class BacktestEngine:
                     df[f'rel_strength_{_n}'] = 0.0
                     df[f'idx_ret_{_n}'] = 0.0
                 df['idx_pct_chg'] = 0.0
+
+            # 按日期范围过滤（技术指标/相对强弱需要回看数据，全部算完再过滤）
+            if 'date' in df.columns:
+                try:
+                    sd = pd.to_datetime(str(start_date), format='%Y%m%d', errors='coerce')
+                    ed = pd.to_datetime(str(end_date), format='%Y%m%d', errors='coerce') if end_date else None
+                    if pd.notna(sd):
+                        df = df[df['date'] >= sd]
+                    if ed is not None and pd.notna(ed):
+                        df = df[df['date'] <= ed]
+                    df = df.reset_index(drop=True)
+                    logger.info(f"按日期过滤后数据: {len(df)} 行, {start_date} ~ {end_date}")
+                except Exception as e:
+                    logger.warning(f"日期过滤失败: {e}")
+
+            if df.empty:
+                raise ValueError(f"过滤日期范围后数据为空 {code} ({start_date}-{end_date})")
 
         capital = initial_capital
         position = 0  # 持仓股数

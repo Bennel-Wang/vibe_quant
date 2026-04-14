@@ -24,7 +24,7 @@ from .indicators import technical_indicators, indicator_analyzer
 from .feature_extractor import feature_extractor
 from .strategy import ai_decision_maker, strategy_manager
 from .notification import notification_manager
-from .strategy_matcher import strategy_matcher
+from .strategy_matcher import strategy_matcher, format_market_strategy_stock_sections
 from .market_regime import market_regime_detector
 from .stock_classifier import stock_classifier
 
@@ -554,37 +554,7 @@ class TradingScheduler:
             content += f"### 大盘阶段: {regime_label}（T评分={t_score:.0f} / V评分={v_score:.0f}）\n"
             content += f"{detail}\n\n"
 
-            ACTION_ICONS  = {'buy': '🟢', 'layout': '🔵', 'watch': '🟡', 'empty': '⚪'}
-            ACTION_LABELS = {'buy': '买入', 'layout': '可布局', 'watch': '观望', 'empty': '空仓'}
-
-            buy_stocks   = [s for s in stocks_data if s.get('action') in ('buy', 'layout')]
-            watch_stocks = [s for s in stocks_data if s.get('action') == 'watch']
-            empty_stocks = [s for s in stocks_data if s.get('action') == 'empty']
-
-            if buy_stocks:
-                content += f"### ✅ 建议操作 ({len(buy_stocks)}只)\n\n"
-                for s in buy_stocks:
-                    sc   = s.get('scores', {})
-                    t    = sc.get('t_score', '-')
-                    v    = sc.get('v_score', '-')
-                    icon = ACTION_ICONS.get(s.get('action', 'empty'), '⚪')
-                    lbl  = ACTION_LABELS.get(s.get('action', 'empty'), '')
-                    content += f"{icon} **{s['name']}({s['code']})** T={t}/V={v} [{lbl}]\n"
-                    content += f"  {s.get('reason', '')}\n"
-                content += "\n"
-
-            if watch_stocks:
-                content += f"### 🟡 观望 ({len(watch_stocks)}只)\n"
-                for s in watch_stocks[:10]:
-                    sc = s.get('scores', {})
-                    t  = sc.get('t_score', '-')
-                    v  = sc.get('v_score', '-')
-                    content += f"- {s['name']}({s['code']}) T={t}/V={v}  {s.get('reason','')}\n"
-                content += "\n"
-
-            if empty_stocks:
-                content += f"### ⚪ 空仓 ({len(empty_stocks)}只)\n"
-                content += '、'.join(s['name'] for s in empty_stocks[:12]) + "\n\n"
+            content += format_market_strategy_stock_sections(stocks_data)
 
             content += f"\n---\n*生成时间: {datetime.now(BEIJING_TZ).strftime('%Y-%m-%d %H:%M')}*"
 

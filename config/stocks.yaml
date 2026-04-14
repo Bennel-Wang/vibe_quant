@@ -59,8 +59,8 @@ stocks:
   market: sz
   type: stock
   industry: 电气设备
-  strategy: 混搭：价值动量共振买入买×高PE泡沫卖出卖
-  buy_strategy: 价值动量共振买入
+  strategy: 低PE价值底部买入(买) + 高PE泡沫卖出(卖)
+  buy_strategy: 低PE价值底部买入
   sell_strategy: 高PE泡沫卖出
 - name: 阿里巴巴
   code: 09988

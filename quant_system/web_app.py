@@ -3721,6 +3721,49 @@ def _backtest_one_strategy_with_end(code, strategy_name, end_date_str, sell_stra
         return 0.0
 
 
+def _signal_label_from_backtest_result(result):
+    """从回测结果最后一根K线的信号动作提取与回测一致的提醒文案。"""
+    if result is None or result.equity_curve is None or result.equity_curve.empty:
+        return '观望'
+
+    action = str(result.equity_curve.iloc[-1].get('signal_action', 'hold') or 'hold').lower()
+    return {
+        'buy': '建议买入',
+        'sell': '建议卖出',
+        'hold': '观望',
+    }.get(action, '观望')
+
+
+def _backtest_one_strategy_snapshot_with_end(code, strategy_name, end_date_str, sell_strategy_name=None):
+    """返回指定截止日的回测收益和最后一个回测信号。"""
+    buy_obj = strategy_manager.get_strategy(strategy_name)
+    if buy_obj is None:
+        return {'return_pct': 0.0, 'signal': '观望'}
+    if sell_strategy_name and sell_strategy_name != strategy_name:
+        sell_obj = strategy_manager.get_strategy(sell_strategy_name)
+        from .strategy import merge_buy_sell_strategies
+        strategy_obj = merge_buy_sell_strategies(buy_obj, sell_obj) if sell_obj else buy_obj
+    else:
+        strategy_obj = buy_obj
+
+    from datetime import timedelta
+    end_dt = datetime.strptime(end_date_str, '%Y%m%d')
+    start_date = (end_dt - timedelta(days=365)).strftime('%Y%m%d')
+
+    try:
+        result = backtest_engine.run_backtest(
+            code, strategy_obj, start_date, end_date_str,
+            initial_capital=1000000,
+        )
+        return {
+            'return_pct': result.total_return_pct if result else 0.0,
+            'signal': _signal_label_from_backtest_result(result),
+        }
+    except Exception as e:
+        logger.warning(f"回测失败 {code} {strategy_name}: {e}")
+        return {'return_pct': 0.0, 'signal': '观望'}
+
+
 @app.route('/api/strategy/alerts/assign', methods=['POST'])
 def api_strategy_alerts_assign():
     """保存股票策略分配到YAML（支持独立的买入/卖出策略）"""
@@ -3784,11 +3827,12 @@ def api_strategy_alerts_compute():
         end_today = datetime.now().strftime('%Y%m%d')
         end_yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y%m%d')
 
-        return_today = _backtest_one_strategy_with_end(stock.full_code, buy_strategy_name, end_today, sell_strategy_name)
-        return_yesterday = _backtest_one_strategy_with_end(stock.full_code, buy_strategy_name, end_yesterday, sell_strategy_name)
-
-        # 获取当前信号（使用策略实际规则评估，而非硬编码分支）
-        signal = scheduler._signal_from_decision(buy_strategy_name, stock.full_code)
+        today_snapshot = _backtest_one_strategy_snapshot_with_end(
+            stock.full_code, buy_strategy_name, end_today, sell_strategy_name
+        )
+        yesterday_snapshot = _backtest_one_strategy_snapshot_with_end(
+            stock.full_code, buy_strategy_name, end_yesterday, sell_strategy_name
+        )
 
         return jsonify({
             'success': True,
@@ -3796,9 +3840,9 @@ def api_strategy_alerts_compute():
             'name': stock.name,
             'strategy': buy_strategy_name,
             'sell_strategy': sell_strategy_name if sell_strategy_name != buy_strategy_name else '',
-            'return_today': round(return_today, 2),
-            'return_yesterday': round(return_yesterday, 2),
-            'signal': signal,
+            'return_today': round(today_snapshot['return_pct'], 2),
+            'return_yesterday': round(yesterday_snapshot['return_pct'], 2),
+            'signal': today_snapshot['signal'],
         })
     except Exception as e:
         logger.error(f"策略提醒计算失败: {e}")
@@ -3812,7 +3856,6 @@ def _compute_strategy_alerts(items):
     from datetime import timedelta
     end_today = datetime.now().strftime('%Y%m%d')
     end_yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y%m%d')
-    start_date = (datetime.now() - timedelta(days=365)).strftime('%Y%m%d')
     results = []
 
     for item in items:
@@ -3835,11 +3878,12 @@ def _compute_strategy_alerts(items):
                 })
                 continue
 
-            return_today = _backtest_one_strategy_with_end(stock.full_code, buy_strategy_name, end_today, sell_strategy_name)
-            return_yesterday = _backtest_one_strategy_with_end(stock.full_code, buy_strategy_name, end_yesterday, sell_strategy_name)
-
-            # 使用策略实际规则评估当前信号
-            signal = scheduler._signal_from_decision(buy_strategy_name, stock.full_code)
+            today_snapshot = _backtest_one_strategy_snapshot_with_end(
+                stock.full_code, buy_strategy_name, end_today, sell_strategy_name
+            )
+            yesterday_snapshot = _backtest_one_strategy_snapshot_with_end(
+                stock.full_code, buy_strategy_name, end_yesterday, sell_strategy_name
+            )
 
             results.append({
                 'code': code,
@@ -3847,9 +3891,9 @@ def _compute_strategy_alerts(items):
                 'success': True,
                 'strategy': buy_strategy_name,
                 'sell_strategy': sell_strategy_name if sell_strategy_name != buy_strategy_name else '',
-                'return_today': round(return_today, 2),
-                'return_yesterday': round(return_yesterday, 2),
-                'signal': signal,
+                'return_today': round(today_snapshot['return_pct'], 2),
+                'return_yesterday': round(yesterday_snapshot['return_pct'], 2),
+                'signal': today_snapshot['signal'],
             })
         except Exception as e:
             results.append({'code': code, 'success': False, 'error': str(e)})
@@ -4173,6 +4217,7 @@ def api_strategy_match_stock(code):
 def api_market_strategy_match_send():
     """将大盘阶段分析结果发送到微信通知"""
     try:
+        from .strategy_matcher import format_market_strategy_stock_sections
         data = request.json or {}
         analysis = data.get('data', {})
         market = analysis.get('market', {})
@@ -4190,31 +4235,7 @@ def api_market_strategy_match_send():
         if detail:
             content += f"> {detail}\n\n"
 
-        ACTION_ICONS = {'buy': '🟢', 'layout': '🔵', 'watch': '🟡', 'empty': '⚪'}
-        ACTION_LABELS = {'buy': '买入', 'layout': '可布局', 'watch': '观望', 'empty': '空仓'}
-
-        buy_stocks    = [s for s in stocks if s.get('action') in ('buy', 'layout')]
-        watch_stocks  = [s for s in stocks if s.get('action') == 'watch']
-        empty_stocks  = [s for s in stocks if s.get('action') == 'empty']
-
-        if buy_stocks:
-            content += f"### ✅ 建议操作（{len(buy_stocks)} 只）\n\n"
-            for s in buy_stocks[:15]:
-                sc    = s.get('scores', {})
-                t     = sc.get('t_score', '-')
-                v     = sc.get('v_score', '-')
-                icon  = ACTION_ICONS.get(s.get('action', 'empty'), '⚪')
-                lbl   = ACTION_LABELS.get(s.get('action', 'empty'), '')
-                content += f"{icon} **{s['name']}({s['code']})** T={t}/V={v} [{lbl}]\n"
-                content += f"  {s.get('reason', '')}\n\n"
-
-        if watch_stocks:
-            content += f"### 🟡 观望（{len(watch_stocks)} 只）\n"
-            content += '、'.join(f"{s['name']}(T={s.get('scores',{}).get('t_score','-')})" for s in watch_stocks[:10]) + "\n\n"
-
-        if empty_stocks:
-            names = '、'.join(s['name'] for s in empty_stocks[:10])
-            content += f"### ⚪ 空仓（{len(empty_stocks)} 只）\n{names}\n\n"
+        content += format_market_strategy_stock_sections(stocks)
 
         notification_manager.send_markdown_message(f"大盘阶段判断 {regime_label}", content)
         return jsonify({'success': True})

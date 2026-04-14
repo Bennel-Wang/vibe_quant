@@ -29,6 +29,52 @@ ACTION_DISPLAY = {
 }
 
 
+def format_market_strategy_stock_sections(stocks: List[Dict]) -> str:
+    """格式化大盘策略分析里的股票分组，完整输出，不截断列表。"""
+    if not stocks:
+        return ""
+
+    buy_stocks = [s for s in stocks if s.get('action') in (ACTION_BUY, ACTION_LAYOUT)]
+    watch_stocks = [s for s in stocks if s.get('action') == ACTION_WATCH]
+    empty_stocks = [s for s in stocks if s.get('action') == ACTION_EMPTY]
+    lines: List[str] = []
+
+    if buy_stocks:
+        lines.append(f"### ✅ 建议操作（{len(buy_stocks)} 只）")
+        lines.append("")
+        for s in buy_stocks:
+            sc = s.get('scores', {})
+            t = sc.get('t_score', '-')
+            v = sc.get('v_score', '-')
+            icon = ACTION_DISPLAY.get(s.get('action'), ACTION_DISPLAY[ACTION_EMPTY])['icon']
+            label = ACTION_DISPLAY.get(s.get('action'), ACTION_DISPLAY[ACTION_EMPTY])['label']
+            lines.append(f"{icon} **{s['name']}({s['code']})** T={t}/V={v} [{label}]")
+            lines.append(f"  {s.get('reason', '')}")
+            lines.append("")
+
+    if watch_stocks:
+        lines.append(f"### 🟡 观望（{len(watch_stocks)} 只）")
+        lines.append("")
+        for s in watch_stocks:
+            sc = s.get('scores', {})
+            t = sc.get('t_score', '-')
+            v = sc.get('v_score', '-')
+            lines.append(f"- **{s['name']}({s['code']})** T={t}/V={v}  {s.get('reason', '')}")
+        lines.append("")
+
+    if empty_stocks:
+        lines.append(f"### ⚪ 空仓（{len(empty_stocks)} 只）")
+        lines.append("")
+        for s in empty_stocks:
+            sc = s.get('scores', {})
+            t = sc.get('t_score', '-')
+            v = sc.get('v_score', '-')
+            lines.append(f"- **{s['name']}({s['code']})** T={t}/V={v}  {s.get('reason', '')}")
+        lines.append("")
+
+    return "\n".join(lines).rstrip() + "\n\n"
+
+
 def _decide_action(regime: MarketRegime, scores: Dict) -> Tuple[str, str]:
     """根据大盘阶段 + 个股 T/V 综合评分，返回 (action, reason)。
 
