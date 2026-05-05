@@ -65,14 +65,16 @@ class TradingScheduler:
             'data_update': '数据更新',
             'ai_report': '生成AI日报并发送',
             'strategy_alert': '策略触发提醒',
-            'market_strategy_analysis': '大盘阶段判断及对应策略推荐'
+            'market_strategy_analysis': '大盘阶段判断及对应策略推荐',
+            'manipulation_phase_alert': '主力操纵阶段每日操作建议'
         }
         # 映射到实际方法（在实例化后，方法可用）
         self._custom_type_to_func = {
             'data_update': self.update_all,
             'ai_report': self.send_daily_report,
             'strategy_alert': self.run_strategy_backtest_alert,
-            'market_strategy_analysis': self.run_market_strategy_analysis
+            'market_strategy_analysis': self.run_market_strategy_analysis,
+            'manipulation_phase_alert': self.run_manipulation_phase_alert
         }
     
     # 内建任务默认调度配置（hour/minute/enabled 必须完整）
@@ -565,6 +567,152 @@ class TradingScheduler:
 
         except Exception as e:
             logger.error(f"大盘策略分析失败: {e}", exc_info=True)
+
+    def run_manipulation_phase_alert(self, force: bool = False):
+        """主力操纵阶段每周操作建议：扫描全部股票周线最新信号，发送微信通知"""
+        if not force and not self.is_trading_day():
+            logger.info("跳过主力阶段提醒：今天不是交易日")
+            return
+        if not notification_manager.enabled:
+            logger.info("跳过主力阶段提醒：通知未启用")
+            return
+
+        logger.info("开始执行主力操纵阶段每周扫描（周线）")
+        try:
+            import pandas as pd
+            import numpy as np
+            from .indicators import technical_indicators
+            from .data_source import unified_data
+            from .utils.ohlcv import resample_to_weekly
+
+            date_str = datetime.now(BEIJING_TZ).strftime('%Y-%m-%d')
+            stocks = stock_manager.get_all_stocks()
+
+            buy_signals = []     # 吸筹 → 买入
+            hold_signals = []    # 拉升 → 持有
+            sell_signals = []    # 出货/砸盘 → 卖出
+            neutral_stocks = []  # 其他
+
+            for stock in stocks:
+                code = getattr(stock, 'unified_code', '') or getattr(stock, 'code', '')
+                name = getattr(stock, 'name', code)
+                stype = getattr(stock, 'type', '')
+                if stype in ('index', 'sector'):
+                    continue
+
+                try:
+                    # 优先从周线 CSV 加载
+                    df = technical_indicators.load_indicators(code, freq='week')
+                    if df.empty or 'manipulation_phase' not in df.columns:
+                        # 从日线拉取 → 重采样为周线 → 计算指标
+                        df_day = unified_data.get_historical_data(code, '', date_str)
+                        if df_day is not None and not df_day.empty:
+                            if df_day['date'].dtype == 'object':
+                                df_day['date'] = pd.to_datetime(df_day['date'].astype(str), format='%Y%m%d', errors='coerce')
+                            else:
+                                df_day['date'] = pd.to_datetime(df_day['date'])
+                            df_week = resample_to_weekly(df_day)
+                            df = technical_indicators.calculate_all_indicators_from_df(
+                                df_week, code=code, freq='week'
+                            )
+                            if not df.empty:
+                                technical_indicators.save_indicators(code, df, freq='week')
+
+                    if df.empty or len(df) < 1:
+                        continue
+
+                    latest = df.iloc[-1]
+                    phase = str(latest.get('manipulation_phase', '中性') or '中性')
+                    rpc_ema5 = float(latest.get('rel_price_change_ema5', 0) or 0)
+                    eff_z = float(latest.get('eff_zscore', 0) or 0)
+                    close = float(latest.get('close', 0) or 0)
+
+                    # 本周涨跌幅（周线）
+                    prev_close = float(df.iloc[-2].get('close', close) or close) if len(df) >= 2 else close
+                    week_pct = (close - prev_close) / prev_close * 100 if prev_close != 0 else 0
+
+                    stock_info = {
+                        'name': name,
+                        'code': code,
+                        'phase': phase,
+                        'rpc_ema5': rpc_ema5,
+                        'eff_z': eff_z,
+                        'close': close,
+                        'pct_chg': week_pct,
+                    }
+
+                    if phase == '吸筹':
+                        buy_signals.append(stock_info)
+                    elif phase == '拉升':
+                        hold_signals.append(stock_info)
+                    elif phase in ('出货', '砸盘'):
+                        sell_signals.append(stock_info)
+                    else:
+                        neutral_stocks.append(stock_info)
+
+                except Exception as e:
+                    logger.debug(f"扫描 {code} 周线失败: {e}")
+                    continue
+
+            # ── 构建 Markdown 通知 ────────────────────────────
+            content = f"## 主力操纵阶段每周扫描 ({date_str})\n\n"
+            content += f"> 基于周线量价效率 z-score + 状态机识别主力行为\n"
+            content += f"> 吸筹→买入 | 拉升→持有 | 出货/砸盘→卖出\n\n"
+
+            if buy_signals:
+                content += "### 买入信号 — 吸筹阶段\n\n"
+                content += "| 股票 | 代码 | 本周涨跌 | Z-Score | 收盘价 |\n"
+                content += "|------|------|----------|---------|--------|\n"
+                for s in sorted(buy_signals, key=lambda x: x['eff_z']):
+                    pct_str = f"+{s['pct_chg']:.1f}%" if s['pct_chg'] >= 0 else f"{s['pct_chg']:.1f}%"
+                    content += f"| {s['name']} | {s['code']} | {pct_str} | {s['eff_z']:+.2f} | {s['close']:.2f} |\n"
+                content += "\n"
+
+            if hold_signals:
+                content += "### 持有信号 — 拉升阶段\n\n"
+                content += "| 股票 | 代码 | 本周涨跌 | Z-Score | 收盘价 |\n"
+                content += "|------|------|----------|---------|--------|\n"
+                for s in sorted(hold_signals, key=lambda x: -x['eff_z']):
+                    pct_str = f"+{s['pct_chg']:.1f}%" if s['pct_chg'] >= 0 else f"{s['pct_chg']:.1f}%"
+                    content += f"| {s['name']} | {s['code']} | {pct_str} | {s['eff_z']:+.2f} | {s['close']:.2f} |\n"
+                content += "\n"
+
+            if sell_signals:
+                content += "### 卖出信号 — 出货/砸盘阶段\n\n"
+                content += "| 股票 | 代码 | 阶段 | 本周涨跌 | Z-Score | 收盘价 |\n"
+                content += "|------|------|------|----------|---------|--------|\n"
+                for s in sorted(sell_signals, key=lambda x: x['eff_z']):
+                    pct_str = f"+{s['pct_chg']:.1f}%" if s['pct_chg'] >= 0 else f"{s['pct_chg']:.1f}%"
+                    content += f"| {s['name']} | {s['code']} | {s['phase']} | {pct_str} | {s['eff_z']:+.2f} | {s['close']:.2f} |\n"
+                content += "\n"
+
+            if neutral_stocks:
+                neutral_phases = {}
+                for s in neutral_stocks:
+                    p = s['phase']
+                    neutral_phases[p] = neutral_phases.get(p, 0) + 1
+                phase_summary = '、'.join(f"{p}({c})" for p, c in sorted(neutral_phases.items(), key=lambda x: -x[1]))
+                content += f"### 其他\n\n"
+                content += f"其余 {len(neutral_stocks)} 只股票处于非交易信号阶段：{phase_summary}\n\n"
+
+            total_signals = len(buy_signals) + len(sell_signals)
+            if total_signals >= 5:
+                signal_tag = "[Hot]"
+            elif total_signals >= 2:
+                signal_tag = "[OK]"
+            else:
+                signal_tag = "[Idle]"
+            content += "---\n"
+            content += f"**{signal_tag} 周线汇总**: 买入 {len(buy_signals)} | 持有 {len(hold_signals)} | 卖出 {len(sell_signals)} | 其他 {len(neutral_stocks)}\n"
+            content += f"\n*生成时间: {datetime.now(BEIJING_TZ).strftime('%Y-%m-%d %H:%M')}*"
+
+            title = f"{signal_tag} 主力阶段周线扫描 {date_str} | 买{len(buy_signals)} 持{len(hold_signals)} 卖{len(sell_signals)}"
+
+            notification_manager.send_markdown_message(title, content)
+            logger.info(f"主力阶段周线扫描通知已发送: 买{len(buy_signals)} 持{len(hold_signals)} 卖{len(sell_signals)}")
+
+        except Exception as e:
+            logger.error(f"主力阶段周线扫描失败: {e}", exc_info=True)
 
     # ------ 策略回测辅助方法 ------
 

@@ -258,10 +258,15 @@ class TechnicalIndicators:
         
         return mas
     
-    def calculate_all_indicators_from_df(self, df: pd.DataFrame) -> pd.DataFrame:
+    def calculate_all_indicators_from_df(self, df: pd.DataFrame, code: str = None, freq: str = 'day') -> pd.DataFrame:
         """
         从DataFrame计算所有技术指标
         用于重采样后的数据计算
+
+        Args:
+            df: OHLCV DataFrame
+            code: 可选，统一格式股票代码（如 600519.SH），用于计算相对价格变化
+            freq: 数据频率 ('day', 'week', 'month')，用于同步大盘数据频率
         """
         if df.empty:
             logger.warning("输入数据为空")
@@ -371,6 +376,13 @@ class TechnicalIndicators:
                     bisect.insort(history_sorted, cur_pe)
             df['pettm_pct10y'] = pct_pe
 
+        # 13. 相对价格变化（如果提供了code）
+        if code:
+            try:
+                df = self._compute_rel_price_change(df, code, freq=freq)
+            except Exception as e:
+                logger.warning(f"相对价格变化计算失败({code}): {e}")
+
         return df
     
     def calculate_wr(self, df: pd.DataFrame, period: int = 14) -> pd.Series:
@@ -379,6 +391,232 @@ class TechnicalIndicators:
         low = df['low'].rolling(window=period).min()
         wr = (high - df['close']) / (high - low) * (-100)
         return wr.fillna(-50)
+
+    @staticmethod
+    def _safe_parse_date(date_col: pd.Series) -> pd.Series:
+        """安全解析日期列：处理 int/object/datetime 多种格式"""
+        if pd.api.types.is_datetime64_any_dtype(date_col):
+            return date_col
+        if pd.api.types.is_integer_dtype(date_col):
+            return pd.to_datetime(date_col.astype(str), format='%Y%m%d', errors='coerce')
+        if pd.api.types.is_float_dtype(date_col):
+            return pd.to_datetime(date_col.astype(int).astype(str), format='%Y%m%d', errors='coerce')
+        return pd.to_datetime(date_col.astype(str).str.strip(), format='%Y%m%d', errors='coerce')
+
+    def _compute_rel_price_change(self, df: pd.DataFrame, code: str, freq: str = 'day') -> pd.DataFrame:
+        """
+        计算相对价格变化指标
+
+        公式: rel_price_change = (stock_ret / market_ret) / (stock_std_252 / market_std_252)
+
+        经相对波动率调整后的相对收益率。
+        正值表示风险调整后跑赢大盘，负值表示跑输。
+
+        Args:
+            freq: 数据频率，大盘数据会同步到此频率后再计算
+        """
+        if df.empty or 'close' not in df.columns:
+            return df
+
+        # 根据股票代码后缀判断对应大盘指数（与 web_app._get_market_index_code 逻辑一致）
+        upper = code.upper()
+        if upper.endswith('.HK'):
+            market_code = 'HSI.HK'
+        elif upper.endswith('.SZ'):
+            market_code = '399001.SZ'
+        else:
+            market_code = '000001.SH'
+
+        try:
+            # 大盘始终拉日线，然后按需重采样
+            market_df = unified_data.get_historical_data(market_code, freq='day', adjust=True)
+            if market_df is None or market_df.empty:
+                logger.warning(f"无法获取大盘数据 {market_code}，跳过相对价格变化计算")
+                return df
+
+            if 'date' in market_df.columns:
+                market_df['date'] = self._safe_parse_date(market_df['date'])
+                market_df = market_df.sort_values('date').reset_index(drop=True)
+
+                # 重采样大盘数据到与股票数据相同频率
+                if freq == 'week':
+                    from .utils.ohlcv import resample_to_weekly
+                    market_df = resample_to_weekly(market_df)
+                elif freq == 'month':
+                    from .utils.ohlcv import resample_to_monthly
+                    market_df = resample_to_monthly(market_df)
+
+                market_df['date'] = pd.to_datetime(market_df['date'])
+                market_df = market_df.set_index('date')
+
+            if 'date' in df.columns:
+                df_dated = df.copy()
+                df_dated['date'] = self._safe_parse_date(df_dated['date'])
+                df_dated = df_dated.set_index('date')
+            else:
+                df_dated = df.copy()
+
+            stock_ret = df_dated['close'].pct_change()
+            market_ret = market_df['close'].pct_change()
+            market_ret.name = 'market_ret'
+
+            # Align dates
+            aligned = pd.concat([stock_ret, market_ret], axis=1, join='inner')
+            aligned.columns = ['stock_ret', 'market_ret']
+
+            # 安全处理：market_ret 绝对值过小或为0时设为NaN
+            safe_market_ret = aligned['market_ret'].where(
+                aligned['market_ret'].abs() >= 0.0001, float('nan')
+            )
+
+            # 252日滚动标准差（至少60个样本）
+            stock_std = aligned['stock_ret'].rolling(252, min_periods=60).std()
+            market_std = aligned['market_ret'].rolling(252, min_periods=60).std()
+
+            # 防止 market_std 为0
+            safe_market_std = market_std.where(market_std > 1e-8, float('nan'))
+
+            # 相对价格变化 = (stock_ret / market_ret) / (stock_std / market_std)
+            rel_ratio = (aligned['stock_ret'] / safe_market_ret)
+            vol_ratio = (stock_std / safe_market_std)
+            rel_price_change = rel_ratio / vol_ratio.replace(0, float('nan'))
+
+            # 限制极端值（99.5% 分位数截断）
+            upper = rel_price_change.quantile(0.995)
+            lower = rel_price_change.quantile(0.005)
+            if not pd.isna(upper) and not pd.isna(lower):
+                rel_price_change = rel_price_change.clip(lower, upper)
+
+            df_dated['rel_price_change'] = rel_price_change
+
+            # EMA 平滑版
+            df_dated['rel_price_change_ema5'] = rel_price_change.ewm(span=5, min_periods=2).mean()
+            df_dated['rel_price_change_ema20'] = rel_price_change.ewm(span=20, min_periods=10).mean()
+
+            # 主力操纵阶段检测（基于相对价格变化和成交量）
+            df_dated = self._compute_manipulation_phase(df_dated)
+
+            result = df_dated.reset_index()
+            return result
+
+        except Exception as e:
+            logger.warning(f"相对价格变化计算出错({code}): {e}")
+            return df
+
+    def _compute_manipulation_phase(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        基于相对价格变化和成交量识别主力操纵阶段（v2 — z-score + 持续性过滤）
+
+        核心逻辑：
+        - 量价效率 = rel_price_change_ema5 / volume_ratio
+          高效率 = 少量成交推动大价格变动 → 拉升/砸盘
+          低效率 = 大量成交推动小价格变动 → 吸筹/出货
+        - 使用滚动60日 z-score 自适应不同股票的分布特征
+        - 3日滚动众数过滤，消除单日噪音
+        """
+        if df.empty or 'rel_price_change_ema5' not in df.columns:
+            return df
+
+        rpc = df['rel_price_change_ema5'].fillna(0)
+
+        # 成交量比率
+        if 'volume_ratio' in df.columns:
+            vr = df['volume_ratio'].fillna(1).clip(0.1, 20)
+        elif 'volume' in df.columns:
+            vol_ma20 = df['volume'].rolling(20, min_periods=5).mean()
+            vr = (df['volume'] / vol_ma20.replace(0, float('nan'))).fillna(1).clip(0.1, 20)
+        else:
+            return df
+
+        # ── 量价效率 + z-score 标准化 ──────────────────────────
+        efficiency = rpc / vr
+
+        # 滚动60日均值和标准差（最少20个样本），用于自适应阈值
+        eff_mean = efficiency.rolling(60, min_periods=20).mean()
+        eff_std = efficiency.rolling(60, min_periods=20).std().clip(lower=0.05)
+        eff_z = ((efficiency - eff_mean) / eff_std).fillna(0)
+
+        # 成交量滚动百分位（判断放量/缩量）
+        vol_median = vr.rolling(60, min_periods=20).median()
+        vol_ratio_vs_median = (vr / vol_median.replace(0, 1)).fillna(1)
+        high_vol = vol_ratio_vs_median > 1.2   # 比近期中位数高20%
+        low_vol = vol_ratio_vs_median < 0.7    # 比近期中位数低30%
+
+        # ── 阶段分类（按优先级排序）────────────────────────────
+        conditions = [
+            # 1. 拉升: z-score > 1.0（显著高于近期常态）且 RPC 为正
+            (eff_z > 1.0) & (rpc > 0),
+            # 2. 砸盘: z-score < -1.0（显著低于近期常态）且放量
+            (eff_z < -1.0) & (rpc < 0) & high_vol,
+            # 3. 吸筹: z-score 轻微正向(0~1.0) + 放量 + 价格正向
+            (eff_z > 0) & (eff_z <= 1.0) & high_vol & (rpc > 0),
+            # 4. 出货: z-score 轻微负向(-1.0~0) + 放量 + 价格负向
+            (eff_z < 0) & (eff_z >= -1.0) & high_vol & (rpc < 0),
+            # 5. 无量阴跌: z-score 负向 + 缩量
+            (eff_z < -0.3) & low_vol,
+            # 6. 缩量整理: 缩量 + 效率接近常态
+            (eff_z.abs() < 0.5) & low_vol,
+        ]
+
+        choices = [
+            '拉升',
+            '砸盘',
+            '吸筹',
+            '出货',
+            '无量阴跌',
+            '缩量整理',
+        ]
+
+        phase_raw = np.select(conditions, choices, default='中性')
+
+        # ── 3日持续性过滤 ─────────────────────────────────────
+        phase_series = pd.Series(phase_raw, index=df.index)
+
+        def rolling_mode(series, window=3):
+            result = series.copy()
+            for i in range(len(series)):
+                if i < window - 1:
+                    continue
+                win = series.iloc[i - window + 1:i + 1]
+                mode_val = win.value_counts().index[0]
+                result.iloc[i] = mode_val
+            return result
+
+        phase_smoothed = rolling_mode(phase_series, window=3)
+
+        # ── 状态机约束 ────────────────────────────────────────
+        # 主力操纵遵循生命周期：吸筹 → 拉升 → 出货 → 砸盘 → 吸筹...
+        # 状态机禁止"跳跃"式的非理性转换
+        VALID_TRANSITIONS = {
+            '中性':    {'中性', '吸筹', '拉升', '缩量整理', '无量阴跌', '砸盘', '出货'},
+            '吸筹':    {'吸筹', '拉升', '中性', '缩量整理'},
+            '拉升':    {'拉升', '出货', '中性', '砸盘'},       # 拉升后可直接砸盘（突发利空）
+            '出货':    {'出货', '砸盘', '中性', '无量阴跌'},
+            '砸盘':    {'砸盘', '吸筹', '中性'},              # 砸盘后可重新吸筹
+            '缩量整理': {'缩量整理', '中性', '吸筹', '无量阴跌', '拉升'},
+            '无量阴跌': {'无量阴跌', '中性', '吸筹', '出货'},
+        }
+
+        phase_states = []
+        prev = '中性'
+        stuck_counter = 0
+        for p in phase_smoothed:
+            if p in VALID_TRANSITIONS.get(prev, set()):
+                prev = p
+                stuck_counter = 0
+            else:
+                # 非法转换：保持前一状态，但如果卡太久则回中性
+                stuck_counter += 1
+                if stuck_counter > 10:
+                    prev = '中性'
+                    stuck_counter = 0
+            phase_states.append(prev)
+
+        df['manipulation_phase'] = phase_states
+        df['efficiency'] = efficiency.round(4)
+        df['eff_zscore'] = eff_z.round(4)
+
+        return df
     
     def calculate_major_cost(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -561,7 +799,7 @@ class TechnicalIndicators:
         
         # 调用现有的 from_df 计算函数
         try:
-            ind_df = self.calculate_all_indicators_from_df(df)
+            ind_df = self.calculate_all_indicators_from_df(df, code=code, freq=freq)
             return ind_df
         except Exception as e:
             logger.exception(f"从DataFrame计算指标失败: {e}")

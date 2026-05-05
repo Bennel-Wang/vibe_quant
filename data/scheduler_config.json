@@ -50,7 +50,8 @@
         "data_update",
         "ai_report",
         "strategy_alert",
-        "market_strategy_analysis"
+        "market_strategy_analysis",
+        "manipulation_phase_alert"
       ],
       "enabled": true,
       "skip_non_trading_day": true

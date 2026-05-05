@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python scripts/backtest_manipulation_phase.py)",
+      "Bash(taskkill //F //IM python.exe)",
+      "Bash(python main.py web)",
+      "Bash(curl -s \"http://127.0.0.1:8080/api/stock/600519.SH/chart?n=60\")",
+      "Bash(python -c ' *)",
+      "Bash(curl -s \"http://127.0.0.1:8080/api/stock/600519.SH/chart?n=30\")",
+      "Bash(python -c \"import py_compile; py_compile.compile\\('quant_system/web_app.py', doraise=True\\); print\\('OK'\\)\")",
+      "Bash(curl -s \"http://127.0.0.1:8080/api/stock/600519.SH/chart?n=50\")",
+      "Bash(curl -s \"http://127.0.0.1:8080/api/stock/002371.SZ/chart?n=50\")",
+      "Bash(curl -s \"http://127.0.0.1:8080/api/stock/000001.SH/chart?freq=day&n=20\")",
+      "Bash(curl -s \"http://127.0.0.1:8080/api/stock/000001.SH/chart?freq=week&n=20\")",
+      "Bash(curl -s \"http://127.0.0.1:8080/api/stock/000001.SH/chart?freq=month&n=20\")",
+      "Bash(python -c \"import py_compile; py_compile.compile\\('quant_system/scheduler.py', doraise=True\\); print\\('OK'\\)\")",
+      "Bash(curl -s -X POST http://127.0.0.1:8080/api/scheduler/custom_tasks -H 'Content-Type: application/json' -d '{\"time\":\"15:50\",\"name\":\"主力阶段每日扫描\",\"types\":[\"manipulation_phase_alert\"],\"enabled\":true,\"skip_non_trading_day\":true}')",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d, indent=2, ensure_ascii=False\\)\\)\")",
+      "Bash(curl -s \"http://127.0.0.1:8080/api/scheduler/tasks\")",
+      "Bash(curl -s -X POST \"http://127.0.0.1:8080/api/scheduler/custom_tasks\" -H \"Content-Type: application/json\" -d \"{\\\\\"time\\\\\":\\\\\"16:00\\\\\",\\\\\"name\\\\\":\\\\\"主力阶段每日扫描\\\\\",\\\\\"types\\\\\":[\\\\\"manipulation_phase_alert\\\\\"],\\\\\"enabled\\\\\":true,\\\\\"skip_non_trading_day\\\\\":true}\")",
+      "Bash(curl *)",
+      "Bash(python scripts/backtest_daily_vs_weekly.py)",
+      "Bash(grep -E \"^  [A-Z]|^Stock|^---|^AVERAGE|^$|beats|Weekly|^==|Strategy|Rules|Return|Annual|MaxDD|Sharpe|Win:|PF:|Trades\")"
+    ]
+  }
+}

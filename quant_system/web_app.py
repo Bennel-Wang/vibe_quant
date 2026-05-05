@@ -693,7 +693,7 @@ def api_stock_chart(code):
                 logger.info('为周/月线强制重新计算指标（使用完整重采样结果）')
                 df_for_indicators = resampled_full.copy()
                 df_for_indicators['date'] = pd.to_datetime(df_for_indicators['date'])
-                df_ind = technical_indicators.calculate_all_indicators_from_df(df_for_indicators)
+                df_ind = technical_indicators.calculate_all_indicators_from_df(df_for_indicators, code=code, freq=original_freq)
                 if not df_ind.empty:
                     try:
                         technical_indicators.save_indicators(code, df_ind, freq=original_freq)
@@ -710,13 +710,21 @@ def api_stock_chart(code):
                 if not df_ind.empty:
                     df_ind['date'] = pd.to_datetime(df_ind['date'])
                     df_ind = df_ind.sort_values('date')
-                    # If loaded CSV is missing newer indicator columns, recalculate
-                    if 'kdj_k' not in df_ind.columns or 'boll_upper' not in df_ind.columns:
-                        logger.info('CSV缺少KDJ/BOLL指标，重新计算并保存')
+                    # If loaded CSV is missing newer indicator columns or has all-null data, recalculate
+                    need_recalc = False
+                    for check_col in ['kdj_k', 'boll_upper', 'rel_price_change']:
+                        if check_col not in df_ind.columns:
+                            need_recalc = True
+                            break
+                        if df_ind[check_col].notna().sum() == 0:
+                            need_recalc = True
+                            break
+                    if need_recalc:
+                        logger.info('CSV缺少指标列或数据为空，重新计算并保存')
                         try:
                             df_for_indicators = df_full.copy()
                             df_for_indicators['date'] = pd.to_datetime(df_for_indicators['date'])
-                            df_ind = technical_indicators.calculate_all_indicators_from_df(df_for_indicators)
+                            df_ind = technical_indicators.calculate_all_indicators_from_df(df_for_indicators, code=code, freq=original_freq)
                             if not df_ind.empty:
                                 df_ind['date'] = pd.to_datetime(df_ind['date'])
                                 df_ind = df_ind.sort_values('date')
@@ -743,7 +751,7 @@ def api_stock_chart(code):
                         try:
                             df_for_indicators = df_full.copy()
                             df_for_indicators['date'] = pd.to_datetime(df_for_indicators['date'])
-                            df_ind = technical_indicators.calculate_all_indicators_from_df(df_for_indicators)
+                            df_ind = technical_indicators.calculate_all_indicators_from_df(df_for_indicators, code=code, freq=original_freq)
                             if not df_ind.empty:
                                 technical_indicators.save_indicators(code, df_ind, freq=original_freq)
                         except Exception as e2:
@@ -753,19 +761,19 @@ def api_stock_chart(code):
                 try:
                     df_for_indicators = df_full.copy()
                     df_for_indicators['date'] = pd.to_datetime(df_for_indicators['date'])
-                    df_ind = technical_indicators.calculate_all_indicators_from_df(df_for_indicators)
+                    df_ind = technical_indicators.calculate_all_indicators_from_df(df_for_indicators, code=code, freq=original_freq)
                     if not df_ind.empty:
                         technical_indicators.save_indicators(code, df_ind, freq=original_freq)
                 except Exception as e2:
                     logger.error(f'回退计算也失败: {e2}')
         
-        # 创建4行子图：价格+均线 / 成交量 / MACD / RSI
+        # 创建5行子图：价格+均线 / 成交量 / MACD / RSI / 相对价格变化+主力阶段
         fig = make_subplots(
-            rows=4, cols=1,
+            rows=5, cols=1,
             shared_xaxes=True,
-            row_heights=[0.5, 0.12, 0.18, 0.20],
-            vertical_spacing=0.03,
-            subplot_titles=('', '成交量', 'MACD', 'RSI')
+            row_heights=[0.45, 0.10, 0.15, 0.15, 0.15],
+            vertical_spacing=0.025,
+            subplot_titles=('', '成交量', 'MACD', 'RSI', '相对价格变化')
         )
         
         # 打印K线数据用于调试
@@ -985,7 +993,7 @@ def api_stock_chart(code):
         fig.update_layout(
             title=f'{stock_name}({code}) {freq_name}线图',
             xaxis_title='交易日',
-            height=950,
+            height=1150,
             xaxis_rangeslider_visible=False,
             showlegend=True
         )
@@ -1156,21 +1164,94 @@ def api_stock_chart(code):
                 fig.add_hline(y=70, line_dash="dash", line_color="red", opacity=0.3, row=4, col=1)
                 fig.add_hline(y=30, line_dash="dash", line_color="green", opacity=0.3, row=4, col=1)
                 fig.update_yaxes(title_text='RSI', row=4, col=1, range=[0, 100], autorange=False)
-        
+
+        # === 相对价格变化 + 主力操纵阶段 (Row 5) ===
+        if not df_ind.empty:
+            rpc_cols = [c for c in ['rel_price_change', 'rel_price_change_ema5', 'rel_price_change_ema20']
+                       if c in df_ind.columns]
+            if rpc_cols:
+                df_rpc = pd.merge(df[['date']], df_ind[['date'] + rpc_cols], on='date', how='left')
+
+                # 主力阶段数据（用于 hover 显示）
+                if 'manipulation_phase' in df_ind.columns:
+                    df_phase = pd.merge(df[['date']], df_ind[['date', 'manipulation_phase']],
+                                       on='date', how='left')
+                    phase_hover = df_phase['manipulation_phase'].fillna('--').tolist()
+                else:
+                    phase_hover = ['--'] * len(dates_str)
+
+                rpc_raw = df_rpc['rel_price_change'].tolist() if 'rel_price_change' in df_rpc.columns else []
+
+                # ── RPC 原始值（浅灰细线）──
+                if rpc_raw:
+                    fig.add_trace(go.Scatter(
+                        x=dates_str, y=rpc_raw,
+                        name='RPC',
+                        mode='lines',
+                        line=dict(color='rgba(150,150,150,0.6)', width=1),
+                        connectgaps=False,
+                        showlegend=True,
+                        hovertemplate=(
+                            '日期: %{x}<br>'
+                            'RPC: %{y:.4f}<br>'
+                            '<extra></extra>'
+                        )
+                    ), row=5, col=1)
+
+                # ── EMA5 快线 + hover 显示主力阶段 ──
+                if 'rel_price_change_ema5' in df_rpc.columns:
+                    ema5_customdata = [
+                        [p, round(df_rpc['rel_price_change_ema5'].iloc[i], 4) if i < len(df_rpc) and not pd.isna(df_rpc['rel_price_change_ema5'].iloc[i]) else None]
+                        for i, p in enumerate(phase_hover)
+                    ]
+                    fig.add_trace(go.Scatter(
+                        x=dates_str, y=df_rpc['rel_price_change_ema5'],
+                        name='EMA5',
+                        mode='lines+markers',
+                        marker=dict(size=5, color='#ff9800', symbol='circle'),
+                        line=dict(color='#ff9800', width=1.8),
+                        connectgaps=False,
+                        customdata=ema5_customdata,
+                        hovertemplate=(
+                            '日期: %{x}<br>'
+                            'EMA5: %{y:.4f}<br>'
+                            '<b>主力阶段: %{customdata[0]}</b>'
+                            '<extra></extra>'
+                        )
+                    ), row=5, col=1)
+
+                # ── EMA20 慢线 ──
+                if 'rel_price_change_ema20' in df_rpc.columns:
+                    fig.add_trace(go.Scatter(
+                        x=dates_str, y=df_rpc['rel_price_change_ema20'],
+                        name='EMA20',
+                        line=dict(color='#2196f3', width=1.5, dash='dash'),
+                        connectgaps=False,
+                        hovertemplate='日期: %{x}<br>EMA20: %{y:.4f}<extra></extra>'
+                    ), row=5, col=1)
+
+                # 参考线
+                fig.add_hline(y=0, line_dash="dash", line_color="white", opacity=0.5, row=5, col=1)
+                fig.add_hline(y=1, line_dash="dot", line_color="gray", opacity=0.3, row=5, col=1,
+                             annotation_text="持平线(1)", annotation_position="top right")
+                fig.update_yaxes(title_text='相对价格变化', row=5, col=1)
+
         # 统一X轴刻度与标签（只在底部显示日期标签）
         tick_indices = list(range(0, len(df), max(1, len(df)//10)))
         tickvals_dates = [dates_str[i] for i in tick_indices]
         ticktext = [df.iloc[i]['date'].strftime('%Y-%m-%d') for i in tick_indices]
-        fig.update_xaxes(tickmode='array', tickvals=tickvals_dates, ticktext=ticktext, row=4, col=1)
+        fig.update_xaxes(tickmode='array', tickvals=tickvals_dates, ticktext=ticktext, row=5, col=1)
         # 顶部子图隐藏刻度标签
         fig.update_xaxes(showticklabels=False, row=1, col=1)
         fig.update_xaxes(showticklabels=False, row=2, col=1)
         fig.update_xaxes(showticklabels=False, row=3, col=1)
+        fig.update_xaxes(showticklabels=False, row=4, col=1)
         # 使用 category 类型以避免交易日间隙同时保留日期作为 hover 值
         fig.update_xaxes(type='category', row=1, col=1)
         fig.update_xaxes(type='category', row=2, col=1)
         fig.update_xaxes(type='category', row=3, col=1)
         fig.update_xaxes(type='category', row=4, col=1)
+        fig.update_xaxes(type='category', row=5, col=1)
         
         # 准备响应数据
         response_data = json.loads(json.dumps(fig, cls=PlotlyJSONEncoder))

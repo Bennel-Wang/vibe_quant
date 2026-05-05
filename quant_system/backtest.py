@@ -384,6 +384,13 @@ class BacktestEngine:
                 'volatility':    _safe(row.get('volatility'),    0),
                 'volume_ratio':  _safe(row.get('volume_ratio'),  1),
                 'overall_score': _safe(row.get('overall_score'), 0),
+                # ── 相对价格变化 & 主力操纵阶段 ──────────────────────────
+                'rel_price_change':       _safe(row.get('rel_price_change'),       0),
+                'rel_price_change_ema5':  _safe(row.get('rel_price_change_ema5'),  0),
+                'rel_price_change_ema20': _safe(row.get('rel_price_change_ema20'), 0),
+                'manipulation_phase':     str(row.get('manipulation_phase', '中性') or '中性'),
+                'efficiency':             _safe(row.get('efficiency'),             0),
+                'eff_zscore':             _safe(row.get('eff_zscore'),             0),
                 # ── 新闻（回测无历史新闻，给安全默认值） ─────────────
                 'news_sentiment': 0,
                 'news_count':     0,

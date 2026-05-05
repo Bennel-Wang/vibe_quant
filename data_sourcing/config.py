@@ -56,7 +56,9 @@ FULL_COLUMNS = [
     "boll_middle", "boll_upper", "boll_lower",
     "kdj_k", "kdj_d", "kdj_j",
     "volatility", "volume_ma_5", "volume_ma_20", "volume_ratio", "wr_14",
-    "rsi6_pct100", "pettm_pct10y"
+    "rsi6_pct100", "pettm_pct10y",
+    "rel_price_change", "rel_price_change_ema5", "rel_price_change_ema20",
+    "manipulation_phase", "efficiency", "eff_zscore"
 ]
 
 # === 测试样本 ===
