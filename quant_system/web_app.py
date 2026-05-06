@@ -3985,6 +3985,11 @@ def _compute_strategy_alerts(items):
 def _send_strategy_alerts(items):
     """将策略提醒结果格式化后发送到微信，与「策略提醒」页面的「发送到微信」逻辑完全一致。"""
     date_str = datetime.now().strftime('%Y-%m-%d')
+
+    # 排序：建议买入 > 持有/加仓 > 观望 > 建议卖出 > 未分配策略
+    _sig_order = {'建议买入': 1, '持有/加仓': 1, '观望': 2, '建议卖出': 3, '未分配策略': 4}
+    items.sort(key=lambda r: _sig_order.get(r.get('signal', ''), 2))
+
     content = f"## 📈 策略提醒 ({date_str})\n\n"
     for item in items:
         if not item.get('success', True) or item.get('no_strategy'):
@@ -4128,6 +4133,10 @@ def api_ai_daily_report():
                 logger.debug(f"日报生成 {stock.code} 失败: {e}")
                 continue
         
+        # 排序：持有/加仓 > 建议关注买入 > 观望等待 > 建议减仓观望
+        _sug_order = {'持有/加仓': 1, '建议关注买入': 1, '观望等待': 2, '建议减仓观望': 3}
+        report_items.sort(key=lambda r: _sug_order.get(r['suggestion'], 2))
+
         # 市场概览
         bullish_count = sum(1 for r in report_items if '多头' in str(r['signals']) or r['change_pct'] > 1)
         bearish_count = sum(1 for r in report_items if '空头' in str(r['signals']) or r['change_pct'] < -1)

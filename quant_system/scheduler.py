@@ -492,6 +492,10 @@ class TradingScheduler:
                 logger.warning("日报无数据，跳过发送")
                 return
 
+            # 排序：持有/加仓 > 建议关注买入 > 观望等待 > 建议减仓观望
+            _sug_order = {'持有/加仓': 1, '建议关注买入': 1, '观望等待': 2, '建议减仓观望': 3}
+            report_items.sort(key=lambda r: _sug_order.get(r['suggestion'], 2))
+
             bullish_count = sum(1 for r in report_items if '多头' in str(r['signals']) or r['change_pct'] > 1)
             bearish_count = sum(1 for r in report_items if '空头' in str(r['signals']) or r['change_pct'] < -1)
 
@@ -621,13 +625,25 @@ class TradingScheduler:
                     if df.empty or len(df) < 1:
                         continue
 
+                    # 去掉当前不完整周（最后一行 date 对应周五 > 今天，说明本周未结束）
+                    if 'date' in df.columns and len(df) >= 2:
+                        try:
+                            last_date = pd.to_datetime(df.iloc[-1]['date'])
+                            if last_date > pd.Timestamp.now():
+                                df = df.iloc[:-1]  # 去掉未完成的本周
+                        except Exception:
+                            pass
+
+                    if df.empty or len(df) < 1:
+                        continue
+
                     latest = df.iloc[-1]
                     phase = str(latest.get('manipulation_phase', '中性') or '中性')
                     rpc_ema5 = float(latest.get('rel_price_change_ema5', 0) or 0)
                     eff_z = float(latest.get('eff_zscore', 0) or 0)
                     close = float(latest.get('close', 0) or 0)
 
-                    # 本周涨跌幅（周线）
+                    # 本周涨跌幅（周线，对比最后两个完整周）
                     prev_close = float(df.iloc[-2].get('close', close) or close) if len(df) >= 2 else close
                     week_pct = (close - prev_close) / prev_close * 100 if prev_close != 0 else 0
 

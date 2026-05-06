@@ -42,9 +42,24 @@
   },
   "custom_tasks": [
     {
-      "id": "67e09437",
+      "id": "07c09fe1",
+      "time": "17:10",
+      "name": "每日收盘数据更新，发送日报，策略提醒",
+      "content": "",
+      "types": [
+        "data_update",
+        "ai_report",
+        "strategy_alert",
+        "market_strategy_analysis",
+        "manipulation_phase_alert"
+      ],
+      "enabled": true,
+      "skip_non_trading_day": false
+    },
+    {
+      "id": "e9e4afce",
       "time": "14:20",
-      "name": "交易日盘中数据更新，发送日报，策略提醒1",
+      "name": "每日任务",
       "content": "",
       "types": [
         "data_update",
@@ -55,20 +70,6 @@
       ],
       "enabled": true,
       "skip_non_trading_day": true
-    },
-    {
-      "id": "07c09fe1",
-      "time": "17:10",
-      "name": "每日收盘数据更新，发送日报，策略提醒",
-      "content": "",
-      "types": [
-        "data_update",
-        "ai_report",
-        "strategy_alert",
-        "market_strategy_analysis"
-      ],
-      "enabled": true,
-      "skip_non_trading_day": false
     }
   ]
 }

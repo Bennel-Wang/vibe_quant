@@ -282,6 +282,24 @@ function checkSendButton() {
     document.getElementById('btn-send-wechat').disabled = !anyComputed;
 }
 
+function _signalSortOrder(signal) {
+    if (!signal) return 2;
+    if (signal.includes('买入') || signal.includes('加仓')) return 1;
+    if (signal.includes('卖出')) return 3;
+    return 2; // 观望 etc.
+}
+
+function sortAlertRows() {
+    var tbody = document.getElementById('alerts-tbody');
+    var rows = Array.from(tbody.querySelectorAll('tr[id^="alert-row-"]'));
+    rows.sort(function(a, b) {
+        var sigA = (a.querySelector('.signal-cell') || {}).textContent || '';
+        var sigB = (b.querySelector('.signal-cell') || {}).textContent || '';
+        return _signalSortOrder(sigA) - _signalSortOrder(sigB);
+    });
+    rows.forEach(function(row) { tbody.appendChild(row); });
+}
+
 function computeAll() {
     var btn = document.getElementById('btn-compute-all');
     var spinner = document.getElementById('compute-spinner');
@@ -308,6 +326,7 @@ function computeAll() {
                 resp.results.forEach(function(r) {
                     if (r.success) applyResult(r.code, r);
                 });
+                sortAlertRows();
             }
         },
         error: function() {
