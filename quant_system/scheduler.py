@@ -605,34 +605,27 @@ class TradingScheduler:
                     continue
 
                 try:
-                    # 优先从周线 CSV 加载
-                    df = technical_indicators.load_indicators(code, freq='week')
-                    if df.empty or 'manipulation_phase' not in df.columns:
-                        # 从日线拉取 → 重采样为周线 → 计算指标
-                        df_day = unified_data.get_historical_data(code, '', date_str)
-                        if df_day is not None and not df_day.empty:
-                            if df_day['date'].dtype == 'object':
-                                df_day['date'] = pd.to_datetime(df_day['date'].astype(str), format='%Y%m%d', errors='coerce')
-                            else:
-                                df_day['date'] = pd.to_datetime(df_day['date'])
-                            df_week = resample_to_weekly(df_day)
+                    # 始终从日线重新生成周线，避免缓存数据过时
+                    df = pd.DataFrame()
+                    df_day = unified_data.get_historical_data(code, '', date_str)
+                    if df_day is not None and not df_day.empty:
+                        # 标准化日期列：统一使用 trade_date（优先）或 date，去掉多余的日期列避免重复
+                        date_col = 'trade_date' if 'trade_date' in df_day.columns else 'date'
+                        other_date = [c for c in ('trade_date', 'date') if c in df_day.columns and c != date_col]
+                        if other_date:
+                            df_day = df_day.drop(columns=other_date)
+                        if df_day[date_col].dtype == 'object':
+                            df_day[date_col] = pd.to_datetime(df_day[date_col].astype(str), format='%Y%m%d', errors='coerce')
+                        else:
+                            df_day[date_col] = pd.to_datetime(df_day[date_col])
+                        df_day = df_day.rename(columns={date_col: 'date'})
+                        df_week = resample_to_weekly(df_day)
+                        if not df_week.empty:
                             df = technical_indicators.calculate_all_indicators_from_df(
                                 df_week, code=code, freq='week'
                             )
                             if not df.empty:
                                 technical_indicators.save_indicators(code, df, freq='week')
-
-                    if df.empty or len(df) < 1:
-                        continue
-
-                    # 去掉当前不完整周（最后一行 date 对应周五 > 今天，说明本周未结束）
-                    if 'date' in df.columns and len(df) >= 2:
-                        try:
-                            last_date = pd.to_datetime(df.iloc[-1]['date'])
-                            if last_date > pd.Timestamp.now():
-                                df = df.iloc[:-1]  # 去掉未完成的本周
-                        except Exception:
-                            pass
 
                     if df.empty or len(df) < 1:
                         continue
@@ -643,7 +636,7 @@ class TradingScheduler:
                     eff_z = float(latest.get('eff_zscore', 0) or 0)
                     close = float(latest.get('close', 0) or 0)
 
-                    # 本周涨跌幅（周线，对比最后两个完整周）
+                    # 最新完整周 vs 上一完整周涨跌幅
                     prev_close = float(df.iloc[-2].get('close', close) or close) if len(df) >= 2 else close
                     week_pct = (close - prev_close) / prev_close * 100 if prev_close != 0 else 0
 
