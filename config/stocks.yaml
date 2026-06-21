@@ -97,10 +97,6 @@ stocks:
   strategy: 强势动量右侧买入(买) + 强势动量趋势卖出(卖)
   buy_strategy: 强势动量右侧买入
   sell_strategy: 强势动量趋势卖出
-- name: 特海国际
-  code: 09658
-  market: hk
-  type: stock
 - name: 阳光电源
   code: '300274'
   market: sz
@@ -125,10 +121,6 @@ stocks:
   strategy: 低等策略17_价值动量共振买入(买) + 低等策略18_价值动量共振卖出(卖)
   buy_strategy: 低等策略17_价值动量共振买入
   sell_strategy: 低等策略18_价值动量共振卖出
-- name: 波司登
-  code: 03998
-  market: hk
-  type: stock
 - name: 国盾量子
   code: '688027'
   market: sh
@@ -202,13 +194,6 @@ stocks:
   market: sz
   type: stock
   industry: 白酒
-- name: 颐海国际
-  code: 01579
-  market: hk
-  type: stock
-  strategy: 短线RSI超卖反弹买入(买) + 短线RSI超买止盈卖出(卖)
-  buy_strategy: 短线RSI超卖反弹买入
-  sell_strategy: 短线RSI超买止盈卖出
 - name: 小米集团-W
   code: 01810
   market: hk
@@ -224,10 +209,6 @@ stocks:
   strategy: 周线超卖均值回归买入(买) + 周线超买均值回归卖出(卖)
   buy_strategy: 周线超卖均值回归买入
   sell_strategy: 周线超买均值回归卖出
-- name: 海底捞
-  code: 06862
-  market: hk
-  type: stock
 - name: 首华燃气
   code: '300483'
   market: sz
@@ -247,3 +228,33 @@ stocks:
   strategy: 强势动量右侧买入(买) + 强势动量趋势卖出(卖)
   buy_strategy: 强势动量右侧买入
   sell_strategy: 强势动量趋势卖出
+- name: 云路股份
+  code: '688190'
+  market: sh
+  type: stock
+  industry: 矿物制品
+- name: 铂科新材
+  code: '300811'
+  market: sz
+  type: stock
+  industry: 矿物制品
+- name: 顺络电子
+  code: 002138
+  market: sz
+  type: stock
+  industry: 元器件
+- name: 深科技
+  code: '000021'
+  market: sz
+  type: stock
+  industry: 元器件
+- name: 麦捷科技
+  code: '300319'
+  market: sz
+  type: stock
+  industry: 元器件
+- name: 长江电力
+  code: '600900'
+  market: sz
+  type: stock
+  industry: 水力发电
