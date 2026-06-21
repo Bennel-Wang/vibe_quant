@@ -640,6 +640,14 @@ class TradingScheduler:
                     prev_close = float(df.iloc[-2].get('close', close) or close) if len(df) >= 2 else close
                     week_pct = (close - prev_close) / prev_close * 100 if prev_close != 0 else 0
 
+                    # 诊断日志：记录周线最后几根 bar 的日期和收盘价
+                    if 'date' in df.columns and len(df) >= 2:
+                        last_dates = list(df['date'].iloc[-3:].astype(str)) if len(df) >= 3 else list(df['date'].iloc[-2:].astype(str))
+                        last_closes = list(df['close'].iloc[-3:].astype(float)) if len(df) >= 3 else list(df['close'].iloc[-2:].astype(float))
+                        logger.info(f"[周线诊断] {name}({code}) df={len(df)}行 "
+                                    f"dates={last_dates} closes={last_closes} "
+                                    f"close={close:.4f} prev_close={prev_close:.4f} week_pct={week_pct:.2f}%")
+
                     stock_info = {
                         'name': name,
                         'code': code,
@@ -1028,7 +1036,7 @@ class TradingScheduler:
         job_id = f"custom_task_{task.get('id')}"
         try:
             # 不在 CronTrigger 层面限制星期，由应用层 skip_non_trading_day 标志控制
-            self.scheduler.add_job(self.run_custom_task, CronTrigger(hour=hh, minute=mm), args=[task.get('id')], id=job_id, replace_existing=True)
+            self.scheduler.add_job(self.run_custom_task, CronTrigger(hour=hh, minute=mm), args=[task.get('id')], id=job_id, replace_existing=True, misfire_grace_time=None)
             logger.info(f"已调度自定义任务 [{task.get('id')}]: {time_str} -> {task.get('name')[:30]}")
         except Exception as e:
             logger.error(f"添加自定义任务失败: {e}")
@@ -1154,7 +1162,8 @@ class TradingScheduler:
                         self._task_funcs_map[task_name],
                         CronTrigger(hour=hh, minute=mm, day_of_week='mon-fri'),
                         id=f'task_{task_name}',
-                        replace_existing=True
+                        replace_existing=True,
+                        misfire_grace_time=None
                     )
                     logger.info(f"已添加任务 [{task_name}]: {hh:02d}:{mm:02d}")
                 except Exception as e:
@@ -1169,7 +1178,8 @@ class TradingScheduler:
                         self.run_daily_tasks,
                         CronTrigger(hour=hour, minute=minute, day_of_week='mon-fri'),
                         id=f'daily_task_{time_str}',
-                        replace_existing=True
+                        replace_existing=True,
+                        misfire_grace_time=None
                     )
                     logger.info(f"已添加定时任务: {time_str}")
                 except Exception as e:

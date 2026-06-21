@@ -10,6 +10,7 @@ import re
 from typing import List, Dict, Optional, Any, Union
 from dataclasses import dataclass, asdict
 from datetime import datetime
+from .utils import beijing_now
 from enum import Enum
 from pathlib import Path
 
@@ -882,7 +883,7 @@ class QuantStrategy:
                 confidence=0,
                 reasoning="无法获取技术指标",
                 rules_triggered=[],
-                timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                timestamp=beijing_now().strftime('%Y-%m-%d %H:%M:%S')
             )
         
         triggered_rules = []
@@ -911,7 +912,7 @@ class QuantStrategy:
                     confidence=0.5,
                     reasoning=f"排除规则触发: {exc_rule.condition} - {exc_rule.reason}",
                     rules_triggered=[],
-                    timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    timestamp=beijing_now().strftime('%Y-%m-%d %H:%M:%S')
                 )
         
         # 决策逻辑
@@ -942,7 +943,7 @@ class QuantStrategy:
             confidence=confidence,
             reasoning=reasoning,
             rules_triggered=[r.condition for r in triggered_rules],
-            timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            timestamp=beijing_now().strftime('%Y-%m-%d %H:%M:%S')
         )
     
     def to_dict(self) -> Dict:
@@ -1274,7 +1275,7 @@ class AIDecisionMaker:
                 confidence=0,
                 reasoning="无法获取数据",
                 rules_triggered=[],
-                timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                timestamp=beijing_now().strftime('%Y-%m-%d %H:%M:%S')
             )
         
         # 构建策略要求部分（避免在f-string中使用转义字符）
@@ -1345,7 +1346,7 @@ class AIDecisionMaker:
                 confidence=confidence,
                 reasoning=reasoning_text + "\n风险评估: " + risk_text,
                 rules_triggered=["AI决策"],
-                timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                timestamp=beijing_now().strftime('%Y-%m-%d %H:%M:%S')
             )
             
         except Exception as e:
@@ -1365,7 +1366,7 @@ class AIDecisionMaker:
                 confidence=0,
                 reasoning=f"AI决策失败: {e}",
                 rules_triggered=[],
-                timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                timestamp=beijing_now().strftime('%Y-%m-%d %H:%M:%S')
             )
 
 

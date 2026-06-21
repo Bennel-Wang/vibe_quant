@@ -11,6 +11,7 @@ from email.mime.multipart import MIMEMultipart
 import requests
 from typing import List, Optional, Dict
 from datetime import datetime
+from .utils import beijing_now
 
 from .config_manager import config
 
@@ -336,7 +337,7 @@ class NotificationManager:
 - **数量**: {shares} 股
 - **价格**: ¥{price:.2f}
 - **金额**: ¥{amount:,.2f}
-- **时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+- **时间**: {beijing_now().strftime('%Y-%m-%d %H:%M:%S')}
 
 ### 操作理由
 {reason}
@@ -369,7 +370,7 @@ class NotificationManager:
 - **策略**: {strategy_name}
 - **信号**: {action_emoji} {action.upper()}
 - **置信度**: {confidence:.1%}
-- **时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+- **时间**: {beijing_now().strftime('%Y-%m-%d %H:%M:%S')}
 
 ### 决策理由
 {reasoning}
@@ -393,7 +394,7 @@ class NotificationManager:
         for alert in alerts:
             content += f"- **{alert['name']}({alert['code']})**: {alert['reason']}\n"
         
-        content += f"\n**时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        content += f"\n**时间**: {beijing_now().strftime('%Y-%m-%d %H:%M:%S')}"
         
         self._send(title, content)
     
@@ -407,7 +408,7 @@ class NotificationManager:
         if not self.enabled:
             return
         
-        title = f"📊 每日报告 ({datetime.now().strftime('%Y-%m-%d')})"
+        title = f"📊 每日报告 ({beijing_now().strftime('%Y-%m-%d')})"
         
         content = f"""
 ## 每日投资报告
@@ -431,7 +432,7 @@ class NotificationManager:
         else:
             content += "- 今日无交易信号\n"
         
-        content += f"\n**报告时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        content += f"\n**报告时间**: {beijing_now().strftime('%Y-%m-%d %H:%M:%S')}"
         
         self._send(title, content)
     
@@ -475,7 +476,7 @@ class NotificationManager:
 - 胜率: {result_summary.get('win_rate', 0):.2f}%
 - 盈亏比: {result_summary.get('profit_factor', 0):.2f}
 
-**生成时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+**生成时间**: {beijing_now().strftime('%Y-%m-%d %H:%M:%S')}
 """
         
         self._send(title, content)
@@ -498,7 +499,7 @@ class NotificationManager:
         }.get(level, "ℹ️")
         
         title = f"{level_emoji} 系统通知"
-        content = f"{message}\n\n**时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        content = f"{message}\n\n**时间**: {beijing_now().strftime('%Y-%m-%d %H:%M:%S')}"
         
         self._send(title, content)
 

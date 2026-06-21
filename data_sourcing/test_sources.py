@@ -6,7 +6,10 @@
 import sys
 import os
 import datetime
+import pytz
 import traceback
+
+BEIJING_TZ = pytz.timezone('Asia/Shanghai')
 import pandas as pd
 
 # 确保项目根目录在path中
@@ -293,7 +296,7 @@ def print_summary(all_results):
 def main():
     logger.info(f"\n{'#'*80}")
     logger.info(f"统一量化数据源系统 - 全面测试")
-    logger.info(f"测试时间: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    logger.info(f"测试时间: {datetime.datetime.now(BEIJING_TZ).strftime('%Y-%m-%d %H:%M:%S')}")
     logger.info(f"测试日期范围: {START_DATE} - {END_DATE}")
     logger.info(f"测试样本: {TEST_SAMPLES}")
     logger.info(f"{'#'*80}")

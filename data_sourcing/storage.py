@@ -24,7 +24,15 @@ def load_existing_data(code: str, freq: str = "day") -> pd.DataFrame:
             df = pd.read_csv(path, dtype={"trade_date": str})
             if not df.empty:
                 df["trade_date"] = df["trade_date"].astype(str).str.replace("-", "")
-                logger.info(f"加载本地数据 {code}: {len(df)} 行, 日期范围 {df['trade_date'].min()}-{df['trade_date'].max()}")
+                # 过滤 trade_date 不是合法 YYYYMMDD 的损坏行
+                before = len(df)
+                valid_date_mask = df["trade_date"].str.match(r'^\d{8}$')
+                df = df[valid_date_mask]
+                removed = before - len(df)
+                if removed > 0:
+                    logger.warning(f"加载 {code} 时过滤掉 {removed} 行损坏数据（trade_date 非法）")
+                if not df.empty:
+                    logger.info(f"加载本地数据 {code}: {len(df)} 行, 日期范围 {df['trade_date'].min()}-{df['trade_date'].max()}")
                 return df
         except Exception as e:
             logger.warning(f"加载本地数据失败 {code}: {e}")

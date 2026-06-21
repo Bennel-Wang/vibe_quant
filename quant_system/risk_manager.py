@@ -9,6 +9,7 @@ import logging
 from typing import List, Dict, Optional, Any
 from dataclasses import dataclass, field
 from datetime import datetime
+from .utils import beijing_now
 from pathlib import Path
 
 import pandas as pd
@@ -564,7 +565,7 @@ class RiskReportGenerator:
         
         report = f"""
 === 风险报告 ===
-生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+生成时间: {beijing_now().strftime('%Y-%m-%d %H:%M:%S')}
 
 【资金概况】
 - 总资金: ¥{portfolio_risk['total_capital']:,.2f}

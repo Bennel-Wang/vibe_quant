@@ -16,6 +16,7 @@ import logging
 import os
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
+from .utils import beijing_now
 from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Optional, Any
@@ -135,7 +136,7 @@ class SimulatedBroker:
 
     def _new_order_id(self) -> str:
         self._order_seq += 1
-        return f"SIM{datetime.now().strftime('%Y%m%d%H%M%S')}{self._order_seq:04d}"
+        return f"SIM{beijing_now().strftime('%Y%m%d%H%M%S')}{self._order_seq:04d}"
 
     def _calc_commission(self, side: str, price: float, shares: int) -> float:
         amt = price * shares
@@ -194,7 +195,7 @@ class SimulatedBroker:
             order_type=order_type,
             shares=shares,
             limit_price=limit_price,
-            created_at=datetime.now().isoformat(),
+            created_at=beijing_now().isoformat(),
             reason="",
         )
         self.orders[order_id] = order
@@ -209,7 +210,7 @@ class SimulatedBroker:
         o = Order(order_id=oid, code=code, side=side, order_type=order_type,
                   shares=shares, limit_price=limit_price,
                   status=OrderStatus.REJECTED.value,
-                  created_at=datetime.now().isoformat(),
+                  created_at=beijing_now().isoformat(),
                   reason=reason)
         self.orders[oid] = o
         logger.warning(f"[SimBroker] 订单拒绝: {code} {side} {shares}股 - {reason}")
@@ -299,7 +300,7 @@ class SimulatedBroker:
         order.filled_shares = order.shares
         order.commission = commission
         order.status = OrderStatus.FILLED.value
-        order.filled_at = datetime.now().isoformat()
+        order.filled_at = beijing_now().isoformat()
 
         record = {**order.to_dict(), 'total_asset': self._total_asset()}
         self.trade_history.append(record)

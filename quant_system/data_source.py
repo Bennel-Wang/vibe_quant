@@ -8,6 +8,7 @@ import sys
 import math
 import logging
 from datetime import datetime
+from .utils import beijing_now
 from typing import List, Dict, Optional
 from pathlib import Path
 
@@ -241,7 +242,7 @@ class UnifiedDataSource:
         if not start_date:
             start_date = config.get('data_collection.history.start_date', '20030101')
         if not end_date:
-            end_date = datetime.now().strftime('%Y%m%d')
+            end_date = beijing_now().strftime('%Y%m%d')
 
         # 清洗日期格式
         start_date = str(start_date).replace('-', '').replace('/', '')[:8]
@@ -315,7 +316,7 @@ class UnifiedDataSource:
     def _fallback_realtime_from_csv(self, codes: list, dm) -> pd.DataFrame:
         """回退：从本地 CSV 最后一行获取近似价格（非实时）"""
         from datetime import timedelta
-        end_d = datetime.now()
+        end_d = beijing_now()
         start_d = end_d - timedelta(days=7)
         start_date = start_d.strftime('%Y%m%d')
         end_date = end_d.strftime('%Y%m%d')
@@ -362,7 +363,7 @@ class UnifiedDataSource:
         """将实时快照持久化到本地CSV（更新/追加今日行情行，确保今日数据可查）"""
         if not live_data:
             return True
-        today = datetime.now().strftime('%Y%m%d')
+        today = beijing_now().strftime('%Y%m%d')
         try:
             from data_sourcing.storage import load_existing_data, get_csv_path
         except ImportError:
@@ -488,7 +489,7 @@ class UnifiedDataSource:
             'low': data.get('low', 0),
             'close': data.get('close', 0),
             'volume': data.get('volume', data.get('vol', 0)),
-            'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'time': beijing_now().strftime('%Y-%m-%d %H:%M:%S'),
         }
 
     def close_all(self):

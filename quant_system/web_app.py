@@ -7,6 +7,7 @@ import os
 import json
 import logging
 from datetime import datetime, timedelta
+from .utils import beijing_now
 from typing import Dict, Any
 
 from flask import Flask, render_template, jsonify, request, send_from_directory, Response
@@ -137,7 +138,7 @@ def is_trading_time(market: str = None) -> bool:
     A股: 周一至周五 09:30-11:30 / 13:00-15:00
     港股: 周一至周五 09:30-12:00 / 13:00-16:00
     """
-    now = datetime.now()
+    now = beijing_now()
     if now.weekday() >= 5:  # 周六/周日
         return False
     minutes = now.hour * 60 + now.minute
@@ -421,8 +422,8 @@ def api_stock_data(code):
     """获取股票历史数据"""
     try:
         start_date = request.args.get('start', 
-            (datetime.now() - timedelta(days=365)).strftime('%Y%m%d'))
-        end_date = request.args.get('end', datetime.now().strftime('%Y%m%d'))
+            (beijing_now() - timedelta(days=365)).strftime('%Y%m%d'))
+        end_date = request.args.get('end', beijing_now().strftime('%Y%m%d'))
         freq = request.args.get('freq', 'day')
         
         df = unified_data.get_historical_data(code, start_date, end_date, freq)
@@ -601,9 +602,9 @@ def api_stock_chart(code):
                 chart_days = 365 * 5
             else:
                 chart_days = 365 * 10
-            start_date = (datetime.now() - timedelta(days=chart_days)).strftime('%Y%m%d')
+            start_date = (beijing_now() - timedelta(days=chart_days)).strftime('%Y%m%d')
 
-        end_date = request.args.get('end', datetime.now().strftime('%Y%m%d'))
+        end_date = request.args.get('end', beijing_now().strftime('%Y%m%d'))
         
         # 获取股票信息
         stock = stock_manager.get_stock_by_code(code)
@@ -1610,7 +1611,7 @@ def api_run_backtest():
 
                 BACKTEST_RESULTS[run_id] = {'status': 'done', 'result': response}
                 _save_backtest_result(run_id, {'status': 'done', 'result': response,
-                                               'created_at': datetime.now().isoformat(), **response})
+                                               'created_at': beijing_now().isoformat(), **response})
                 BACKTEST_PROGRESS[run_id].update({'processed': BACKTEST_PROGRESS[run_id].get('total') or 0, 'elapsed': round(duration,2), 'eta': 0, 'status': 'done'})
                 logger.info(f"回测后台任务完成: run_id={run_id}, code={code}, strategy={strategy.name}, trades={len(result.trades)}, duration={duration:.1f}s")
                 
@@ -1628,7 +1629,7 @@ def api_run_backtest():
                 tb = _tb.format_exc()
                 BACKTEST_RESULTS[run_id] = {'status': 'error', 'error': str(e), 'traceback': tb}
                 _save_backtest_result(run_id, {'status': 'error', 'error': str(e),
-                                               'created_at': datetime.now().isoformat()})
+                                               'created_at': beijing_now().isoformat()})
                 BACKTEST_PROGRESS[run_id].update({'status': 'error', 'error': str(e)})
                 logger.exception(f"后台回测任务失败: run_id={run_id}, error={e}\n{tb}")
 
@@ -2689,7 +2690,7 @@ def api_data_update():
                 
                 update_task_status['progress'] = 100
                 update_task_status['message'] = '更新完成'
-                update_task_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                update_task_status['last_update'] = beijing_now().strftime('%Y-%m-%d %H:%M:%S')
                 
             finally:
                 update_task_status['is_running'] = False
@@ -2784,7 +2785,7 @@ def api_data_realtime():
                     except Exception as e:
                         logger.error(f"合并实时数据失败: {e}")
 
-                    update_task_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    update_task_status['last_update'] = beijing_now().strftime('%Y-%m-%d %H:%M:%S')
                     
                     time.sleep(interval)
                 
@@ -2865,7 +2866,7 @@ def api_data_realtime_global():
                             update_task_status['message'] = f'全局第 {update_count} 次已合并 ({len(rt)} 只)'
                     except Exception as e:
                         logger.error(f"全局合并失败: {e}")
-                    update_task_status['last_update'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    update_task_status['last_update'] = beijing_now().strftime('%Y-%m-%d %H:%M:%S')
 
                 try:
                     # 立即做一次全量更新（无论是否在交易时间）
@@ -2968,7 +2969,7 @@ def api_data_realtime_latest():
         logger.error(f"批量评分附加失败: {e}")
 
     # Store intraday snapshot — 仅在交易时间内采集
-    now_str = datetime.now().strftime('%H:%M')
+    now_str = beijing_now().strftime('%H:%M')
     for code_key, data in result.items():
         # 使用 full_code 作为 key，避免同代码不同市场冲突
         full_code = data.get('full_code', code_key)
@@ -3498,8 +3499,8 @@ def api_group_chart(name):
         if not stocks:
             return jsonify({'success': False, 'error': '分组内无股票'}), 404
 
-        start_date = request.args.get('start', (datetime.now() - timedelta(days=365)).strftime('%Y%m%d'))
-        end_date = request.args.get('end', datetime.now().strftime('%Y%m%d'))
+        start_date = request.args.get('start', (beijing_now() - timedelta(days=365)).strftime('%Y%m%d'))
+        end_date = request.args.get('end', beijing_now().strftime('%Y%m%d'))
 
         combined = None
         total_weight = sum(float(s.get('weight', 1)) for s in stocks)
@@ -3563,7 +3564,7 @@ def save_system_state():
     try:
         state = {
             'risk_manager': risk_manager.to_dict(),
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            'timestamp': beijing_now().strftime('%Y-%m-%d %H:%M:%S')
         }
         
         with open(DATA_STATE_PATH, 'w', encoding='utf-8') as f:
@@ -3651,7 +3652,7 @@ def api_notification_test():
         channels = [channel] if channel != 'all' else ['wechat', 'email']
         results = notification_manager._send(
             '测试通知 - 量化交易系统',
-            f'这是一条测试消息，发送时间: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}',
+            f'这是一条测试消息，发送时间: {beijing_now().strftime("%Y-%m-%d %H:%M:%S")}',
             channels=channels
         )
         return jsonify({'success': True, 'results': {k: v for k, v in results.items()}})
@@ -3767,8 +3768,8 @@ def _backtest_one_strategy(code, strategy_name):
     if strategy_obj is None:
         return 0.0
     from datetime import timedelta
-    end_date = datetime.now().strftime('%Y%m%d')
-    start_date = (datetime.now() - timedelta(days=365)).strftime('%Y%m%d')
+    end_date = beijing_now().strftime('%Y%m%d')
+    start_date = (beijing_now() - timedelta(days=365)).strftime('%Y%m%d')
     try:
         result = backtest_engine.run_backtest(code, strategy_obj, start_date, end_date, initial_capital=1000000)
         return result.total_return_pct if result else 0.0
@@ -3905,8 +3906,8 @@ def api_strategy_alerts_compute():
                 'no_strategy': True,
             })
 
-        end_today = datetime.now().strftime('%Y%m%d')
-        end_yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y%m%d')
+        end_today = beijing_now().strftime('%Y%m%d')
+        end_yesterday = (beijing_now() - timedelta(days=1)).strftime('%Y%m%d')
 
         today_snapshot = _backtest_one_strategy_snapshot_with_end(
             stock.full_code, buy_strategy_name, end_today, sell_strategy_name
@@ -3935,8 +3936,8 @@ def _compute_strategy_alerts(items):
     items: list of {code, buy_strategy, sell_strategy}
     返回: list of result dicts"""
     from datetime import timedelta
-    end_today = datetime.now().strftime('%Y%m%d')
-    end_yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y%m%d')
+    end_today = beijing_now().strftime('%Y%m%d')
+    end_yesterday = (beijing_now() - timedelta(days=1)).strftime('%Y%m%d')
     results = []
 
     for item in items:
@@ -3984,7 +3985,7 @@ def _compute_strategy_alerts(items):
 
 def _send_strategy_alerts(items):
     """将策略提醒结果格式化后发送到微信，与「策略提醒」页面的「发送到微信」逻辑完全一致。"""
-    date_str = datetime.now().strftime('%Y-%m-%d')
+    date_str = beijing_now().strftime('%Y-%m-%d')
 
     # 排序：建议买入 > 持有/加仓 > 观望 > 建议卖出 > 未分配策略
     _sig_order = {'建议买入': 1, '持有/加仓': 1, '观望': 2, '建议卖出': 3, '未分配策略': 4}
@@ -4152,8 +4153,8 @@ def api_ai_daily_report():
             market_advice = '市场方向不明，建议谨慎操作'
         
         report = {
-            'date': datetime.now().strftime('%Y-%m-%d'),
-            'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'date': beijing_now().strftime('%Y-%m-%d'),
+            'generated_at': beijing_now().strftime('%Y-%m-%d %H:%M:%S'),
             'market_overview': {
                 'sentiment': market_sentiment,
                 'advice': market_advice,
@@ -4319,7 +4320,7 @@ def api_market_strategy_match_send():
         description = market.get('description', '')
         detail = market.get('detail', '')
 
-        date_str = datetime.now().strftime('%Y-%m-%d %H:%M')
+        date_str = beijing_now().strftime('%Y-%m-%d %H:%M')
         content = f"## 🏦 大盘阶段操作建议 ({date_str})\n\n"
         content += f"### 当前大盘阶段：{regime_label}（T={t_score:.0f} / V={v_score:.0f}）\n\n"
         if detail:
@@ -4747,7 +4748,7 @@ def api_factors_optimize():
 
         if not end_date:
             from datetime import datetime
-            end_date = datetime.now().strftime('%Y%m%d')
+            end_date = beijing_now().strftime('%Y%m%d')
 
         # Pre-compute indicator DataFrame ONCE to avoid redundant fetching per strategy
         try:
@@ -5040,11 +5041,11 @@ def api_factors_best():
             # HTML date input returns "YYYY-MM-DD"
             start_date = _raw_start.replace('-', '')
         else:
-            start_date = (datetime.now() - timedelta(days=5 * 365)).strftime('%Y%m%d')
+            start_date = (beijing_now() - timedelta(days=5 * 365)).strftime('%Y%m%d')
         if _raw_end:
             end_date = _raw_end.replace('-', '')
         else:
-            end_date = datetime.now().strftime('%Y%m%d')
+            end_date = beijing_now().strftime('%Y%m%d')
 
         import threading, uuid, time as _time
         run_id = str(uuid.uuid4())
@@ -5478,7 +5479,7 @@ def api_factors_best_export():
     unfit_stocks  = res.get('unfit_stocks', [])
     start_date    = res.get('start_date', '')
     end_date      = res.get('end_date', '')
-    now_str       = datetime.now().strftime('%Y-%m-%d %H:%M')
+    now_str       = beijing_now().strftime('%Y-%m-%d %H:%M')
 
     def _fmt(v, suffix='%', nd=2):
         if v is None:
@@ -5604,7 +5605,7 @@ def api_factors_best_send_wechat():
     unfit_stocks  = res.get('unfit_stocks', [])
     start_date    = res.get('start_date', '')
     end_date      = res.get('end_date', '')
-    now_str       = datetime.now().strftime('%Y-%m-%d %H:%M')
+    now_str       = beijing_now().strftime('%Y-%m-%d %H:%M')
 
     # ── 构建 Markdown 报告（PushPlus markdown 模板）──
     lines = [
@@ -5785,7 +5786,7 @@ def api_strategy_adapt_run():
         buy_strategy_name = data.get('buy_strategy', '')
         sell_strategy_name = data.get('sell_strategy', '')
         start_date = data.get('start_date', '20200101')
-        end_date = data.get('end_date', '') or datetime.now().strftime('%Y%m%d')
+        end_date = data.get('end_date', '') or beijing_now().strftime('%Y%m%d')
         initial_capital = float(data.get('initial_capital', 1000000))
 
         if not buy_strategy_name and not sell_strategy_name:
@@ -6028,7 +6029,7 @@ def api_multi_backtest_run():
         data = request.json or {}
         pairs_input = data.get('pairs', [])
         start_date = data.get('start_date', '20200101')
-        end_date = data.get('end_date', '') or datetime.now().strftime('%Y%m%d')
+        end_date = data.get('end_date', '') or beijing_now().strftime('%Y%m%d')
         total_capital = float(data.get('total_capital', 1000000))
 
         if not pairs_input:

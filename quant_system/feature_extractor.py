@@ -8,6 +8,7 @@ import json
 import logging
 from typing import List, Dict, Optional, Any
 from datetime import datetime
+from .utils import beijing_now
 from pathlib import Path
 
 import pandas as pd
@@ -215,7 +216,7 @@ class FeatureExtractor:
         features = {
             'code': code,
             'name': stock.name if stock else code,
-            'extract_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'extract_time': beijing_now().strftime('%Y-%m-%d %H:%M:%S'),
             'technical': self.extract_technical_features(code),
             'sentiment': self.extract_sentiment_features(code),
             'market': self.extract_market_features(code),

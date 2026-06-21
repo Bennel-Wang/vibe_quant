@@ -7,6 +7,7 @@ import sys
 import argparse
 import logging
 from datetime import datetime
+from quant_system.utils import beijing_now
 
 # 添加项目路径
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -290,7 +291,7 @@ def main():
     p_backtest.add_argument('-c', '--code', required=True, help='股票代码')
     p_backtest.add_argument('-s', '--strategy', required=True, help='策略名称')
     p_backtest.add_argument('--start-date', default='20230101', help='开始日期')
-    p_backtest.add_argument('--end-date', default=datetime.now().strftime('%Y%m%d'), help='结束日期')
+    p_backtest.add_argument('--end-date', default=beijing_now().strftime('%Y%m%d'), help='结束日期')
     p_backtest.add_argument('--capital', type=float, default=1000000, help='初始资金')
     p_backtest.add_argument('-n', '--notify', action='store_true', help='发送通知')
     p_backtest.set_defaults(func=cmd_backtest)

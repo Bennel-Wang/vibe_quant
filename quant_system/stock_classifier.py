@@ -13,6 +13,7 @@ import numpy as np
 
 from .data_source import unified_data
 from .stock_manager import stock_manager
+from .utils import beijing_now
 
 logger = logging.getLogger(__name__)
 
@@ -216,10 +217,10 @@ class StockClassifier:
 
     def _calc_vol_beta(self, code: str) -> Tuple[float, float]:
         """计算20日波动率和Beta"""
-        from datetime import datetime, timedelta
+        from datetime import timedelta
 
-        end_date = datetime.now().strftime('%Y%m%d')
-        start_date = (datetime.now() - timedelta(days=120)).strftime('%Y%m%d')
+        end_date = beijing_now().strftime('%Y%m%d')
+        start_date = (beijing_now() - timedelta(days=120)).strftime('%Y%m%d')
 
         df = unified_data.get_historical_data(code, start_date, end_date)
         if df is None or df.empty or len(df) < 20:

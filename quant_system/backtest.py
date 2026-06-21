@@ -9,6 +9,7 @@ import logging
 from typing import List, Dict, Optional, Any, Tuple, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
+from .utils import beijing_now
 from pathlib import Path
 
 import pandas as pd
@@ -755,7 +756,7 @@ class BacktestEngine:
             return StrategyDecision(code=code, action='hold', position_ratio=0, confidence=0.5,
                                    reasoning=f'排除条件触发: {exc_reason}',
                                    rules_triggered=[],
-                                   timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                                   timestamp=beijing_now().strftime('%Y-%m-%d %H:%M:%S'))
 
         if buy_fired and not sell_fired:
             action = 'buy'
@@ -796,7 +797,7 @@ class BacktestEngine:
             code=code, action=action, position_ratio=position_ratio,
             confidence=confidence, reasoning=reasoning,
             rules_triggered=triggered,
-            timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            timestamp=beijing_now().strftime('%Y-%m-%d %H:%M:%S')
         )
     
     def run_multi_stock_backtest(self, codes: List[str], strategy: QuantStrategy,

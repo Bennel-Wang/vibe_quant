@@ -6,6 +6,7 @@
 import logging
 from typing import Optional, Dict, Tuple
 from datetime import datetime, timedelta
+from .utils import beijing_now
 from dataclasses import dataclass
 from enum import Enum
 
@@ -173,7 +174,7 @@ class MarketRegimeDetector:
             MarketAnalysis 大盘分析结果
         """
         try:
-            end_date   = date or datetime.now().strftime('%Y%m%d')
+            end_date   = date or beijing_now().strftime('%Y%m%d')
             start_date = (datetime.strptime(end_date, '%Y%m%d') - timedelta(days=400)).strftime('%Y%m%d')
 
             results = []   # [(label, weight, score_dict)]
@@ -257,7 +258,7 @@ class MarketRegimeDetector:
 
         except Exception as e:
             logger.error(f"大盘环境检测失败: {e}", exc_info=True)
-            return self._default_analysis(date or datetime.now().strftime('%Y%m%d'))
+            return self._default_analysis(date or beijing_now().strftime('%Y%m%d'))
 
     def detect_for_period(self, start_date: str, end_date: str) -> Dict[str, MarketAnalysis]:
         """检测一段时期内每个月末的大盘环境

@@ -9,6 +9,7 @@ import json
 import logging
 import requests
 from datetime import datetime, timedelta
+from .utils import beijing_now
 from typing import List, Dict, Optional
 from pathlib import Path
 
@@ -128,7 +129,7 @@ class NewsCollector:
                                 'time': news_time,
                                 'title': news_text,
                                 'url': news_url,
-                                'fetch_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                'fetch_time': beijing_now().strftime('%Y-%m-%d %H:%M:%S'),
                             })
                             found_news = True
                         elif news_date < start_date_str:

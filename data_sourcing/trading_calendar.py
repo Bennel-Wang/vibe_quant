@@ -5,7 +5,10 @@
 同时保持向后兼容：写入 data/trading_dates.json（只包含最新交易日 summary）
 """
 import datetime
+import pytz
 from functools import lru_cache
+
+BEIJING_TZ = pytz.timezone('Asia/Shanghai')
 import os
 import json
 
@@ -97,7 +100,7 @@ def get_prev_trading_day(date: datetime.date, market: str) -> datetime.date:
 
 def is_trading_hours(market: str) -> bool:
     """判断当前是否在交易时段内"""
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(BEIJING_TZ)
     if market.startswith("HK"):
         # 港股: 9:30-12:00, 13:00-16:00
         morning = datetime.time(9, 30) <= now.time() <= datetime.time(12, 0)

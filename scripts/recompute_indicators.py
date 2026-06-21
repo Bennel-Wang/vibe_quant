@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta
+from quant_system.utils import beijing_now
 import pandas as pd
 import sys, os
 # ensure project root is on path
@@ -12,8 +13,8 @@ from quant_system.data_source import unified_data
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('recompute_indicators')
 
-start_date = (datetime.now() - timedelta(days=365*6)).strftime('%Y%m%d')
-end_date = datetime.now().strftime('%Y%m%d')
+start_date = (beijing_now() - timedelta(days=365*6)).strftime('%Y%m%d')
+end_date = beijing_now().strftime('%Y%m%d')
 
 stocks = stock_manager.get_all_stocks()
 logger.info(f"Found {len(stocks)} stocks to recompute indicators for")
