@@ -53,6 +53,15 @@ class MarketRegime(Enum):
             'extremely_pessimistic': '⚫',
         }[self.value]
 
+    @property
+    def description(self) -> str:
+        return {
+            'optimistic': 'T分≥50，趋势强劲',
+            'chaotic': 'T分28~50，方向不明',
+            'pessimistic': 'T分<28，V分<55，全部空仓',
+            'extremely_pessimistic': 'T分<35，V分≥55（4421底部）',
+        }[self.value]
+
 
 @dataclass
 class MarketAnalysis:
@@ -74,6 +83,7 @@ class MarketAnalysis:
             'regime': self.regime.value,
             'regime_label': self.regime.label,
             'regime_emoji': self.regime.emoji,
+            'description': self.regime.description,
             'score': self.score,
             't_score': self.t_score,
             'v_score': self.v_score,

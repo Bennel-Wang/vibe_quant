@@ -48,10 +48,7 @@
       "content": "",
       "types": [
         "data_update",
-        "ai_report",
-        "strategy_alert",
-        "market_strategy_analysis",
-        "manipulation_phase_alert"
+        "market_strategy_analysis"
       ],
       "enabled": true,
       "skip_non_trading_day": false
@@ -63,10 +60,7 @@
       "content": "",
       "types": [
         "data_update",
-        "ai_report",
-        "strategy_alert",
-        "market_strategy_analysis",
-        "manipulation_phase_alert"
+        "market_strategy_analysis"
       ],
       "enabled": true,
       "skip_non_trading_day": true

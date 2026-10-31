@@ -24,7 +24,11 @@ from .indicators import technical_indicators, indicator_analyzer
 from .feature_extractor import feature_extractor
 from .strategy import ai_decision_maker, strategy_manager
 from .notification import notification_manager
-from .strategy_matcher import strategy_matcher, format_market_strategy_stock_sections
+from .strategy_matcher import (
+    strategy_matcher,
+    format_market_strategy_market_section,
+    format_market_strategy_stock_sections,
+)
 from .market_regime import market_regime_detector
 from .stock_classifier import stock_classifier
 
@@ -554,11 +558,9 @@ class TradingScheduler:
             regime_label = market.get('regime_label', '未知')
             t_score = market.get('t_score', 0)
             v_score = market.get('v_score', 0)
-            detail = market.get('detail', '')
 
             content = f"## {regime_emoji} 大盘操作建议 ({date_str})\n\n"
-            content += f"### 大盘阶段: {regime_label}（T评分={t_score:.0f} / V评分={v_score:.0f}）\n"
-            content += f"{detail}\n\n"
+            content += format_market_strategy_market_section(market)
 
             content += format_market_strategy_stock_sections(stocks_data)
 

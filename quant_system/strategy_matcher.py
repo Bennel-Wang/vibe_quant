@@ -29,6 +29,43 @@ ACTION_DISPLAY = {
 }
 
 
+def _fmt_pct(value) -> str:
+    return f"{float(value):+.2f}%" if isinstance(value, (int, float)) else "-"
+
+
+def format_market_strategy_market_section(market: Dict) -> str:
+    """格式化大盘分析部分（阶段 + T/V评分细节），与页面左侧卡片一致。"""
+    if not market:
+        return ""
+
+    emoji = market.get('regime_emoji', '')
+    label = market.get('regime_label', '未知')
+    t_score = float(market.get('t_score', 0) or 0)
+    v_score = float(market.get('v_score', 0) or 0)
+
+    lines: List[str] = [
+        "### 📊 大盘分析",
+        "",
+        f"{emoji} **{label}**（T={t_score:.0f} / V={v_score:.0f}）".strip(),
+        "",
+    ]
+    if market.get('description'):
+        lines.append(f"**{market['description']}**")
+        lines.append("")
+    lines += [
+        f"- 分析日期: {market.get('date', '-')}",
+        f"- 5日涨幅: {_fmt_pct(market.get('idx_ret_5'))}",
+        f"- 20日涨幅: {_fmt_pct(market.get('idx_ret_20'))}",
+        f"- 60日涨幅: {_fmt_pct(market.get('idx_ret_60'))}",
+        f"- 均线排列: {market.get('ma_trend', '-')}",
+        f"- RSI状态: {market.get('rsi_level', '-')}",
+    ]
+    if market.get('detail'):
+        lines.append("")
+        lines.append(f"> {market['detail']}")
+    return "\n".join(lines).rstrip() + "\n\n"
+
+
 def format_market_strategy_stock_sections(stocks: List[Dict]) -> str:
     """格式化大盘策略分析里的股票分组，完整输出，不截断列表。"""
     if not stocks:

@@ -258,3 +258,7 @@ stocks:
   market: sz
   type: stock
   industry: 水力发电
+- name: 蜜雪集团
+  code: 02097
+  market: hk
+  type: stock

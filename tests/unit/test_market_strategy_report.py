@@ -1,6 +1,35 @@
 from quant_system.scheduler import TradingScheduler
-from quant_system.strategy_matcher import format_market_strategy_stock_sections
+from quant_system.strategy_matcher import (
+    format_market_strategy_market_section,
+    format_market_strategy_stock_sections,
+)
 from quant_system.web_app import app
+
+
+def test_format_market_strategy_market_section_includes_scores_and_detail():
+    content = format_market_strategy_market_section({
+        'regime_label': '悲观',
+        'regime_emoji': '🔴',
+        'description': 'T分<28，V分<55，全部空仓',
+        't_score': 23.9,
+        'v_score': 50.0,
+        'idx_ret_5': -2.48,
+        'idx_ret_20': -8.57,
+        'idx_ret_60': -5.99,
+        'ma_trend': '空头排列',
+        'rsi_level': '超卖',
+        'detail': '测试详情',
+        'date': '20261030',
+    })
+
+    assert '### 📊 大盘分析' in content
+    assert '**悲观**（T=24 / V=50）' in content
+    assert 'T分<28，V分<55，全部空仓' in content
+    assert '分析日期: 20261030' in content
+    assert '20日涨幅: -8.57%' in content
+    assert '均线排列: 空头排列' in content
+    assert 'RSI状态: 超卖' in content
+    assert '测试详情' in content
 
 
 def test_format_market_strategy_stock_sections_keeps_all_grouped_stocks():
@@ -75,6 +104,9 @@ def test_scheduler_market_strategy_report_includes_untruncated_lists(monkeypatch
 
     scheduler.run_market_strategy_analysis(force=True)
 
+    assert '### 📊 大盘分析' in sent['content']
+    assert '**乐观**（T=58 / V=24）' in sent['content']
+    assert '测试详情' in sent['content']
     assert '阳光电源(300274)' in sent['content']
     assert '### 🟡 观望（11 只）' in sent['content']
 
@@ -117,5 +149,7 @@ def test_market_strategy_send_api_includes_untruncated_lists(monkeypatch):
     assert response.status_code == 200
     payload = response.get_json()
     assert payload['success'] is True
+    assert '### 📊 大盘分析' in sent['content']
+    assert '**乐观**（T=58 / V=24）' in sent['content']
     assert '阳光电源(300274)' in sent['content']
     assert '### 🟡 观望（11 只）' in sent['content']

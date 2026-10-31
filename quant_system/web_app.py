@@ -4308,24 +4308,25 @@ def api_strategy_match_stock(code):
 def api_market_strategy_match_send():
     """将大盘阶段分析结果发送到微信通知"""
     try:
-        from .strategy_matcher import format_market_strategy_stock_sections
+        from .strategy_matcher import (
+            format_market_strategy_market_section,
+            format_market_strategy_stock_sections,
+        )
         data = request.json or {}
         analysis = data.get('data', {})
-        market = analysis.get('market', {})
+        market = analysis.get('market') or {}
         stocks = analysis.get('stocks', [])
 
+        # 页面传参缺失大盘信息时，服务端补算，保证微信消息总带大盘分析
+        if not market.get('regime_label'):
+            from .market_regime import market_regime_detector
+            market = market_regime_detector.detect().to_dict()
+
         regime_label = market.get('regime_label', '未知')
-        t_score = market.get('t_score', 0)
-        v_score = market.get('v_score', 0)
-        description = market.get('description', '')
-        detail = market.get('detail', '')
 
         date_str = beijing_now().strftime('%Y-%m-%d %H:%M')
         content = f"## 🏦 大盘阶段操作建议 ({date_str})\n\n"
-        content += f"### 当前大盘阶段：{regime_label}（T={t_score:.0f} / V={v_score:.0f}）\n\n"
-        if detail:
-            content += f"> {detail}\n\n"
-
+        content += format_market_strategy_market_section(market)
         content += format_market_strategy_stock_sections(stocks)
 
         notification_manager.send_markdown_message(f"大盘阶段判断 {regime_label}", content)
