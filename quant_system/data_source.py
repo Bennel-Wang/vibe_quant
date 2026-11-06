@@ -45,6 +45,7 @@ class UnifiedDataSource:
         self.tushare_available = True
         # 上市日期缓存：{unified_code: "YYYYMMDD"}
         self._listing_dates: Dict[str, str] = {}
+        self._listing_dates_tried = False  # 首次自动拉取只尝试一次（失败不反复重试）
         self._listing_dates_path = os.path.join(
             config.get('data_storage.data_dir', './data'), 'listing_dates.json')
         self._load_listing_dates()
@@ -83,13 +84,28 @@ class UnifiedDataSource:
             logger.warning(f"保存上市日期缓存失败: {e}")
 
     def get_listing_date(self, unified_code: str) -> Optional[str]:
-        """获取单只股票上市日期（优先从 StockInfo，其次从缓存）"""
+        """获取单只股票上市日期（StockInfo > 本地缓存 > westock profile 兜底）"""
         # 优先从 StockInfo 中读取（用户手动维护的最准确）
         stock = stock_manager.get_stock_by_code(unified_code)
         if stock and stock.list_date:
             return stock.list_date
         # 从缓存读取
-        return self._listing_dates.get(unified_code)
+        cached = self._listing_dates.get(unified_code)
+        if cached:
+            return cached
+        # westock profile 兜底（tushare stock_basic 受积分/频限，常不可用）
+        try:
+            dm = self._ensure_dm()
+            src = dm.get_source("westock") if dm else None
+            if src:
+                ld = src.fetch_listing_date(unified_code)
+                if ld:
+                    self._listing_dates[unified_code] = ld
+                    self._save_listing_dates()
+                    return ld
+        except Exception as e:
+            logger.debug(f"westock profile 上市日期获取失败 {unified_code}: {e}")
+        return None
 
     def fetch_listing_dates(self, force: bool = False) -> Dict[str, str]:
         """
@@ -248,8 +264,16 @@ class UnifiedDataSource:
         start_date = str(start_date).replace('-', '').replace('/', '')[:8]
         end_date = str(end_date).replace('-', '').replace('/', '')[:8]
 
+        # 上市日期缺失时自动批量补拉（每进程一次）：完整性校验/截断判定依赖 list_date
+        list_date = self.get_listing_date(unified)
+        if list_date is None and not self._listing_dates_tried:
+            self._listing_dates_tried = True
+            self.fetch_listing_dates(force=True)  # 缓存可能不完整，强制刷新
+            list_date = self.get_listing_date(unified)
+
         try:
-            df = dm.fetch(unified, start_date, end_date, freq=freq)
+            df = dm.fetch(unified, start_date, end_date, freq=freq,
+                          list_date=list_date)
         except Exception as e:
             logger.error(f"DataManager.fetch 失败 ({unified}): {e}")
             return pd.DataFrame()
@@ -267,6 +291,21 @@ class UnifiedDataSource:
         _validate_completeness(unified, df, cfg_start, market=market, logger=logger)
 
         return self._adapt_columns(df)
+
+    def prefetch_history(self, codes: list, start_date: Optional[str] = None,
+                         end_date: Optional[str] = None) -> None:
+        """批量预取历史日K（一次数据源调用拉多只），供后续 get_historical_data 加速。
+
+        codes: 统一/兼容格式代码列表；失败静默忽略（不影响后续逐只正常取数）。
+        """
+        dm = self._ensure_dm()
+        if dm is None:
+            return
+        unified_codes = [self._resolve_unified_code(c) for c in codes]
+        try:
+            dm.prefetch_history(unified_codes, start_date, end_date)
+        except Exception as e:
+            logger.warning(f"prefetch_history 失败（忽略）: {e}")
 
     def get_realtime_data(self, codes: Optional[list] = None, adjust: bool = True) -> pd.DataFrame:
         """获取实时行情 — 直接调用新浪/HKQuote API，绕过本地 CSV 缓存。
@@ -425,7 +464,8 @@ class UnifiedDataSource:
             try:
                 unified = stock.unified_code
                 logger.info(f"更新数据: {stock.name} ({unified})")
-                df = dm.fetch(unified, start_date, freq="day")
+                df = dm.fetch(unified, start_date, freq="day",
+                              list_date=self.get_listing_date(unified))
 
                 if df is not None and not df.empty:
                     # 过滤非交易日

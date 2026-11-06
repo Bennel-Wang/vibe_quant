@@ -169,10 +169,11 @@ def validate_data_completeness(
     end_date = str(df["trade_date"].max())
     earliest = str(df["trade_date"].min())
 
-    # 用上市日期（如有）、数据实际最早日期、配置起始日期三者取最晚
-    # 上市日期比数据最早日期更准确（数据可能从上市后某天才开始记录）
+    # 用上市日期（如有）、数据实际最早日期、配置起始日期推算有效起始日
+    # 上市日期已知时以其为准（不再用数据最早日收缩窗口——否则截断/缺头数据
+    # 会把 expected 缩到实际行数而漏判）；未知时退回数据最早日兜底
     if list_date and len(list_date) == 8:
-        effective_start = max(start_date, list_date, earliest)
+        effective_start = max(start_date, list_date)
     else:
         effective_start = max(start_date, earliest)
 

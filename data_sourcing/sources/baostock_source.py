@@ -21,12 +21,15 @@ class BaostockSource(BaseSource):
             lg = bs.login()
             if lg.error_code != '0':
                 self.logger.error(f"Baostock 登录失败: {lg.error_msg}")
+                # 登录失败通常是网络不通（TCP 10030 被封），短时间不会恢复，长熔断
+                self.mark_unavailable(1800)
                 return False
             self._initialized = True
             self.logger.info("Baostock 初始化成功")
             return True
         except Exception as e:
             self.logger.error(f"Baostock 初始化失败: {e}")
+            self.mark_unavailable(1800)
             return False
 
     def fetch_daily(self, code: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:

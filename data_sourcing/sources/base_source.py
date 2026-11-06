@@ -2,6 +2,7 @@
 数据源抽象基类
 """
 from abc import ABC, abstractmethod
+import time
 from typing import Optional
 import pandas as pd
 from config import setup_logger
@@ -14,6 +15,15 @@ class BaseSource(ABC):
         self.name = name
         self.logger = setup_logger(f"source.{name}", f"source_{name}.log")
         self._initialized = False
+        self._unavailable_until = 0.0  # 熔断截止时间戳
+
+    def mark_unavailable(self, seconds: float) -> None:
+        """熔断：连续失败（登录不通/限流等）后一段时间内跳过该源，避免重复付出失败代价"""
+        self._unavailable_until = time.time() + seconds
+        self.logger.warning(f"{self.name} 熔断 {seconds:.0f}s（失败冷却，期间跳过该源）")
+
+    def is_unavailable(self) -> bool:
+        return time.time() < self._unavailable_until
 
     @abstractmethod
     def init(self) -> bool:
@@ -39,6 +49,14 @@ class BaseSource(ABC):
 
     def fetch_monthly(self, code: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
         """获取月线数据（默认从日线聚合）"""
+        return None
+
+    def prefetch(self, requests: dict) -> None:
+        """批量预取（可选优化）：requests = {code: (start_date, end_date)}
+
+        默认不实现。支持批量的数据源可一次调用拉取多只，
+        供后续 fetch_daily 命中，避免逐只请求。
+        """
         return None
 
     @abstractmethod

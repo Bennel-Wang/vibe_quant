@@ -23,19 +23,6 @@ indices:
   code: HSI
   market: hk
   type: index
-sectors:
-- name: 农林牧渔
-  code: '801010'
-  market: ''
-  type: sector
-- name: 采掘
-  code: '801020'
-  market: ''
-  type: sector
-- name: 白酒板块
-  code: '801110'
-  market: sh
-  type: sector
 stocks:
 - name: 贵州茅台
   code: '600519'
@@ -253,11 +240,6 @@ stocks:
   market: sz
   type: stock
   industry: 元器件
-- name: 长江电力
-  code: '600900'
-  market: sz
-  type: stock
-  industry: 水力发电
 - name: 蜜雪集团
   code: 02097
   market: hk

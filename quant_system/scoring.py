@@ -142,12 +142,27 @@ def scoring_core(df_ind) -> dict:
         return (s < value).sum() / len(s)
 
     pe_hist, pb_hist = None, None
-    if pe_avail and pe_raw > 0 and 'pe_ttm' in df_ind.columns:
+    # 来源自带的历史分位优先（如指数估值经跟踪ETF overview 的 peTtmPct/pbPct）
+    if 'pe_hist_direct' in df_ind.columns:
+        try:
+            v = latest.get('pe_hist_direct')
+            if v is not None and v == v:
+                pe_hist = float(v)
+        except Exception:
+            pass
+    if 'pb_hist_direct' in df_ind.columns:
+        try:
+            v = latest.get('pb_hist_direct')
+            if v is not None and v == v:
+                pb_hist = float(v)
+        except Exception:
+            pass
+    if pe_hist is None and pe_avail and pe_raw > 0 and 'pe_ttm' in df_ind.columns:
         pe_s = df_ind['pe_ttm'].iloc[-lookback:]
         pe_s = pe_s[pe_s > 0]
         if len(pe_s) >= 10:
             pe_hist = hist_pct(pe_s, pe_raw)
-    if pb_avail and pb_raw > 0 and 'pb' in df_ind.columns:
+    if pb_hist is None and pb_avail and pb_raw > 0 and 'pb' in df_ind.columns:
         pb_s = df_ind['pb'].iloc[-lookback:]
         pb_s = pb_s[pb_s > 0]
         if len(pb_s) >= 10:

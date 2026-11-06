@@ -28,11 +28,21 @@ def get_market(code: str) -> str:
 
 
 def _split_code(code: str) -> tuple:
-    """分拆统一代码为 (symbol, suffix)"""
+    """分拆统一代码为 (symbol, suffix)
+
+    对后缀与代码段明显矛盾的做纠正（如 600900.SZ → 600900.SH）：
+    6/5/9 开头必为沪市、3 开头必为深市；000 开头（指数/深市个股歧义）不纠正。
+    """
     parts = code.strip().upper().split(".")
     if len(parts) == 2:
-        return parts[0], parts[1]
-    return code.strip(), ""
+        symbol, suffix = parts
+    else:
+        symbol, suffix = code.strip(), ""
+    if suffix == "SZ" and symbol[:1] in ("6", "5", "9"):
+        suffix = "SH"
+    elif suffix == "SH" and symbol[:1] == "3":
+        suffix = "SZ"
+    return symbol, suffix
 
 
 def _is_a_index(symbol: str, suffix: str) -> bool:
@@ -116,6 +126,22 @@ def to_mootdx(code: str) -> tuple:
 def from_tushare(ts_code: str) -> str:
     """tushare格式 -> 统一代码"""
     return ts_code.strip().upper()
+
+
+# === Westock 格式 ===
+def to_westock(code: str) -> str:
+    """统一代码 -> westock格式 (sh600519 / sz000651 / hk00700 / hkHSI)
+
+    westock 仅支持 A股/港股（含指数）；其它市场返回 None。
+    """
+    symbol, suffix = _split_code(code)
+    market = get_market(code)
+    if market in ("A_STOCK", "A_INDEX"):
+        prefix = "sh" if suffix == "SH" else "sz"
+        return f"{prefix}{symbol}"
+    if market in ("HK_STOCK", "HK_INDEX"):
+        return f"hk{symbol}"
+    return None
 
 
 def from_baostock(bs_code: str) -> str:

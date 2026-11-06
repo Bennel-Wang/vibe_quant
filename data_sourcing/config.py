@@ -36,9 +36,17 @@ DEFAULT_START_DATE = (
     _main_config.get("data_collection", {}).get("history", {}).get("start_date", "20030101")
 )
 
-# === 数据源优先级 ===
-HISTORICAL_SOURCES = ["tushare", "baostock"]
-REALTIME_SOURCES = ["easyquotation", "pytdx", "mootdx"]
+# === 数据源优先级（即降级顺序：前源失败/数据差异过大自动降级到下一个）===
+# 可在 config.yaml 的 data_sources 段覆盖：
+#   data_sources:
+#     historical: [westock, tushare, baostock]
+#     realtime: [easyquotation, pytdx, mootdx, westock]
+#     mismatch_tolerance: 0.20
+_sources_cfg = _main_config.get("data_sources", {}) or {}
+HISTORICAL_SOURCES = list(_sources_cfg.get("historical", ["westock", "tushare", "baostock"]))
+REALTIME_SOURCES = list(_sources_cfg.get("realtime", ["easyquotation", "pytdx", "mootdx", "westock"]))
+# 取数行数与预期交易日差异超过该比例 → 判定该源失败，降级下一个数据源
+MISMATCH_TOLERANCE = float(_sources_cfg.get("mismatch_tolerance", 0.20))
 
 # === 统一CSV列 ===
 BASE_COLUMNS = [

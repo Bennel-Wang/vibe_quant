@@ -9,7 +9,10 @@ import pandas as pd
 import numpy as np
 from typing import Optional, List
 
-from config import HISTORICAL_SOURCES, REALTIME_SOURCES, setup_logger
+from config import (
+    HISTORICAL_SOURCES, REALTIME_SOURCES, MISMATCH_TOLERANCE,
+    DEFAULT_START_DATE, setup_logger,
+)
 import code_mapper
 import trading_calendar
 from validator import validate_dataframe, has_valid_data, validate_data_completeness
@@ -21,6 +24,7 @@ from sources.baostock_source import BaostockSource
 from sources.easyquotation_source import EasyquotationSource
 from sources.pytdx_source import PytdxSource
 from sources.mootdx_source import MootdxSource
+from sources.westock_source import WestockSource
 
 logger = setup_logger("data_manager", "data_manager.log")
 
@@ -42,6 +46,7 @@ class DataManager:
             "easyquotation": EasyquotationSource,
             "pytdx": PytdxSource,
             "mootdx": MootdxSource,
+            "westock": WestockSource,
         }
 
         for name in HISTORICAL_SOURCES:
@@ -60,7 +65,7 @@ class DataManager:
         return self._source_map.get(name)
 
     def fetch(self, code: str, start_date: str, end_date: str = None,
-              freq: str = "day") -> Optional[pd.DataFrame]:
+              freq: str = "day", list_date: str = None) -> Optional[pd.DataFrame]:
         """获取股票数据（含自动降级和增量更新）
 
         Args:
@@ -68,6 +73,9 @@ class DataManager:
             start_date: 开始日期 YYYYMMDD
             end_date: 结束日期 YYYYMMDD，默认今天
             freq: 频率 day/week/month
+            list_date: 上市日期 YYYYMMDD（可选）——用于按真实上市日推算预期行数，
+                使「数据被截断/行数差异过大」也能触发降级（否则截断数据会因
+                effective_start 被缩到数据最早日而漏判）
 
         Returns:
             包含OHLCV和技术指标的DataFrame
@@ -89,34 +97,41 @@ class DataManager:
                 actual_start = next_day
                 logger.info(f"增量更新: 从 {actual_start} 开始 (本地数据到 {latest_valid})")
 
-        # 1b. 检查本地数据是否覆盖了请求的起始日期
-        # 避免只有短窗口数据（如实时7天）被误认为完整数据
-        if actual_start > end_date:
-            existing_check = load_existing_data(code, freq)
-            if not existing_check.empty:
-                earliest_local = str(existing_check['trade_date'].min())
-                try:
-                    gap = (datetime.datetime.strptime(earliest_local, "%Y%m%d")
-                           - datetime.datetime.strptime(start_date, "%Y%m%d")).days
-                except ValueError:
-                    gap = 0
-                if gap > 30:
-                    logger.warning(
-                        f"本地数据不完整 ({code}): 最早 {earliest_local}, "
-                        f"请求起始 {start_date}, 差距 {gap} 天，需重新获取"
-                    )
-                    actual_start = start_date
+        # 1b. 本地历史完整性检查（截断/短窗口数据被误认为完整 → 全量重取）
+        # 用 validate_data_completeness 按预期交易日核对行数（带上市日期），
+        # 与源级降级判定同一口径（MISMATCH_TOLERANCE），避免残缺历史一直算评分
+        existing_check = load_existing_data(code, freq)
+        if not existing_check.empty:
+            market_code = "HK" if market.startswith("HK") else "A"
+            check = validate_data_completeness(
+                code, existing_check, start_date, market=market_code,
+                tolerance=MISMATCH_TOLERANCE, list_date=list_date,
+            )
+            if not check["ok"]:
+                logger.warning(f"本地数据不完整 ({code}): {check['message']}，需重新获取")
+                actual_start = start_date
 
         if actual_start > end_date:
             logger.info(f"本地数据已是最新: {code}")
             df = load_existing_data(code, freq)
-            return self._add_indicators(df, freq)
+            had_val = "pe_ttm" in df.columns and df["pe_ttm"].notna().any()
+            df = self._enrich_valuation(code, df)
+            has_val = "pe_ttm" in df.columns and df["pe_ttm"].notna().any()
+            # 指标已随 CSV 持久化且估值无新增时跳过重算（重算结果确定性相同）
+            if {"rsi_6", "macd", "volume_ratio", "pettm_pct10y"} <= set(df.columns) and had_val == has_val:
+                return df
+            result = self._add_indicators(df, freq)
+            save_with_indicators(code, result, freq)
+            return result
 
         # 2. 尝试历史数据源
         new_data = None
         for source in self.historical_sources:
             if not source.supports_market(market):
                 logger.debug(f"{source.name} 不支持 {market}, 跳过")
+                continue
+            if source.is_unavailable():
+                logger.debug(f"{source.name} 熔断冷却中, 跳过")
                 continue
 
             logger.info(f"尝试历史数据源: {source.name}")
@@ -136,12 +151,14 @@ class DataManager:
                     if days_requested >= 10:
                         market_code = "HK" if market.startswith("HK") else "A"
                         completeness = validate_data_completeness(
-                            code, data, actual_start, market=market_code, tolerance=0.20
+                            code, data, actual_start, market=market_code,
+                            tolerance=MISMATCH_TOLERANCE, list_date=list_date,
                         )
-                        if not completeness["ok"] and completeness.get("missing_pct", 0) > 20:
+                        if not completeness["ok"] and \
+                                completeness.get("missing_pct", 0) > MISMATCH_TOLERANCE * 100:
                             logger.warning(
                                 f"{source.name} 数据缺失过多 "
-                                f"({completeness.get('missing_pct', '?')}%), 尝试下一个数据源"
+                                f"({completeness.get('missing_pct', '?')}%), 降级下一个数据源"
                             )
                             continue
 
@@ -170,6 +187,8 @@ class DataManager:
             logger.info("尝试实时数据源补充今日数据")
             for source in self.realtime_sources:
                 if not source.supports_market(market):
+                    continue
+                if source.is_unavailable():
                     continue
 
                 logger.info(f"尝试实时数据源: {source.name}")
@@ -200,10 +219,50 @@ class DataManager:
         if merged.empty:
             return None
 
+        merged = self._enrich_valuation(code, merged)
+
         # 5. 计算技术指标
         result = self._add_indicators(merged, freq)
         save_with_indicators(code, result, freq)
         return result
+
+    def _enrich_valuation(self, code: str, df: pd.DataFrame) -> pd.DataFrame:
+        """用 westock 估值基础数据（EPSTTM/NAPS）补 pe_ttm/pb，供 V1/T1 估值评分使用"""
+        src = self._source_map.get("westock")
+        if src is None or df is None or df.empty:
+            return df
+        try:
+            return src.enrich_valuation(code, df)
+        except Exception as e:
+            logger.warning(f"估值补全失败（忽略）: {code}: {e}")
+            return df
+
+    def prefetch_history(self, codes: list, start_date: str = None,
+                         end_date: str = None) -> None:
+        """批量预取历史日K：让支持批量的数据源（westock）一次调用拉多只。
+
+        各 code 起始日期按增量口径计算（本地已有数据则从最新日期次日起），
+        之后 fetch() 的 fetch_daily 将命中预取缓冲。仅对 freq=day 的后续取数生效。
+        """
+        if not codes:
+            return
+        end = end_date or datetime.date.today().strftime("%Y%m%d")
+        requests = {}
+        for code in codes:
+            actual_start = start_date or DEFAULT_START_DATE
+            latest = get_latest_valid_date(code, "day")
+            if latest:
+                d = datetime.datetime.strptime(latest, "%Y%m%d")
+                next_day = (d + datetime.timedelta(days=1)).strftime("%Y%m%d")
+                if next_day > actual_start:
+                    actual_start = next_day
+            requests[code] = (actual_start, end)
+
+        for source in self.historical_sources:
+            try:
+                source.prefetch(requests)
+            except Exception as e:
+                logger.warning(f"{source.name} prefetch 失败（忽略）: {e}")
 
     def _needs_realtime(self, data: pd.DataFrame, market: str) -> bool:
         """判断是否需要补充实时数据

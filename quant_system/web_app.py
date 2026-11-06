@@ -2614,13 +2614,22 @@ def get_all_scores() -> Dict[str, dict]:
         def _do_refresh():
             global _score_cache, _score_cache_ts, _score_refresh_running
             try:
+                from concurrent.futures import ThreadPoolExecutor, as_completed
+
+                def _score_one(stock):
+                    code = stock.full_code if hasattr(stock, 'full_code') else stock.code
+                    return code, compute_stock_score(code)
+
                 scores = {}
-                for stock in stock_manager.get_all_stocks():
-                    try:
-                        code = stock.full_code if hasattr(stock, 'full_code') else stock.code
-                        scores[code] = compute_stock_score(code)
-                    except Exception:
-                        pass
+                # 并行评分（compute_stock_score 自带缓存与线程安全）
+                with ThreadPoolExecutor(max_workers=4) as pool:
+                    futures = [pool.submit(_score_one, s) for s in stock_manager.get_all_stocks()]
+                    for fut in as_completed(futures):
+                        try:
+                            code, sc = fut.result()
+                            scores[code] = sc
+                        except Exception:
+                            pass
                 _score_cache = scores
                 _score_cache_ts = time.time()
             finally:
@@ -2659,7 +2668,15 @@ def api_data_update():
                     stocks = [s for s in stocks if s.code in codes]
                 
                 update_task_status['total'] = len(stocks)
-                
+
+                # 批量预取：一次数据源调用拉多只历史K线，随后逐只更新命中缓冲
+                if update_type in ['all', 'history'] and stocks:
+                    update_task_status['message'] = '批量预取历史数据...'
+                    try:
+                        unified_data.prefetch_history([s.full_code for s in stocks])
+                    except Exception as e:
+                        logger.warning(f'批量预取失败（忽略）: {e}')
+
                 for i, stock in enumerate(stocks):
                     update_task_status['current'] = stock.full_code
                     update_task_status['progress'] = int((i / len(stocks)) * 100)
@@ -4408,29 +4425,15 @@ def page_scheduler():
 
 @app.route('/api/stock/<code>/factors')
 def api_stock_factors(code):
-    """综合评分 v2.0 - 价值体系(V1-V7) + 趋势体系(T1-T7)"""
+    """综合评分 v2.0 - 价值体系(V1-V7) + 趋势体系(T1-T7)
+
+    直接复用 compute_stock_score 的 TTL 缓存（与股票详情页同一结果），
+    避免每次请求重复取数+指标+评分。
+    """
     try:
-        df = unified_data.get_historical_data(code)
-        if df is None or df.empty:
+        s = compute_stock_score(code)
+        if not s or s.get('total_score') is None:
             return jsonify({'error': 'No data'}), 404
-
-        if 'trade_date' in df.columns and 'date' not in df.columns:
-            df = df.rename(columns={'trade_date': 'date'})
-        if 'vol' in df.columns and 'volume' not in df.columns:
-            df = df.rename(columns={'vol': 'volume'})
-        if 'date' in df.columns:
-            df['date'] = pd.to_datetime(df['date'].astype(str), errors='coerce')
-        for col in ['open', 'high', 'low', 'close', 'volume']:
-            if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce')
-
-        from .indicators import technical_indicators
-        df_ind = technical_indicators.calculate_all_indicators_from_df(df)
-
-        if df_ind.empty or len(df_ind) < 20:
-            return jsonify({'error': 'Insufficient indicator data'}), 404
-
-        s = _scoring_core(df_ind)
 
         # 根据主导类型选择展示维度
         is_value   = s['dominant'] in ('价值主导', '趋势+价值均衡')
