@@ -27,6 +27,8 @@ def _to_iso(d: str) -> str:
 # 指数 → 跟踪ETF 种子映射（已验证 trackIndexCode；未收录的运行时发现）
 _INDEX_ETF_SEED = {
     "000300": "sh510300",   # 华泰柏瑞沪深300ETF
+    "399006": "sz159971",   # 创业板ETF富国
+    "HSI": "sz159920",      # 恒生ETF华夏（profile hkHSI 无名，发现流程不可用，必须种子）
 }
 
 
@@ -164,9 +166,23 @@ class WestockSource(BaseSource):
 
     @staticmethod
     def _parse_finance_tables(tables: list, default_code: str = None) -> dict:
-        """解析 finance 输出：{westock_code: {yyyymmdd: (epsttm, naps)}}"""
-        eps_map: dict = {}
-        naps_map: dict = {}
+        """解析 finance 输出 → {westock_code: {yyyymmdd: (epsttm, naps)}}
+
+        A股表直接取 EPSTTM/NAPS；港股表无此二者，收集 BasicEPS/EPS、
+        ProfitToShareholders、SeWithoutMinority 供 _finalize_valuation 换算。
+        """
+        raw: dict = {}  # wc -> {yyyymmdd: {field: value}}
+
+        def cell(row, *names):
+            for n in names:
+                v = row.get(n)
+                if v is not None:
+                    try:
+                        return float(v)
+                    except (TypeError, ValueError):
+                        return None
+            return None
+
         for t in tables:
             title = t.get("title") or ""
             for row in t.get("rows") or []:
@@ -177,23 +193,58 @@ class WestockSource(BaseSource):
                 wc = str(row.get("code") or default_code or "")
                 if not wc:
                     continue
-                eps_map.setdefault(wc, {})
-                naps_map.setdefault(wc, {})
+                f = raw.setdefault(wc, {}).setdefault(d, {})
                 if "利润" in title:
-                    v = row.get("EPSTTM")
-                    if v is not None:
-                        eps_map[wc][d] = float(v)
+                    f["epsttm"] = f.get("epsttm") or cell(row, "EPSTTM")
+                    f["eps"] = f.get("eps") or cell(row, "BasicEPS", "EPS")
+                    f["profit_share"] = f.get("profit_share") or cell(row, "ProfitToShareholders")
                 elif "资产负债" in title:
-                    v = row.get("NAPS")
-                    if v is not None:
-                        naps_map[wc][d] = float(v)
-        result: dict = {}
-        for wc in set(eps_map) | set(naps_map):
-            result[wc] = {
-                d: (eps_map.get(wc, {}).get(d), naps_map.get(wc, {}).get(d))
-                for d in set(eps_map.get(wc, {})) | set(naps_map.get(wc, {}))
-            }
-        return result
+                    f["naps"] = f.get("naps") or cell(row, "NAPS")
+                    f["se_without_minority"] = f.get("se_without_minority") or cell(row, "SeWithoutMinority")
+        return {wc: WestockSource._finalize_valuation(p) for wc, p in raw.items()}
+
+    @staticmethod
+    def _finalize_valuation(periods: dict) -> dict:
+        """各期原始字段 → {yyyymmdd: (epsttm, naps)}
+
+        港股口径：
+        - EPSTTM：年度期(12-31)直接用全年 EPS；中期期用 TTM = 上年度 + 本期 − 上年同期
+          （配不齐则退化为中期×2 年化）
+        - NAPS：缺每股净资产时按 归母权益×每股收益/归母利润 反推（股数 = 归母利润/EPS）
+        """
+        items = sorted(periods.items())  # [(yyyymmdd, fields)]
+
+        def eps_of(d):
+            return periods.get(d, {}).get("eps")
+
+        out = {}
+        for d, f in items:
+            eps_ttm = f.get("epsttm")
+            eps = f.get("eps")
+            if eps_ttm is None and eps is not None:
+                if d[4:8] == "1231":
+                    eps_ttm = eps
+                else:
+                    mmdd = d[4:8]
+                    year = int(d[:4])
+                    prev_same = f"{year - 1}{mmdd}"
+                    prev_year_end = None
+                    for dd in sorted(periods, reverse=True):
+                        if dd < d and dd[4:8] == "1231":
+                            prev_year_end = dd
+                            break
+                    e_ps, e_py = eps_of(prev_same), eps_of(prev_year_end) if prev_year_end else None
+                    if e_ps is not None and e_py is not None:
+                        eps_ttm = e_py + eps - e_ps
+                    else:
+                        eps_ttm = eps * 2
+            naps = f.get("naps")
+            if naps is None:
+                ps, se = f.get("profit_share"), f.get("se_without_minority")
+                if se is not None and eps and ps:
+                    naps = se * eps / ps
+            out[d] = (eps_ttm, naps)
+        return out
 
     def _fetch_valuation_batch(self, westock_codes: list) -> None:
         """批量拉取 finance 估值基础数据（40 个报告期 ≈ 10 年），写入 _valuation_cache"""
@@ -343,7 +394,8 @@ class WestockSource(BaseSource):
                 return df
             self._fetch_valuation_batch([wc])
             series = self._valuation_cache.get(wc) or {}
-            self._valuation_cache[wc] = series
+            if series:
+                self._valuation_cache[wc] = series
         if not series:
             return df
 
