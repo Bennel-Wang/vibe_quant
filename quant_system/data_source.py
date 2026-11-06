@@ -290,6 +290,18 @@ class UnifiedDataSource:
         cfg_start = start_date or config.get('data_collection.history.start_date', '20030101')
         _validate_completeness(unified, df, cfg_start, market=market, logger=logger)
 
+        # 历史起点水位：把首次见到的数据最早日记为该代码的"有效起始"，
+        # 后续完整性校验以它为基准——指数/港股无上市日期也能识别历史被截断。
+        # 仅对 ≥30 行的可信历史打点，避免把截断残骸（1 行）当成起点
+        if "trade_date" in df.columns and len(df) >= 30:
+            try:
+                earliest = str(df["trade_date"].min())[:8]
+                if len(earliest) == 8 and self._listing_dates.get(unified) is None:
+                    self._listing_dates[unified] = earliest
+                    self._save_listing_dates()
+            except Exception:
+                pass
+
         return self._adapt_columns(df)
 
     def prefetch_history(self, codes: list, start_date: Optional[str] = None,
@@ -404,7 +416,7 @@ class UnifiedDataSource:
             return True
         today = beijing_now().strftime('%Y%m%d')
         try:
-            from data_sourcing.storage import load_existing_data, get_csv_path
+            from data_sourcing.storage import update_today_row
         except ImportError:
             logger.warning("data_sourcing.storage 不可用，跳过实时数据合并")
             return False
@@ -425,21 +437,9 @@ class UnifiedDataSource:
                     'vol': float(info.get('volume', 0) or 0),
                     'amount': float(info.get('amount', 0) or 0),
                 }
-                csv_path = get_csv_path(unified, 'day')
-                df = load_existing_data(unified, 'day')
-                if df.empty:
-                    df = pd.DataFrame([new_row])
-                else:
-                    mask = df['trade_date'].astype(str) == today
-                    if mask.any():
-                        for col, val in new_row.items():
-                            if col in df.columns:
-                                df.loc[mask, col] = val
-                    else:
-                        new_df = pd.DataFrame([new_row])
-                        df = pd.concat([df, new_df], ignore_index=True)
-                df.to_csv(csv_path, index=False)
-                updated += 1
+                # 带锁读-改-写 + 原子写 + 防缩水守卫（防止并发把历史截成 1 行）
+                if update_today_row(unified, 'day', new_row):
+                    updated += 1
             except Exception as e:
                 logger.debug(f"merge_realtime_data 持久化失败 {code_key}: {e}")
         logger.debug(f"merge_realtime_data: 已更新 {updated} 只股票的今日数据")

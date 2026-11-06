@@ -2,12 +2,84 @@
 CSV存储与增量更新模块
 """
 import os
+import threading
+from typing import Optional
+
+try:
+    import msvcrt  # Windows 跨进程文件锁
+except ImportError:  # pragma: no cover - POSIX
+    msvcrt = None
+    import fcntl
+
 import pandas as pd
 import numpy as np
 from config import DATA_DIR, BASE_COLUMNS, FULL_COLUMNS, setup_logger
 from validator import validate_dataframe
 
 logger = setup_logger("storage", "storage.log")
+
+# ── 每文件读-改-写锁（线程 + 跨进程）+ 原子写 ─────────────────────────────────
+# to_csv 非原子，并发读-改-写（实时轮询 vs 评分刷新 vs 外部脚本）会读到半截
+# 文件 → 读失败返回空 → 被 1 行今日数据覆盖（历史截断事故根因，2026-11-06）。
+_file_locks: dict = {}
+_file_locks_guard = threading.Lock()
+
+
+class _FileGuard:
+    """同进程 RLock + 跨进程文件区域锁（每次调用独立句柄，可嵌套）"""
+
+    def __init__(self, path: str, thread_lock: threading.RLock):
+        self._thread_lock = thread_lock
+        self._path = path
+        self._fh = None
+
+    def __enter__(self):
+        self._thread_lock.acquire()
+        self._fh = open(self._path + ".lock", "a+")
+        try:
+            if msvcrt is not None:
+                msvcrt.locking(self._fh.fileno(), msvcrt.LK_LOCK, 1)
+            else:
+                fcntl.flock(self._fh.fileno(), fcntl.LOCK_EX)
+        except OSError:
+            pass  # 锁失败不阻塞写入（可用性优先，原子写仍防撕裂）
+        return self
+
+    def __exit__(self, *exc):
+        try:
+            if msvcrt is not None:
+                msvcrt.locking(self._fh.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                fcntl.flock(self._fh.fileno(), fcntl.LOCK_UN)
+        except OSError:
+            pass
+        self._fh.close()
+        self._thread_lock.release()
+        return False
+
+
+def _lock_for(path: str) -> _FileGuard:
+    with _file_locks_guard:
+        thread_lock = _file_locks.get(path)
+        if thread_lock is None:
+            thread_lock = threading.RLock()
+            _file_locks[path] = thread_lock
+    return _FileGuard(path, thread_lock)
+
+
+def _atomic_to_csv(df: pd.DataFrame, path: str) -> None:
+    """先写临时文件再原子替换，杜绝读到半截 CSV"""
+    tmp = path + ".tmp"
+    df.to_csv(tmp, index=False)
+    os.replace(tmp, path)
+
+
+def _disk_row_count(path: str) -> int:
+    try:
+        with open(path, encoding="utf-8") as f:
+            return max(sum(1 for _ in f) - 1, 0)
+    except OSError:
+        return 0
 
 
 def get_csv_path(code: str, freq: str = "day") -> str:
@@ -91,10 +163,47 @@ def merge_and_save(code: str, new_data: pd.DataFrame, freq: str = "day") -> pd.D
 
     # 保存
     path = get_csv_path(code, freq)
-    result.to_csv(path, index=False)
+    with _lock_for(path):
+        _atomic_to_csv(result, path)
     logger.info(f"保存数据 {code}: {len(result)} 行 -> {path}")
 
     return result
+
+
+def update_today_row(code: str, freq: str, new_row: dict) -> bool:
+    """把今日行情行合并进 CSV（读-改-写全程持锁 + 原子写 + 防缩水守卫）。
+
+    防缩水守卫：读到 0 行但磁盘文件明显有历史数据时，判定为并发读写瞬时失败，
+    拒绝用 1 行覆盖（2026-11-06 全量截断事故的直接防线）。
+    """
+    path = get_csv_path(code, freq)
+    today = str(new_row.get("trade_date", ""))
+    with _lock_for(path):
+        df = load_existing_data(code, freq)
+        disk_rows = _disk_row_count(path) if os.path.exists(path) else 0
+        if df.empty and disk_rows > 1:
+            logger.warning(
+                f"跳过实时合并 {code}: 读到 0 行但磁盘有 {disk_rows} 行"
+                f"（疑似并发读写冲突，拒绝覆盖）"
+            )
+            return False
+
+        if df.empty:
+            df = pd.DataFrame([new_row])
+        else:
+            df = df.copy()
+            mask = df["trade_date"].astype(str) == today
+            if mask.any():
+                for col, val in new_row.items():
+                    if col in df.columns:
+                        df.loc[mask, col] = val
+                    else:
+                        df[col] = np.nan
+                        df.loc[mask, col] = val
+            else:
+                df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+        _atomic_to_csv(df, path)
+    return True
 
 
 def save_with_indicators(code: str, df: pd.DataFrame, freq: str = "day"):
@@ -115,5 +224,6 @@ def save_with_indicators(code: str, df: pd.DataFrame, freq: str = "day"):
     df = df[ordered_cols + extra_cols]
 
     df = df.sort_values("trade_date").reset_index(drop=True)
-    df.to_csv(path, index=False)
+    with _lock_for(path):
+        _atomic_to_csv(df, path)
     logger.info(f"保存完整数据(含指标) {code}: {len(df)} 行 -> {path}")

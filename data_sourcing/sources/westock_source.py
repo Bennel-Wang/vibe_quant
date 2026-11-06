@@ -115,7 +115,7 @@ class WestockSource(BaseSource):
                      qfq: bool = False) -> Optional[pd.DataFrame]:
         """调用 westock kline，返回原始行 DataFrame（含 westock_code 列）。
 
-        限流时指数退避重试（3s/8s），仍被限流则短熔断 30s 并返回 None（降级下一源）。
+        限流时按实测恢复窗（~60s）退避重试一次，仍被限流则熔断 62s 并返回 None。
         """
         args = ["kline", westock_codes, "--period", "day",
                 "--start", _to_iso(start), "--end", _to_iso(end),
@@ -126,9 +126,9 @@ class WestockSource(BaseSource):
             args += ["--fq", "qfq"]
 
         env = None
-        for attempt, backoff in enumerate((0, 3, 8)):
+        for attempt, backoff in enumerate((0, 70)):
             if backoff:
-                self.logger.warning(f"Westock 限流，{backoff}s 后重试 ({attempt + 1}/3): {westock_codes}")
+                self.logger.warning(f"Westock 限流，{backoff}s 后重试 ({attempt + 1}/2): {westock_codes}")
                 time.sleep(backoff)
             env = run_westock(args)
             if env["ok"] or "限流" not in (env.get("error") or ""):
@@ -138,7 +138,7 @@ class WestockSource(BaseSource):
             err = (env or {}).get("error") or "未知错误"
             if "限流" in err:
                 self.logger.warning(f"Westock 限流重试耗尽: {westock_codes}")
-                self.mark_unavailable(30)
+                self.mark_unavailable(62)
             else:
                 self.logger.warning(f"Westock 查询失败({err}): {westock_codes} ({start}-{end})")
             return None

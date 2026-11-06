@@ -18,6 +18,14 @@ import numpy as np
 from .config_manager import config
 from .stock_manager import stock_manager
 
+try:
+    from quant_system.code_converter import to_unified_code as _to_unified_code
+except ImportError:
+    try:
+        from code_converter import to_unified_code as _to_unified_code
+    except ImportError:
+        _to_unified_code = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -122,6 +130,11 @@ class RiskManager:
     def update_position(self, code: str, shares: int, avg_cost: float, 
                         current_price: float, prev_close: float = 0.0):
         """更新持仓信息"""
+        # 归一化为后缀格式（状态文件里可能存裸代码如 09988）
+        if '.' not in code and _to_unified_code is not None:
+            converted = _to_unified_code(code)
+            if '.' in converted:
+                code = converted
         stock = stock_manager.get_stock_by_code(code)
         name = stock.name if stock else code
         
