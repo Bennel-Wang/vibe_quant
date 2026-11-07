@@ -11,6 +11,7 @@
 import time
 import logging
 import threading
+from datetime import datetime, timedelta
 from typing import Optional
 
 import pandas as pd
@@ -18,10 +19,28 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
-# ── 评分结果 TTL 缓存（10分钟，线程安全）──────────────────────────────────────
-_score_cache: dict = {}       # key -> (result_dict, timestamp)
-_score_cache_ttl = 600        # seconds
+# ── 评分结果 TTL 缓存（线程安全）──────────────────────────────────────────────
+# 盘中（交易日 9-16 点）600s 短缓存；盘外评分不变，缓存到下一交易日 9 点。
+# 数据批量更新后应调用 invalidate_cache() 强制刷新。
+_score_cache: dict = {}       # key -> (result_dict, expires_at)
 _score_cache_lock = threading.Lock()
+
+
+def session_cache_ttl() -> float:
+    """盘中 600s；盘外（含非交易日）缓存到次日 09:00（上限 24h）"""
+    now = datetime.now()
+    if now.weekday() < 5 and 9 <= now.hour < 16:
+        return 600.0
+    nxt = now.replace(hour=9, minute=0, second=0, microsecond=0)
+    while nxt <= now or nxt.weekday() >= 5:
+        nxt += timedelta(days=1)
+    return min(max((nxt - now).total_seconds(), 600.0), 86400.0)
+
+
+def invalidate_cache():
+    """数据更新后清空评分缓存"""
+    with _score_cache_lock:
+        _score_cache.clear()
 
 
 def _cache_get(key: str):
@@ -29,15 +48,15 @@ def _cache_get(key: str):
         entry = _score_cache.get(key)
     if entry is None:
         return None
-    result, ts = entry
-    if time.time() - ts > _score_cache_ttl:
+    result, expires_at = entry
+    if time.time() > expires_at:
         return None
     return result
 
 
 def _cache_set(key: str, value: dict):
     with _score_cache_lock:
-        _score_cache[key] = (value, time.time())
+        _score_cache[key] = (value, time.time() + session_cache_ttl())
 
 
 # ── 评分等级 ─────────────────────────────────────────────────────────────────

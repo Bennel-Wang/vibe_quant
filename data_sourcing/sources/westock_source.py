@@ -24,6 +24,11 @@ def _to_iso(d: str) -> str:
     return f"{d[:4]}-{d[4:6]}-{d[6:8]}"
 
 
+def _fmt_wc(wc: str) -> str:
+    """westock 代码（可逗号批量）→ 统一 aa.bb 格式，日志打印统一用"""
+    return ",".join(code_mapper.from_westock(c) for c in str(wc).split(","))
+
+
 # 指数 → 跟踪ETF 种子映射（已验证 trackIndexCode；未收录的运行时发现）
 _INDEX_ETF_SEED = {
     "000300": "sh510300",   # 华泰柏瑞沪深300ETF
@@ -128,7 +133,7 @@ class WestockSource(BaseSource):
         env = None
         for attempt, backoff in enumerate((0, 70)):
             if backoff:
-                self.logger.warning(f"Westock 限流，{backoff}s 后重试 ({attempt + 1}/2): {westock_codes}")
+                self.logger.warning(f"Westock 限流，{backoff}s 后重试 ({attempt + 1}/2): {_fmt_wc(westock_codes)}")
                 time.sleep(backoff)
             env = run_westock(args)
             if env["ok"] or "限流" not in (env.get("error") or ""):
@@ -137,10 +142,10 @@ class WestockSource(BaseSource):
         if env is None or not env["ok"]:
             err = (env or {}).get("error") or "未知错误"
             if "限流" in err:
-                self.logger.warning(f"Westock 限流重试耗尽: {westock_codes}")
+                self.logger.warning(f"Westock 限流重试耗尽: {_fmt_wc(westock_codes)}")
                 self.mark_unavailable(62)
             else:
-                self.logger.warning(f"Westock 查询失败({err}): {westock_codes} ({start}-{end})")
+                self.logger.warning(f"Westock 查询失败({err}): {_fmt_wc(westock_codes)} ({start}-{end})")
             return None
 
         tables = env.get("data", {}).get("tables") or []
@@ -149,7 +154,7 @@ class WestockSource(BaseSource):
             if t["rows"]:
                 frames.append(pd.DataFrame(t["rows"]))
         if not frames:
-            self.logger.warning(f"Westock 无数据: {westock_codes} ({start}-{end})")
+            self.logger.warning(f"Westock 无数据: {_fmt_wc(westock_codes)} ({start}-{end})")
             return None
 
         df = pd.concat(frames, ignore_index=True)
@@ -306,7 +311,7 @@ class WestockSource(BaseSource):
                     if etf:
                         break
                 if etf:
-                    self.logger.info(f"指数 {code} 跟踪ETF发现: {etf}")
+                    self.logger.info(f"指数 {code} 跟踪ETF发现: {code_mapper.from_westock(etf)}")
 
         self._index_etf_cache[symbol] = etf
         return etf
@@ -361,7 +366,7 @@ class WestockSource(BaseSource):
             df["pb_hist_direct"] = float(pb_pct) / 100.0
 
         self.logger.info(
-            f"指数估值自算: {code} via {etf} pe={pe_now} pb={pb_now} "
+            f"指数估值自算: {code} via {code_mapper.from_westock(etf)} pe={pe_now} pb={pb_now} "
             f"pe分位={pe_pct}% pb分位={pb_pct}%"
         )
         return df

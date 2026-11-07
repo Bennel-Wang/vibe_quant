@@ -144,6 +144,19 @@ def to_westock(code: str) -> str:
     return None
 
 
+def from_westock(wc: str) -> str:
+    """westock格式 -> 统一代码 (sh600519 -> 600519.SH, hkHSI -> HSI.HK)
+
+    日志打印统一用 aa.bb 格式时使用；未知前缀原样返回。
+    """
+    wc = (wc or "").strip()
+    if len(wc) < 3 or wc[:2].lower() not in ("sh", "sz", "hk", "bj"):
+        return wc
+    prefix, symbol = wc[:2].lower(), wc[2:]
+    suffix = {"sh": "SH", "sz": "SZ", "hk": "HK", "bj": "BJ"}.get(prefix, "")
+    return f"{symbol}.{suffix}" if suffix else wc
+
+
 def from_baostock(bs_code: str) -> str:
     """baostock格式 -> 统一代码 (sh.000001 -> 000001.SH)"""
     parts = bs_code.strip().split(".")

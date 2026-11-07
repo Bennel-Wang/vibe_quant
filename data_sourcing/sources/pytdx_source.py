@@ -43,6 +43,8 @@ class PytdxSource(BaseSource):
             except Exception:
                 continue
         self.logger.error("Pytdx HQ 所有服务器连接失败")
+        # 服务器全连不上是全局故障，熔断避免每只股票都白等连接超时（~30s/次）
+        self.mark_unavailable(300)
         return False
 
     def _connect_ex(self):
@@ -61,9 +63,12 @@ class PytdxSource(BaseSource):
         except ImportError:
             self.logger.error("pytdx 扩展行情模块不可用")
         self.logger.error("Pytdx ExHQ 所有服务器连接失败")
+        self.mark_unavailable(300)
         return False
 
     def fetch_daily(self, code: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
+        if self.is_unavailable():
+            return None
         if not self._initialized and not self.init():
             return None
 
@@ -81,6 +86,8 @@ class PytdxSource(BaseSource):
                 return self._fetch_a_share(code, pytdx_market, symbol, market, start_date, end_date)
         except Exception as e:
             self.logger.error(f"Pytdx 获取失败 {code}: {e}")
+            # 连接类异常通常是服务器侧故障，短熔断防止逐只股票重复付出超时代价
+            self.mark_unavailable(120)
             return None
 
     def _fetch_a_share(self, code, market, symbol, market_type, start_date, end_date):

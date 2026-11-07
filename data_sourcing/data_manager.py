@@ -36,7 +36,20 @@ class DataManager:
         self.historical_sources = []
         self.realtime_sources = []
         self._source_map = {}
+        self._fail_counts = {}  # source.name -> 连续失败次数（连续 3 次熔断 120s）
         self._init_sources()
+
+    def _note_source_fail(self, source) -> None:
+        """连续失败熔断：单只股票"无数据"可能是正常的，连续失败则是源故障"""
+        n = self._fail_counts.get(source.name, 0) + 1
+        self._fail_counts[source.name] = n
+        if n >= 3 and not source.is_unavailable():
+            source.mark_unavailable(120)
+            self._fail_counts[source.name] = 0
+
+    @staticmethod
+    def _note_source_ok(source, counts: dict) -> None:
+        counts[source.name] = 0
 
     def _init_sources(self):
         """初始化所有数据源"""
@@ -86,9 +99,16 @@ class DataManager:
         market = code_mapper.get_market(code)
         logger.info(f"开始获取数据: {code} ({market}), {start_date}-{end_date}, {freq}")
 
-        # 1. 检查本地数据，确定增量起始日期
+        # 1. 检查本地数据，确定增量起始日期（整个 fetch 只读盘一次）
         actual_start = start_date
-        latest_valid = get_latest_valid_date(code, freq)
+        existing = load_existing_data(code, freq)
+
+        latest_valid = None
+        if not existing.empty:
+            valid_mask, _ = validate_dataframe(existing)
+            valid_rows = existing[valid_mask]
+            if not valid_rows.empty:
+                latest_valid = str(valid_rows["trade_date"].max())
         if latest_valid:
             # 从最新有效日期的下一天开始
             d = datetime.datetime.strptime(latest_valid, "%Y%m%d")
@@ -100,11 +120,10 @@ class DataManager:
         # 1b. 本地历史完整性检查（截断/短窗口数据被误认为完整 → 全量重取）
         # 用 validate_data_completeness 按预期交易日核对行数（带上市日期），
         # 与源级降级判定同一口径（MISMATCH_TOLERANCE），避免残缺历史一直算评分
-        existing_check = load_existing_data(code, freq)
-        if not existing_check.empty:
+        if not existing.empty:
             market_code = "HK" if market.startswith("HK") else "A"
             check = validate_data_completeness(
-                code, existing_check, start_date, market=market_code,
+                code, existing, start_date, market=market_code,
                 tolerance=MISMATCH_TOLERANCE, list_date=list_date,
             )
             if not check["ok"]:
@@ -113,7 +132,7 @@ class DataManager:
 
         if actual_start > end_date:
             logger.info(f"本地数据已是最新: {code}")
-            df = load_existing_data(code, freq)
+            df = existing
             had_val = "pe_ttm" in df.columns and df["pe_ttm"].notna().any()
             df = self._enrich_valuation(code, df)
             has_val = "pe_ttm" in df.columns and df["pe_ttm"].notna().any()
@@ -160,8 +179,10 @@ class DataManager:
                                 f"{source.name} 数据缺失过多 "
                                 f"({completeness.get('missing_pct', '?')}%), 降级下一个数据源"
                             )
+                            self._note_source_fail(source)
                             continue
 
+                    self._note_source_ok(source, self._fail_counts)
                     # 检查是否需要实时数据
                     if self._needs_realtime(data, market):
                         logger.info(f"{source.name} 数据非最新，尝试补充实时数据")
@@ -174,6 +195,8 @@ class DataManager:
                     logger.warning(f"{source.name} 数据无效或为空, 尝试下一个")
             except Exception as e:
                 logger.error(f"{source.name} 异常: {e}")
+                # 仅异常计熔断（"无数据"可能是正常的，如当日K线未发布）
+                self._note_source_fail(source)
                 continue
 
         # 3. 如果需要实时数据或历史数据源全部失败
@@ -202,11 +225,15 @@ class DataManager:
                         else:
                             new_data = rt_data
                         logger.info(f"{source.name} 实时数据获取成功")
+                        self._note_source_ok(source, self._fail_counts)
                         break
                     else:
                         logger.warning(f"{source.name} 实时数据无效")
+                        # 实时补充是可牺牲路径，空返回也计熔断（快速跳过挂掉的源）
+                        self._note_source_fail(source)
                 except Exception as e:
                     logger.error(f"{source.name} 实时异常: {e}")
+                    self._note_source_fail(source)
                     continue
 
         # 4. 增量合并并保存

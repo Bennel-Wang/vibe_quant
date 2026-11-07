@@ -7,6 +7,7 @@ import os
 import sys
 import math
 import logging
+import threading
 from datetime import datetime
 from .utils import beijing_now
 from typing import List, Dict, Optional
@@ -41,6 +42,7 @@ class UnifiedDataSource:
         self._preferred_source = config.get('data_storage.history_source', 'easyquotation')
         # 惰性初始化标记
         self._init_attempted = False
+        self._dm_init_lock = threading.Lock()  # 防并发首调竞态
         # 兼容旧代码对 tushare_available 的检查
         self.tushare_available = True
         # 上市日期缓存：{unified_code: "YYYYMMDD"}
@@ -51,14 +53,21 @@ class UnifiedDataSource:
         self._load_listing_dates()
 
     def _ensure_dm(self) -> _DataManager:
-        """惰性初始化 DataManager（首次调用时才连接数据源）"""
-        if self._dm is None and not self._init_attempted:
-            self._init_attempted = True
-            try:
-                self._dm = _DataManager()
-                logger.info("data_sourcing.DataManager 初始化成功")
-            except Exception as e:
-                logger.error(f"DataManager 初始化失败: {e}")
+        """惰性初始化 DataManager（首次调用时才连接数据源）
+
+        加锁防并发竞态：多线程同时首调时，后到者必须等初始化完成再取实例，
+        否则拿到 None（评分批量失败的根因）。
+        """
+        if self._dm is not None:
+            return self._dm
+        with self._dm_init_lock:
+            if self._dm is None and not self._init_attempted:
+                self._init_attempted = True
+                try:
+                    self._dm = _DataManager()
+                    logger.info("data_sourcing.DataManager 初始化成功")
+                except Exception as e:
+                    logger.error(f"DataManager 初始化失败: {e}")
         return self._dm
 
     # ------ 上市日期缓存 ------
@@ -492,6 +501,14 @@ class UnifiedDataSource:
             f"数据更新完成: 成功 {results['ok']}, 警告 {results['warn']}, "
             f"失败 {results['fail']}, 跳过 {results['skip']}"
         )
+        # 数据已更新：清空评分/大盘判定缓存
+        try:
+            from quant_system.scoring import invalidate_cache as _inv_scores
+            from quant_system.market_regime import MarketRegimeDetector
+            _inv_scores()
+            MarketRegimeDetector.invalidate_cache()
+        except Exception:
+            pass
         return results
 
     @staticmethod

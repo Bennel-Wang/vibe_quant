@@ -468,9 +468,9 @@ function fetchRealtimeSummary() {
             var chgText = chg != null ? (parseFloat(chg) >= 0 ? '+' : '') + parseFloat(chg).toFixed(2) : '-';
             var pctCls  = pct != null ? (parseFloat(pct) >= 0 ? 'positive' : 'negative') : 'neutral';
 
-            // 评分数据
+            // 评分数据（未算完显示"计算中"，不显示部分数字）
             var scoreVal = d.score;
-            var scoreText = scoreVal != null ? parseFloat(scoreVal).toFixed(1) : '-';
+            var scoreText = scoreVal != null ? parseFloat(scoreVal).toFixed(1) : (d.score_pending ? '计算中' : '-');
             var ratingText = d.rating || '-';
             var ratingColor = d.rating_color || '#999';
             var dominantText = d.dominant || '';

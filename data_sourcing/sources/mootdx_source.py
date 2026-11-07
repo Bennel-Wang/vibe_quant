@@ -29,6 +29,7 @@ class MootdxSource(BaseSource):
             return True
         except Exception as e:
             self.logger.error(f"Mootdx 初始化失败: {e}")
+            self.mark_unavailable(120)
             return False
 
     def _get_std_client(self):
@@ -44,6 +45,8 @@ class MootdxSource(BaseSource):
         return self._ext_client
 
     def fetch_daily(self, code: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
+        if self.is_unavailable():
+            return None
         if not self._initialized and not self.init():
             return None
 
@@ -61,6 +64,7 @@ class MootdxSource(BaseSource):
                 return self._fetch_ext(code, symbol, start_date, end_date)
         except Exception as e:
             self.logger.error(f"Mootdx 获取失败 {code}: {e}")
+            self.mark_unavailable(120)
             return None
 
     def _fetch_std(self, code, symbol, market_type, start_date, end_date):

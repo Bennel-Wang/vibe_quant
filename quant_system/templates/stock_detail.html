@@ -90,7 +90,7 @@
     <div class="col-md-2">
         <div class="card text-center" id="score-card">
             <div class="card-body">
-                <div class="metric-value" id="score-value" style="cursor:pointer" title="点击查看详情">-</div>
+                <div class="metric-value" id="score-value" style="cursor:pointer" title="点击查看详情">计算中</div>
                 <div class="metric-label">综合评分 <span id="score-rating" class="badge" style="font-size:0.7em"></span></div>
             </div>
         </div>
@@ -757,6 +757,9 @@ function loadAIFeatures() {
 }
 
 function loadScoring() {
+    // 计算完成前只显示"计算中"，不显示任何评分数字
+    $('#score-value').text('计算中');
+    $('#score-rating').text('');
     $.get('/api/stock/' + stockCode + '/factors', function(data) {
         if (!data.success) {
             $('#score-value').text('-');
@@ -798,6 +801,8 @@ function loadScoring() {
         html += extraInfo;
         html += '</div>';
         $('#score-dimensions').html(html);
+    }).fail(function() {
+        $('#score-value').text('-');
     });
 }
 

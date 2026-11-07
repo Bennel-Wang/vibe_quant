@@ -174,20 +174,24 @@ class MarketRegimeDetector:
             logger.debug(f"单指数评分失败: {e}")
             return None
 
-    # detect() 结果 TTL 缓存（5分钟）：大盘 T/V 计算含 4 指数取数+指标+评分，
-    # 页面轮询时避免重复全量计算
+    # detect() 结果 TTL 缓存：盘中 5 分钟；盘外评分不变，缓存到下一交易日 9 点
     _detect_cache: dict = {}
-    _DETECT_TTL = 300  # seconds
 
     def detect(self, date: Optional[str] = None) -> MarketAnalysis:
+        from .scoring import session_cache_ttl
         key = date or "latest"
         now = datetime.now().timestamp()
         entry = self._detect_cache.get(key)
-        if entry is not None and now - entry[0] < self._DETECT_TTL:
-            return entry[1]
+        if entry is not None and now < entry[1]:
+            return entry[0]
         analysis = self._detect_impl(date)
-        self._detect_cache[key] = (now, analysis)
+        self._detect_cache[key] = (analysis, now + session_cache_ttl())
         return analysis
+
+    @classmethod
+    def invalidate_cache(cls):
+        """数据更新后清空大盘判定缓存"""
+        cls._detect_cache.clear()
 
     def _detect_impl(self, date: Optional[str] = None) -> MarketAnalysis:
         """检测大盘环境（多指数加权综合）

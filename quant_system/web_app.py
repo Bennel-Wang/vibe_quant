@@ -2708,7 +2708,16 @@ def api_data_update():
                 update_task_status['progress'] = 100
                 update_task_status['message'] = '更新完成'
                 update_task_status['last_update'] = beijing_now().strftime('%Y-%m-%d %H:%M:%S')
-                
+
+                # 数据已更新：清空评分/大盘判定缓存，下次访问重新计算
+                try:
+                    from .scoring import invalidate_cache as _inv_scores
+                    from .market_regime import MarketRegimeDetector
+                    _inv_scores()
+                    MarketRegimeDetector.invalidate_cache()
+                except Exception:
+                    pass
+
             finally:
                 update_task_status['is_running'] = False
         
@@ -2852,7 +2861,8 @@ def api_data_realtime_global():
 
     data = request.json or {}
     enabled = bool(data.get('enabled', False))
-    interval = int(data.get('interval', 5))
+    # 轮询下限 15s：免费行情接口（新浪）对高频轮询会封 IP
+    interval = max(15, int(data.get('interval', 5)))
 
     if enabled:
         global_realtime_state['enabled'] = True
@@ -2914,11 +2924,62 @@ def api_data_realtime_global():
         return jsonify({'success': True, 'enabled': False})
 
 
+_fallback_quote_cache: dict = {}   # full_code -> (expires_at, row_dict)
+_FALLBACK_QUOTE_TTL = 60  # seconds
+
+
+def _local_close_fallback(codes: list) -> dict:
+    """用本地日线 CSV 的最后收盘价生成兜底行情（实时源不可用时显示最后已知价）"""
+    import time
+    from data_sourcing.storage import load_existing_data
+
+    now = time.time()
+    out = {}
+    for fc in codes:
+        entry = _fallback_quote_cache.get(fc)
+        if entry and now < entry[0]:
+            out[fc] = entry[1]
+            continue
+        try:
+            hist = load_existing_data(fc, "day")
+            if hist is None or hist.empty:
+                continue
+            hist = hist.dropna(subset=["close"]).sort_values("trade_date")
+            last = hist.iloc[-1]
+            prev_close = float(hist.iloc[-2]["close"]) if len(hist) >= 2 else None
+            price = float(last["close"])
+            change = round(price - prev_close, 4) if prev_close else None
+            pct = round((price - prev_close) / prev_close * 100, 2) if prev_close else None
+            stock = stock_manager.get_stock_by_code(fc)
+            row = {
+                "name": stock.name if stock else fc,
+                "code": stock.code if stock else fc,
+                "full_code": fc,
+                "market": stock.market if stock else "",
+                "price": price,
+                "open": float(last.get("open", price) or price),
+                "high": float(last.get("high", price) or price),
+                "low": float(last.get("low", price) or price),
+                "change": change,
+                "pct_chg": pct,
+                "volume": float(last.get("vol", 0) or 0),
+                "amount": float(last.get("amount", 0) or 0),
+                "notes": stock.notes if stock else "",
+                "data_time": "",
+                "data_date": f"{str(last['trade_date'])[:4]}-{str(last['trade_date'])[4:6]}-{str(last['trade_date'])[6:8]}",
+                "price_source": "local",  # 兜底价标记（非实时）
+            }
+            _fallback_quote_cache[fc] = (now + _FALLBACK_QUOTE_TTL, row)
+            out[fc] = row
+        except Exception:
+            continue
+    return out
+
+
 @app.route('/api/data/realtime/latest')
 def api_data_realtime_latest():
     """返回最新实时数据快照（供前端轮询）"""
     import math
-
     def _sanitize(val):
         """将 NaN/Inf 转为 None，避免 JSON 序列化异常"""
         if val is None:
@@ -2972,12 +3033,24 @@ def api_data_realtime_latest():
             'data_date': info.get('data_date', ''),   # Sina-reported date YYYY-MM-DD
         }
 
+    # 快照缺失的代码：用本地历史最后收盘价兜底（实时源不可用时大盘点位等仍可显示）
+    missing = [fc for fc in stock_lookup if fc not in result]
+    if missing:
+        try:
+            fallback = _local_close_fallback(missing)
+            result.update(fallback)
+        except Exception as e:
+            logger.warning(f"本地兜底价获取失败（忽略）: {e}")
+
     # 批量附加评分
     try:
         all_scores = get_all_scores()
         for code_key, data in result.items():
             full_code = data.get('full_code', code_key)
-            sc = all_scores.get(full_code) or all_scores.get(code_key) or {}
+            sc = all_scores.get(full_code) or all_scores.get(code_key)
+            # score_pending：评分尚未算完（前端显示"计算中"，不显示部分数字）
+            data['score_pending'] = sc is None
+            sc = sc or {}
             data['score'] = sc.get('total_score')
             data['rating'] = sc.get('rating', '-')
             data['rating_color'] = sc.get('rating_color', '#999')

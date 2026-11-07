@@ -83,6 +83,9 @@ def count_trading_days(start_date: str, end_date: str, market: str = "A") -> int
     对于有明确节假日数据的年份精确计算，
     对于无节假日数据的年份按每年约15天假期估算。
 
+    实现：numpy.busday_count（C 速度）扣减节假日——旧版逐日 Python 循环
+    在 5000 行区间上要 ~40ms，是评分取数路径的大头。
+
     Args:
         start_date: 起始日期 YYYYMMDD
         end_date: 结束日期 YYYYMMDD
@@ -92,49 +95,45 @@ def count_trading_days(start_date: str, end_date: str, market: str = "A") -> int
         交易日数量
     """
     import datetime as _dt
-    from trading_calendar import is_trading_day, _A_HOLIDAYS, _HK_HOLIDAYS
+    import numpy as _np
+    from trading_calendar import _A_HOLIDAYS, _HK_HOLIDAYS
 
-    d = _dt.datetime.strptime(start_date, "%Y%m%d").date()
-    end = _dt.datetime.strptime(end_date, "%Y%m%d").date()
+    d0 = _dt.datetime.strptime(start_date, "%Y%m%d").date()
+    d1 = _dt.datetime.strptime(end_date, "%Y%m%d").date()
+    if d1 < d0:
+        return 0
+
     holidays_db = _HK_HOLIDAYS if market.startswith("HK") else _A_HOLIDAYS
-    # 每年估计的非周末假期天数（无数据年份使用）
     est_holidays_per_year = 13 if market.startswith("HK") else 15
 
-    count = 0
-    current_year = None
-    year_has_calendar = False
-    year_weekdays = 0
-    year_est_deduct = 0
+    # 区间内工作日总数（含两端）
+    total = int(_np.busday_count(
+        _np.datetime64(d0.isoformat()),
+        _np.datetime64((d1 + _dt.timedelta(days=1)).isoformat()),
+    ))
 
-    while d <= end:
-        if d.year != current_year:
-            # 对前一个无日历年份扣除估计假期
-            if current_year is not None and not year_has_calendar and year_weekdays > 0:
-                count -= min(year_est_deduct, year_weekdays)
+    # 已知节假日（只扣落在区间内的、本身是工作日的假日）
+    known = 0
+    for year, md_set in holidays_db.items():
+        for m, dd in md_set:
+            try:
+                h = _dt.date(year, m, dd)
+            except ValueError:
+                continue
+            if d0 <= h <= d1 and h.weekday() < 5:
+                known += 1
 
-            current_year = d.year
-            year_has_calendar = current_year in holidays_db
-            year_weekdays = 0
-            # 按该年在范围内的比例估算扣减天数
-            year_start = max(d, _dt.date(current_year, 1, 1))
-            year_end = min(end, _dt.date(current_year, 12, 31))
-            fraction = (year_end - year_start).days / 365.0
-            year_est_deduct = round(est_holidays_per_year * fraction) if not year_has_calendar else 0
+    # 无日历数据的年份：按年内占比估算假期天数
+    est_deduct = 0
+    for year in range(d0.year, d1.year + 1):
+        if year in holidays_db:
+            continue
+        y0 = max(d0, _dt.date(year, 1, 1))
+        y1 = min(d1, _dt.date(year, 12, 31))
+        fraction = ((y1 - y0).days + 1) / 365.0
+        est_deduct += round(est_holidays_per_year * fraction)
 
-        if d.weekday() < 5:  # 工作日
-            if year_has_calendar:
-                if is_trading_day(d, market):
-                    count += 1
-            else:
-                count += 1
-                year_weekdays += 1
-        d += _dt.timedelta(days=1)
-
-    # 扣除最后一个无日历年份的估计假期
-    if current_year is not None and not year_has_calendar and year_weekdays > 0:
-        count -= min(year_est_deduct, year_weekdays)
-
-    return max(count, 0)
+    return max(total - known - est_deduct, 0)
 
 
 def validate_data_completeness(
